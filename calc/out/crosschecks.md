@@ -1,0 +1,5 @@
+- Coding only, 10,000 developers, level=base, a=0.45: peak 0.194 RPM per licensed developer; all-token 18.7K TPM; uncached+output 1.61K TPM per developer. Anthropic's table for 500+ users: 0.25-0.35 RPM and 10-15K TPM per user.
+- Coding only, 10,000 developers, level=base, a=0.70: peak 0.301 RPM per licensed developer; all-token 29.1K TPM; uncached+output 2.50K TPM per developer. Anthropic's table for 500+ users: 0.25-0.35 RPM and 10-15K TPM per user.
+- Coding base level: 15.7M tokens per active developer-day (Anthropic $13/day at $0.57-1.00 per M = 13-23M); 168M tokens per licensed seat per month and 297M per month for a developer active 19 days (AWS default quota: 225M per user per month).
+- 10,000 employees at 70/20/10, base level: 14.4B tokens per weekday (98% from coding); usage notes derive ~16.5B with 18M tokens per developer-day.
+- 85,000 employees, software mix, high level: 15.5M tokens per employee per calendar day (Meta, April 2026: 23.6M across all employees).

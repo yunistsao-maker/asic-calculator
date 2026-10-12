@@ -1,0 +1,39 @@
+== role usage ==
+| Role | Level | Active/weekday (a) | Calls/active day (r) | Uncached in/call (u) | Cache-read in/call (c) | Out/call (o) | Cache share of input | Tokens/active user-day | Calls/seat/weekday | Tokens/seat/weekday | Calls/seat/week | Tokens/seat/week | Calls/seat/month | Tokens/seat/month | …uncached in/month | …cache-read/month | …output/month |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| OA / office assistant | low | 12% | 4 | 900 | 100 | 125 | 10% | 4.5K | 0.48 | 540 | 2.83 | 3.19K | 12.3 | 13.8K | 11.1K | 1.23K | 1.54K |
+| OA / office assistant | base | 35% | 10 | 1.75K | 1.75K | 400 | 50% | 39K | 3.5 | 13.6K | 20.7 | 80.5K | 89.7 | 350K | 157K | 157K | 35.9K |
+| OA / office assistant | high | 50% | 30 | 3K | 9K | 800 | 75% | 384K | 15 | 192K | 88.5 | 1.13M | 385 | 4.92M | 1.15M | 3.46M | 308K |
+| Coding / software engineering | low | 30% | 20 | 5K | 63K | 250 | 93% | 1.36M | 6 | 410K | 33 | 2.25M | 143 | 9.79M | 717K | 9.03M | 35.8K |
+| Coding / software engineering | base | 45% | 170 | 6.5K | 85K | 600 | 93% | 15.7M | 76.5 | 7.05M | 421 | 38.8M | 1.83K | 168M | 11.9M | 155M | 1.1M |
+| Coding / software engineering | high | 75% | 400 | 8.5K | 120K | 700 | 93% | 51.7M | 300 | 38.8M | 1.65K | 213M | 7.17K | 926M | 60.9M | 860M | 5.02M |
+| R&D / research | low | 28% | 26 | 2.62K | 1.62K | 615 | 38% | 126K | 7.28 | 35.3K | 41.5 | 201K | 180 | 874K | 471K | 291K | 111K |
+| R&D / research | base | 40% | 100 | 2.5K | 3K | 720 | 55% | 622K | 40 | 249K | 228 | 1.42M | 991 | 6.16M | 2.48M | 2.97M | 713K |
+| R&D / research | high | 55% | 540 | 2.64K | 6.8K | 611 | 72% | 5.43M | 297 | 2.99M | 1.69K | 17M | 7.36K | 74M | 19.4M | 50.1M | 4.49M |
+
+== cross-checks ==
+- Coding only, 10,000 developers, level=base, a=0.45: peak 0.194 RPM per licensed developer; all-token 18.7K TPM; uncached+output 1.61K TPM per developer. Anthropic's table for 500+ users: 0.25-0.35 RPM and 10-15K TPM per user.
+- Coding only, 10,000 developers, level=base, a=0.70: peak 0.301 RPM per licensed developer; all-token 29.1K TPM; uncached+output 2.50K TPM per developer. Anthropic's table for 500+ users: 0.25-0.35 RPM and 10-15K TPM per user.
+- Coding base level: 15.7M tokens per active developer-day (Anthropic $13/day at $0.57-1.00 per M = 13-23M); 168M tokens per licensed seat per month and 297M per month for a developer active 19 days (AWS default quota: 225M per user per month).
+- 10,000 employees at 70/20/10, base level: 14.4B tokens per weekday (98% from coding); usage notes derive ~16.5B with 18M tokens per developer-day.
+- 85,000 employees, software mix, high level: 15.5M tokens per employee per calendar day (Meta, April 2026: 23.6M across all employees).
+
+== sensitivity ==
+| Change from base | Peak RPM | Uncached-in TPM | Cache-read TPM | Output TPM | All-token TPM | In-flight (99.9%) | RPM vs base | Uncached-in TPM vs base |
+|---|---|---|---|---|---|---|---|---|
+| Base case (100,000 employees, mix B, base level, single time zone) | 4.76K | 24.5M | 212M | 3.13M | 240M | 865 | 1.00× | 1.00× |
+| Global population (busy-hour share 6.5% instead of 11%) | 2.82K | 14.5M | 125M | 1.85M | 142M | 527 | 0.59× | 0.59× |
+| Sharper day (busy-hour share 12.5%) | 5.41K | 27.8M | 241M | 3.56M | 272M | 977 | 1.14× | 1.14× |
+| Average weekday instead of P95 weekday (d = 1.0) | 3.97K | 20.4M | 177M | 2.61M | 200M | 728 | 0.83× | 0.83× |
+| Month-end / release peak (d = 1.5) | 5.95K | 30.6M | 265M | 3.91M | 300M | 1.07K | 1.25× | 1.25× |
+| Coding at high level, others base | 11.5K | 98M | 1.14B | 8.41M | 1.25B | 2.18K | 2.42× | 4.01× |
+| Coding at low level, others base | 2.62K | 7.73M | 18.7M | 1.7M | 28.2M | 491 | 0.55× | 0.32× |
+| OA at high level (office agents), others base | 6.8K | 32.6M | 236M | 5.12M | 274M | 1.31K | 1.43× | 1.33× |
+| R&D at high level, others base | 16.5K | 61.2M | 302M | 10.5M | 374M | 2.88K | 3.46× | 2.50× |
+| No prefix / prompt caching (all input uncached) | 4.76K | 265M | 0 | 3.13M | 268M | 865 | 1.00× | 10.84× |
+| Output tokens ×2 (more reasoning) | 4.76K | 24.5M | 212M | 6.26M | 243M | 1.51K | 1.00× | 1.00× |
+| Slower streams (40 tok/s per user) | 4.76K | 24.5M | 212M | 3.13M | 240M | 1.51K | 1.00× | 1.00× |
+| Fast streams (300 tok/s per user) | 4.76K | 24.5M | 212M | 3.13M | 240M | 384 | 1.00× | 1.00× |
+| Wafer-scale class streams (1,000 tok/s per user) | 4.76K | 24.5M | 212M | 3.13M | 240M | 258 | 1.00× | 1.00× |
+
+matrix rows: 96; model-mix blocks: 16

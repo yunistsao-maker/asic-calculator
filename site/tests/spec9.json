@@ -1,0 +1,6 @@
+[
+ {"url": "index.html", "name": "v9-home-phone", "w": 390, "h": 1500, "dpr": 2},
+ {"url": "10-capacity.html#calc", "name": "v9-planner", "w": 1440, "h": 1200},
+ {"url": "04-open-models.html#s3", "name": "v9-ch4-grid-phone", "w": 390, "h": 800, "dpr": 2, "eval": ["document.querySelector('#shg').scrollIntoView()", "document.querySelector('#shg .hm-scroll').scrollLeft = 260"]},
+ {"url": "06-technique-matrix.html", "name": "v9-ch6", "w": 1440, "h": 1200, "eval": ["document.querySelector('#matrix').scrollIntoView()"]}
+]

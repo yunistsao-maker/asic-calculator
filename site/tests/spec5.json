@@ -1,0 +1,12 @@
+[
+ {"url": "08-metrics.html", "name": "v5-ch8-chart", "w": 1440, "h": 1100, "eval": ["document.querySelector('.tabs').scrollIntoView()"]},
+ {"url": "08-metrics.html", "name": "v5-ch8-chart-100k", "w": 1440, "h": 900, "click": ["[data-switch=xhw] button[data-view=k100]"], "eval": ["document.querySelector('.tabs').scrollIntoView()"]},
+ {"url": "04-open-models.html#s2", "name": "v5-ch4-flag", "w": 1440, "h": 1100},
+ {"url": "04-open-models.html#s3", "name": "v5-ch4-grid", "w": 1440, "h": 1000},
+ {"url": "04-open-models.html#s3", "name": "v5-ch4-grid-lo", "w": 1440, "h": 1000, "click": ["[data-switch=shg] button[data-view=lo]"]},
+ {"url": "08-metrics.html", "name": "v5-ch8-phone", "w": 390, "h": 1500, "dpr": 2, "eval": ["document.querySelector('.tabs').scrollIntoView()"]},
+ {"url": "04-open-models.html#s2", "name": "v5-ch4-flag-phone", "w": 390, "h": 1700, "dpr": 2},
+ {"url": "04-open-models.html#s3", "name": "v5-ch4-grid-phone", "w": 390, "h": 1300, "dpr": 2},
+ {"url": "04-open-models.html#s3", "name": "v5-ch4-grid-dark", "w": 1440, "h": 1000, "theme": "dark"},
+ {"url": "07-long-context.html", "name": "v5-ch7-phone-ctx", "w": 390, "h": 1300, "dpr": 2, "eval": ["document.querySelector('.widget').scrollIntoView()"]}
+]

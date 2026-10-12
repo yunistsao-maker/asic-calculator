@@ -1,0 +1,15 @@
+[
+ {"url": "factcheck.html", "name": "v4-fc-top", "w": 1440, "h": 1100},
+ {"url": "factcheck.html#s6", "name": "v4-fc-corr", "w": 1440, "h": 900, "eval": ["window.scrollTo(0, document.documentElement.scrollHeight)"]},
+ {"url": "08-metrics.html#t8-19", "name": "v4-score-sticky", "w": 1440, "h": 900, "eval": ["document.querySelector('#t8-19 .tbl-scroll').scrollLeft = 400"]},
+ {"url": "07-long-context.html", "name": "v4-ch7-phone-ctx", "w": 390, "h": 1500, "dpr": 2, "eval": ["document.querySelector('.widget').scrollIntoView()"]},
+ {"url": "07-long-context.html#s2", "name": "v4-ch7-phone-kv", "w": 390, "h": 2400, "dpr": 2},
+ {"url": "07-long-context.html#s3", "name": "v4-ch7-phone-ttft", "w": 390, "h": 1700, "dpr": 2},
+ {"url": "10-capacity.html#calc", "name": "v4-ch10-phone-peak", "w": 390, "h": 1300, "dpr": 2, "eval": ["document.querySelector('.peak').scrollIntoView()"]},
+ {"url": "06-technique-matrix.html", "name": "v4-ch6-phone", "w": 390, "h": 2600, "dpr": 2},
+ {"url": "10-capacity.html#calc", "name": "v4-ch10-custom", "w": 1440, "h": 1000, "click": ["#pl-mx button[data-mx=\"custom\"]", "#pl-roles button[data-r=\"SE\"][data-l=\"custom\"]"], "eval": ["document.getElementById('pl-mix').scrollIntoView()"]},
+ {"url": "10-capacity.html#calc", "name": "v4-ch10-dark", "w": 1440, "h": 1000, "theme": "dark", "click": ["#pl-roles button[data-r=\"SE\"][data-l=\"custom\"]"]},
+ {"url": "index.html", "name": "v4-home", "w": 1440, "h": 1000},
+ {"url": "index.html", "name": "v4-home-phone", "w": 390, "h": 1600, "dpr": 2},
+ {"url": "09-deployment.html#s3", "name": "v4-ch9-phone", "w": 390, "h": 1600, "dpr": 2}
+]

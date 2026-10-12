@@ -1,0 +1,2270 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>私有模型效能 · Inference ASIC Atlas</title>
+<meta name="description" content="23 筆「私有模型 ↔ 晶片」的公開對應全部來自廠商聲明或媒體報導，沒有任何廠商公布每晶片吞吐量。獨立量測到的是每使用者速度：旗艦推理模型在第一方 API 約 45–92 tokens/s；Anthropic fast mode 在 Claude Opus 5.5 上以 2 倍價格換到 1.66 倍速度。">
+<meta name="color-scheme" content="light dark">
+<link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&amp;display=swap">
+<link rel="stylesheet" href="assets/site.css">
+<link rel="stylesheet" href="assets/katex/katex.min.css">
+<script>(function(){var d=document.documentElement;d.classList.add('js');try{var t=localStorage.getItem('ia-theme');if(t==='light'||t==='dark')d.setAttribute('data-theme',t)}catch(e){}})();</script>
+</head>
+<body><a class="skip" href="#sheet">跳到內容</a><header class="hdr"><div class="hdr-in"><a class="brand" href="index.html"><svg width="32" height="32" viewBox="0 0 32 32" aria-hidden="true"><rect class="k" x="7" y="7" width="18" height="18"></rect><circle cx="11" cy="11" r="1.6" fill="#F2B544"></circle><path class="p" d="M11 2v5M16 2v5M21 2v5M11 25v5M16 25v5M21 25v5M2 11h5M2 16h5M2 21h5M25 11h5M25 16h5M25 21h5" stroke-width="2" fill="none"></path></svg><span class="brand-t"><span class="brand-en">INFERENCE ASIC ATLAS</span><span class="brand-zh">推論晶片圖鑑</span></span></a><button type="button" class="hbtn menu-btn" id="menu-btn" aria-expanded="false" aria-controls="idx"><svg width="18" height="18" viewBox="0 0 18 18" aria-hidden="true"><path d="M2 4.5h14M2 9h14M2 13.5h14" stroke="currentColor" stroke-width="1.8" fill="none"></path></svg><span>章節</span></button><div class="hdr-tools"><span class="rev">REV 2026-10-05 · 12 SHEETS · 777 SOURCES</span><form id="hsearch" class="hsearch" action="search.html" method="get" role="search"><input name="q" type="search" placeholder="搜尋全站" aria-label="搜尋全站"><button type="submit" aria-label="搜尋"><svg width="18" height="18" viewBox="0 0 18 18" aria-hidden="true"><circle cx="7.5" cy="7.5" r="5" fill="none" stroke="currentColor" stroke-width="1.8"></circle><path d="M11.5 11.5L16 16" stroke="currentColor" stroke-width="1.8"></path></svg></button></form><button type="button" class="hbtn" id="theme-btn" aria-label="切換深色模式"><svg width="18" height="18" viewBox="0 0 18 18" aria-hidden="true"><circle cx="9" cy="9" r="7" fill="none" stroke="currentColor" stroke-width="1.6"></circle><path d="M9 2a7 7 0 0 1 0 14z" fill="currentColor"></path></svg></button></div></div></header>
+<div class="wrap">
+<nav class="idx" id="idx" aria-label="章節"><a href="index.html"><span class="n">00</span><span>總覽</span></a><div class="grp"><span class="grp-t">硬體 HARDWARE</span><a href="01-silicon.html"><span class="n">01</span><span>晶片與系統規格</span></a></div><div class="grp"><span class="grp-t">軟體 SOFTWARE</span><a href="02-engines.html"><span class="n">02</span><span>推論引擎</span></a><a href="06-technique-matrix.html"><span class="n">06</span><span>技術支援矩陣</span></a></div><div class="grp"><span class="grp-t">模型 MODELS</span><a href="03-architectures.html"><span class="n">03</span><span>模型架構支援</span></a><a href="04-open-models.html"><span class="n">04</span><span>開源模型效能</span></a><a href="05-proprietary-models.html" aria-current="page"><span class="n">05</span><span>私有模型效能</span></a></div><div class="grp"><span class="grp-t">情境 SCENARIOS</span><a href="07-long-context.html"><span class="n">07</span><span>長上下文 200K / 1M</span></a><a href="08-metrics.html"><span class="n">08</span><span>效能與成本</span></a><a href="09-deployment.html"><span class="n">09</span><span>部署模式</span></a></div><div class="grp"><span class="grp-t">規劃 PLANNING</span><a href="10-capacity.html"><span class="n">10</span><span>容量計算器</span></a><a href="11-evidence.html"><span class="n">11</span><span>估算依據</span></a><a href="12-sources.html"><span class="n">12</span><span>來源</span></a></div><div class="grp"><span class="grp-t">附錄 APPENDIX</span><a href="factcheck.html"><span class="n">A</span><span>查核紀錄</span></a></div></nav>
+<main id="sheet">
+<section class="sheet-head"><span class="sheet-code">SHEET 05 / 12 · PROPRIETARY MODELS</span><h1>私有模型效能：Claude、GPT、Gemini、Nova、Grok</h1><p class="lead">23 筆「私有模型 ↔ 晶片」的公開對應全部來自廠商聲明或媒體報導，沒有任何廠商公布每晶片吞吐量。獨立量測到的是每使用者速度：旗艦推理模型在第一方 API 約 45–92 tokens/s；Anthropic fast mode 在 Claude Opus 5.5 上以 2 倍價格換到 1.66 倍速度。</p><div class="conv prose"><p>資料基準日：2026-10-04。等級：<span class="g g-a" title="等級 A：獨立第三方量測">A</span> = 獨立第三方量測；<span class="g g-b" title="等級 B：廠商或夥伴公布，且揭露方法">B</span> = 廠商／夥伴公布且揭露方法；<span class="g g-c" title="等級 C：廠商宣稱或規格，未揭露方法">C</span> = 廠商宣稱或規格、未揭露方法；<span class="g g-d" title="等級 D：本文推算，附算式">D</span> = 本文推算（附算式）。除另行標明者（<a class="xref" href="#t5-9">表 5-9</a> 的每晶片 total tokens/s、<a class="xref" href="#t5-1">表 5-1</a> 與<a class="xref" href="#t5-10">表 5-10</a> 的 Google 全產品 token 流量）外，本章的 tokens/s 皆指單一請求串流的輸出速度（每使用者速度），不是系統吞吐量。</p>
+</div></section>
+<div class="tabs"><div class="tablist" role="tablist" aria-label="本章的小節"><button type="button" class="tab" role="tab" id="tab-s1" aria-controls="s1" aria-selected="true"><span class="n">5.1</span><span>晶片對應</span></button><button type="button" class="tab" role="tab" id="tab-s2" aria-controls="s2" aria-selected="false"><span class="n">5.2</span><span>TPS / TTFT 與 fast mode</span></button><button type="button" class="tab" role="tab" id="tab-s3" aria-controls="s3" aria-selected="false"><span class="n">5.3</span><span>價格與 context</span></button></div>
+<section class="panel on" role="tabpanel" id="s1" aria-labelledby="tab-s1"><div class="panel-head"><h2>私有模型與晶片對應</h2><div class="sec-lead prose"><p id="b1">本節整理 23 筆「私有模型 ↔ 晶片」的公開對應：16 筆依據廠商聲明，7 筆依據媒體或分析師報導，沒有任何一筆來自獨立量測（等級皆為 C）。在本次讀到的來源中，沒有任何廠商公布私有模型的每晶片或每系統吞吐量；公開的只有每使用者的輸出速度（例如 GPT-5.6 Sol Ultrafast 的「最高 750 tokens/s」）與相對倍數，外加 Google 全產品的總流量（未區分晶片），因此無法由這些資料推算每顆晶片的 tokens/s。</p>
+</div></div>
+<div class="prose">
+<figure class="tbl" data-cols="7" data-rows="23" id="t5-1"><figcaption><strong>表 5-1 私有模型與晶片的公開對應</strong>（2026-10-04 讀取；GW 與金額是合約或承諾規模，不是已交付容量；「廠商聲明」含合作夥伴的新聞稿與部落格，「媒體報導」含分析師與轉述報導）</figcaption><div aria-label="表 5-1 私有模型與晶片的公開對應" class="tbl-scroll" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th class="w2" scope="col">廠商與模型</th>
+<th class="w1" scope="col">晶片</th>
+<th class="w3" scope="col">規模（晶片數、GW、金額，若有）</th>
+<th class="w1" scope="col">日期</th>
+<th scope="col">依據</th>
+<th scope="col">等級</th>
+<th class="src" scope="col">來源</th>
+</tr>
+</thead>
+<tbody>
+<tr id="b2">
+<td><span class="rh">Anthropic Claude</span><span class="rh-sub"><span class="vh">（</span>訓練與推論；文件未逐模型說明<span class="vh">）</span></span></td>
+<td>AWS Trainium2（Project Rainier）</td>
+<td>Rainier 近 50 萬顆 Trainium2，「超過 Anthropic 先前訓練算力的 5 倍」；預期 2025 年底 Claude 用到 100 萬顆以上；2026-07-31 的說法為「超過 100 萬顆」；Claude 工程主管另稱「近 100 萬顆」（日期未載）</td>
+<td>2025-06-24（2025-10-29 更新）；2026-07-31</td>
+<td>廠商聲明</td>
+<td><span class="g g-c" title="等級 C：廠商宣稱或規格，未揭露方法">C</span></td>
+<td class="src"><a href="https://www.aboutamazon.com/news/aws/aws-project-rainier-ai-trainium-chips-compute-cluster" rel="noopener" target="_blank">About Amazon Project Rainier</a>、<a href="https://www.aboutamazon.com/news/aws/amazon-ai-chips-business-history" rel="noopener" target="_blank">About Amazon 晶片事業</a>、<a href="https://aws.amazon.com/ai/machine-learning/trainium/customers/" rel="noopener" target="_blank">AWS Trainium customers</a></td>
+</tr>
+<tr id="b3">
+<td><span class="rh">Anthropic Claude 3.5 Haiku</span><span class="rh-sub"><span class="vh">（</span>Bedrock 延遲最佳化版<span class="vh">）</span></span></td>
+<td>AWS Trainium2</td>
+<td>晶片數未載明；僅此一個「特定 Claude 模型 ↔ 特定晶片世代」的服務端對應</td>
+<td class="num">2024-12-03</td>
+<td>廠商聲明</td>
+<td><span class="g g-c" title="等級 C：廠商宣稱或規格，未揭露方法">C</span></td>
+<td class="src"><a href="https://aws.amazon.com/blogs/aws/amazon-ec2-trn2-instances-and-trn2-ultraservers-for-aiml-training-and-inference-is-now-available/" rel="noopener" target="_blank">AWS News Blog</a></td>
+</tr>
+<tr id="b4">
+<td class="rowhead">Anthropic Claude</td>
+<td>AWS Trainium2 / 3 / 4（含未來世代）</td>
+<td>10 年內在 AWS 花費超過 $100B；最高 5 GW；「相當可觀的 Trainium3 容量」預計 2026 年上線；擴大亞洲與歐洲的國際推論；Amazon 另投資 $5B（最多再 $20B）</td>
+<td class="num">2026-04-20</td>
+<td>廠商聲明</td>
+<td><span class="g g-c" title="等級 C：廠商宣稱或規格，未揭露方法">C</span></td>
+<td class="src"><a href="https://www.aboutamazon.com/news/company-news/amazon-invests-additional-5-billion-anthropic-ai" rel="noopener" target="_blank">About Amazon Anthropic 追加投資</a></td>
+</tr>
+<tr id="b5">
+<td class="rowhead">Anthropic Claude</td>
+<td>Google TPU</td>
+<td>最多 100 萬顆 TPU、「數百億美元」、2026 年「遠超 1 GW」；Google 另稱 Claude 在 TPU 上「訓練並服務」（train and serve）</td>
+<td>2025-10-23（Anthropic）；2025-11-06（Google）</td>
+<td>廠商聲明</td>
+<td><span class="g g-c" title="等級 C：廠商宣稱或規格，未揭露方法">C</span></td>
+<td class="src"><a href="https://www.anthropic.com/news/expanding-our-use-of-google-cloud-tpus-and-services" rel="noopener" target="_blank">Anthropic 2025-10-23</a>、<a href="https://cloud.google.com/blog/products/compute/ironwood-tpus-and-new-axion-based-vms-for-your-ai-workloads" rel="noopener" target="_blank">Google Cloud blog</a></td>
+</tr>
+<tr id="b6">
+<td class="rowhead">Anthropic Claude</td>
+<td>Google TPU（下一代，經 Broadcom）</td>
+<td>「多個 GW」的下一代 TPU 容量，預計 2027 年起上線</td>
+<td class="num">2026-04-06</td>
+<td>廠商聲明</td>
+<td><span class="g g-c" title="等級 C：廠商宣稱或規格，未揭露方法">C</span></td>
+<td class="src"><a href="https://www.anthropic.com/news/google-broadcom-partnership-compute" rel="noopener" target="_blank">Anthropic 2026-04-06</a></td>
+</tr>
+<tr id="b7">
+<td class="rowhead">Anthropic Claude</td>
+<td>Google TPU（Ironwood 等）</td>
+<td>約 3.5 GW（2027 起，另有 2026 年已供應的 1 GW）；Broadcom 揭露 $10B（2025-09）與 $11B（2025-12）的 TPU 機櫃訂單；SemiAnalysis：直購約 40 萬顆以上、向 GCP 租用 60 萬顆以上，「主要用於訓練、也用於推論」；前 40 萬顆 Ironwood（約 $10B 成品機櫃）由 Broadcom 直接賣給 Anthropic</td>
+<td>2025-11-28；2026-04-07；2026-09-07</td>
+<td>媒體報導</td>
+<td><span class="g g-c" title="等級 C：廠商宣稱或規格，未揭露方法">C</span></td>
+<td class="src"><a href="https://thenextweb.com/news/anthropic-google-broadcom-compute-deal" rel="noopener" target="_blank">TNW</a>、<a href="https://inferencex.semianalysis.com/blog/tpu-inferencex-full-steam" rel="noopener" target="_blank">SemiAnalysis InferenceX</a>、<a href="https://newsletter.semianalysis.com/p/tpuv7-google-takes-a-swing-at-the" rel="noopener" target="_blank">SemiAnalysis TPUv7</a></td>
+</tr>
+<tr id="b8">
+<td class="rowhead">Anthropic Claude</td>
+<td>NVIDIA GPU</td>
+<td>規模未載明；原文："We train and run Claude on a range of AI hardware—AWS Trainium, Google TPUs, and NVIDIA GPUs"</td>
+<td class="num">2026-04-06</td>
+<td>廠商聲明</td>
+<td><span class="g g-c" title="等級 C：廠商宣稱或規格，未揭露方法">C</span></td>
+<td class="src"><a href="https://www.anthropic.com/news/google-broadcom-partnership-compute" rel="noopener" target="_blank">Anthropic 2026-04-06</a></td>
+</tr>
+<tr id="b9">
+<td class="rowhead">Anthropic Claude</td>
+<td>AMD Instinct MI450</td>
+<td>最高 2 GW，2027 上半年起；AMD 最多投資 $5B</td>
+<td>2026-07-23 至 2026-07-24（AMD Advancing AI 2026 的報導）</td>
+<td>媒體報導</td>
+<td><span class="g g-c" title="等級 C：廠商宣稱或規格，未揭露方法">C</span></td>
+<td class="src"><a href="https://moorinsightsstrategy.com/field-notes/amd-advancing-ai-2026-helios-ships-venice-swings-and-the-software-moat-narrows/" rel="noopener" target="_blank">Moor Insights 2026-07-24</a>、<a href="https://finance.yahoo.com/technology/ai/articles/amd-expected-launch-next-generation-100622118.html" rel="noopener" target="_blank">Reuters via Yahoo Finance 2026-07-23</a></td>
+</tr>
+<tr id="b10">
+<td><span class="rh">OpenAI GPT-5.3-Codex-Spark</span><span class="rh-sub"><span class="vh">（</span>research preview<span class="vh">）</span></span></td>
+<td>Cerebras WSE-3</td>
+<td>超過 1,000 tokens/s、128K context、僅文字；Techzine 稱其為「第一個不在 NVIDIA 上服務的 OpenAI GPT 模型」；系統數未載明</td>
+<td class="num">2026-02-12</td>
+<td>廠商聲明</td>
+<td><span class="g g-c" title="等級 C：廠商宣稱或規格，未揭露方法">C</span></td>
+<td class="src"><a href="https://www.cerebras.ai/blog/openai-codexspark" rel="noopener" target="_blank">Cerebras blog 2026-02-12</a>、<a href="https://www.techzine.eu/news/analytics/138754/openai-swaps-nvidia-for-cerebras-with-gpt-5-3-codex-spark/" rel="noopener" target="_blank">Techzine 2026-02-13</a></td>
+</tr>
+<tr id="b11">
+<td><span class="rh">OpenAI GPT-5.6 Sol Ultrafast</span><span class="rh-sub"><span class="vh">（</span>limited preview<span class="vh">）</span></span></td>
+<td>Cerebras CS-3（多套系統）</td>
+<td>最高 750 tokens/s、最高為標準的 14×；Cerebras：「相同模型架構、權重、精度、context 設定」；系統數與晶圓數未揭露</td>
+<td>2026-08-13（Cerebras 技術文 2026-08-27）</td>
+<td>廠商聲明</td>
+<td><span class="g g-c" title="等級 C：廠商宣稱或規格，未揭露方法">C</span></td>
+<td class="src"><a href="https://openai.com/index/previewing-ultrafast/" rel="noopener" target="_blank">OpenAI Ultrafast 預覽</a>、<a href="https://www.cerebras.ai/blog/how-cerebras-serves-gpt-5-6-sol-at-up-to-750-tokens-per-second" rel="noopener" target="_blank">Cerebras blog 2026-08-27</a></td>
+</tr>
+<tr id="b12">
+<td><span class="rh">OpenAI</span><span class="rh-sub"><span class="vh">（</span>容量合約，未指明模型<span class="vh">）</span></span></td>
+<td>Cerebras</td>
+<td>750 MW、超過 $20B、多年期；3 年內部署，另有擴充到合計 2 GW 的選擇權（至 2030；分析師說法）</td>
+<td class="num">2025-12 簽約；2026-01-14 公布</td>
+<td>廠商聲明</td>
+<td><span class="g g-c" title="等級 C：廠商宣稱或規格，未揭露方法">C</span></td>
+<td class="src"><a href="https://investors.cerebras.ai/news-releases/news-release-details/cerebras-systems-announces-strong-first-quarter-2026-results" rel="noopener" target="_blank">Cerebras Q1 2026 results</a>、<a href="https://www.sec.gov/Archives/edgar/data/2021728/000162828026025762/cerebras-sx1april2026.htm" rel="noopener" target="_blank">Cerebras S-1</a>、<a href="https://newsletter.semianalysis.com/p/cerebras-faster-tokens-please" rel="noopener" target="_blank">SemiAnalysis</a>、<a href="https://www.viksnewsletter.com/p/cerebras-ipo-and-the-scaling-bottlenecks" rel="noopener" target="_blank">Vik's Newsletter</a></td>
+</tr>
+<tr id="b13">
+<td class="rowhead">OpenAI GPT-6 Astra Ultrafast</td>
+<td>NVIDIA GPU（型號、精度、batch size 未揭露）</td>
+<td>NVIDIA：最高比 Astra Standard 快 8×；媒體：「最高 300 tokens/s」、API 最高 6×、Codex 最高 8×</td>
+<td>2026-09-29（VentureBeat）；2026-10-01（NVIDIA）</td>
+<td>廠商聲明</td>
+<td><span class="g g-c" title="等級 C：廠商宣稱或規格，未揭露方法">C</span></td>
+<td class="src"><a href="https://blogs.nvidia.com/blog/gpus-openai-gpt-6-astra-ultrafast/" rel="noopener" target="_blank">NVIDIA blog 2026-10-01</a>、<a href="https://venturebeat.com/technology/openais-gpt-6-1-sol-offers-astra-like-performance-at-1-5th-price-a-new-ultrafast-tier-clocks-at-300-tokens-per-second" rel="noopener" target="_blank">VentureBeat 2026-09-29</a></td>
+</tr>
+<tr id="b14">
+<td class="rowhead">OpenAI GPT-6.1 Sol Ultrafast</td>
+<td>NVIDIA GPU，低 batch size（SemiAnalysis）</td>
+<td>約 300 tokens/s，對照由 Cerebras 服務的前代約 750 tokens/s；截至報導時 OpenAI 與 Cerebras 均未評論</td>
+<td class="num">2026-09-30</td>
+<td>媒體報導</td>
+<td><span class="g g-c" title="等級 C：廠商宣稱或規格，未揭露方法">C</span></td>
+<td class="src"><a href="https://officechai.com/ai/openais-gpt-6-1-sol-ultrafast-is-not-running-on-cerebras-but-on-nvidia-gpus-says-semi-analysis/" rel="noopener" target="_blank">OfficeChai 2026-09-30</a>、<a href="https://finance.biggo.com/news/ff824066-1b87-4f34-97d6-90fde6ef0de8" rel="noopener" target="_blank">BigGo Finance 2026-09-30</a></td>
+</tr>
+<tr id="b15">
+<td><span class="rh">OpenAI GPT</span><span class="rh-sub"><span class="vh">（</span>AWS 上的工作負載<span class="vh">）</span></span></td>
+<td>NVIDIA GB300</td>
+<td>規模未載明；SemiAnalysis 寫 OpenAI 在 AWS「Uses GB300s」</td>
+<td class="num">2025-12-04</td>
+<td>媒體報導</td>
+<td><span class="g g-c" title="等級 C：廠商宣稱或規格，未揭露方法">C</span></td>
+<td class="src"><a href="https://newsletter.semianalysis.com/p/aws-trainium3-deep-dive-a-potential" rel="noopener" target="_blank">SemiAnalysis Trainium3 深度分析</a></td>
+</tr>
+<tr id="b16">
+<td><span class="rh">OpenAI</span><span class="rh-sub"><span class="vh">（</span>未指明模型<span class="vh">）</span></span></td>
+<td>AMD GPU</td>
+<td>6 GW；機型與起始日未載明</td>
+<td>2026-07-24（AMD Advancing AI 2026 的報導）</td>
+<td>媒體報導</td>
+<td><span class="g g-c" title="等級 C：廠商宣稱或規格，未揭露方法">C</span></td>
+<td class="src"><a href="https://moorinsightsstrategy.com/field-notes/amd-advancing-ai-2026-helios-ships-venice-swings-and-the-software-moat-narrows/" rel="noopener" target="_blank">Moor Insights 2026-07-24</a></td>
+</tr>
+<tr id="b17">
+<td><span class="rh">OpenAI</span><span class="rh-sub"><span class="vh">（</span>Stateful Runtime Environment、Frontier 等進階工作負載<span class="vh">）</span></span></td>
+<td>AWS Trainium3 與 Trainium4</td>
+<td>約 2 GW，2027 年起；既有 $38B 多年協議再擴大 $100B / 8 年；Amazon 投資 $50B。是否用於 GPT 推論，原文未說明</td>
+<td class="num">2026-02-27（2026-07-31 重申）</td>
+<td>廠商聲明</td>
+<td><span class="g g-c" title="等級 C：廠商宣稱或規格，未揭露方法">C</span></td>
+<td class="src"><a href="https://www.aboutamazon.com/news/aws/amazon-open-ai-strategic-partnership-investment" rel="noopener" target="_blank">About Amazon OpenAI 合作</a>、<a href="https://www.aboutamazon.com/news/aws/amazon-ai-chips-business-history" rel="noopener" target="_blank">About Amazon 晶片事業</a></td>
+</tr>
+<tr id="b18">
+<td class="rowhead">Google Gemini</td>
+<td>Google TPU</td>
+<td>TPU 世代未揭露；Google 全產品每月處理逾 3.2 quadrillion tokens，約 12 億 tokens/s（<span class="g g-d" title="等級 D：本文推算，附算式">D</span>：3.2e15 ÷ (30 × 86,400)）</td>
+<td class="num">2025-11-06；2026-05-19</td>
+<td>廠商聲明</td>
+<td><span class="g g-c" title="等級 C：廠商宣稱或規格，未揭露方法">C</span></td>
+<td class="src"><a href="https://cloud.google.com/blog/products/compute/ironwood-tpus-and-new-axion-based-vms-for-your-ai-workloads" rel="noopener" target="_blank">Google Cloud blog</a>、<a href="https://www.shacknews.com/article/149205/google-3-2-quadrillion-monthly-ai-tokens" rel="noopener" target="_blank">Shacknews Pichai I/O</a></td>
+</tr>
+<tr id="b19">
+<td><span class="rh">Amazon Nova</span><span class="rh-sub"><span class="vh">（</span>含 Bedrock 上的 Nova 2<span class="vh">）</span></span></td>
+<td>Cerebras CS-3（預告）</td>
+<td>AWS 預告「年內」在 Bedrock 提供使用 Cerebras 硬體的 Nova；Bedrock 上的 Cerebras 部署依 Cerebras 公告延到 2027 年 Q1，已宣布未出貨</td>
+<td class="num">2026-03-13；2026-08-12</td>
+<td>廠商聲明</td>
+<td><span class="g g-c" title="等級 C：廠商宣稱或規格，未揭露方法">C</span></td>
+<td class="src"><a href="https://www.aboutamazon.com/news/aws/aws-cerebras-ai-inference" rel="noopener" target="_blank">About Amazon AWS + Cerebras</a>、<a href="https://www.sec.gov/Archives/edgar/data/2021728/000162828026056186/cbrsannouncesfinancialresu.htm" rel="noopener" target="_blank">Cerebras Q2 2026 results</a></td>
+</tr>
+<tr id="b20">
+<td><span class="rh">Amazon Bedrock</span><span class="rh-sub"><span class="vh">（</span>整體服務，未逐模型說明<span class="vh">）</span></span></td>
+<td>AWS Trainium</td>
+<td>股東信："runs most of its inference on Trainium"；財報電話會（CFO Olsavsky）："A consistent majority of Bedrock's workloads run on Trainium"；2025-12 已在 Trainium3 上服務正式環境工作負載；比例未揭露</td>
+<td>2025-12-02；2026-04-09；2026-04-29</td>
+<td>廠商聲明</td>
+<td><span class="g g-c" title="等級 C：廠商宣稱或規格，未揭露方法">C</span></td>
+<td class="src"><a href="https://www.aboutamazon.com/news/aws/trainium-3-ultraserver-faster-ai-training-lower-cost" rel="noopener" target="_blank">About Amazon Trainium3</a>、<a href="https://www.aboutamazon.com/news/company-news/amazon-ceo-andy-jassy-2025-letter-to-shareholders" rel="noopener" target="_blank">Amazon 股東信</a>、<a href="https://www.fool.com/earnings/call-transcripts/2026/04/29/amazon-amzn-q1-2026-earnings-call-transcript/" rel="noopener" target="_blank">Q1 2026 財報電話會</a></td>
+</tr>
+<tr id="b21">
+<td><span class="rh">Meta</span><span class="rh-sub"><span class="vh">（</span>未指明模型<span class="vh">）</span></span></td>
+<td>AMD GPU</td>
+<td>最高 6 GW；機型與起始日未載明</td>
+<td>2026-07-24（AMD Advancing AI 2026 的報導）</td>
+<td>媒體報導</td>
+<td><span class="g g-c" title="等級 C：廠商宣稱或規格，未揭露方法">C</span></td>
+<td class="src"><a href="https://moorinsightsstrategy.com/field-notes/amd-advancing-ai-2026-helios-ships-venice-swings-and-the-software-moat-narrows/" rel="noopener" target="_blank">Moor Insights 2026-07-24</a></td>
+</tr>
+<tr id="b22">
+<td><span class="rh">Meta</span><span class="rh-sub"><span class="vh">（</span>未指明<span class="vh">）</span></span></td>
+<td>Google TPU</td>
+<td>多年期、數十億美元合約，租用 TPU「用於開發新 AI 模型」（以訓練為主）；並評估自購 TPU</td>
+<td class="num">2026-02-27</td>
+<td>媒體報導</td>
+<td><span class="g g-c" title="等級 C：廠商宣稱或規格，未揭露方法">C</span></td>
+<td class="src"><a href="https://the-decoder.com/meta-signs-multi-billion-dollar-deal-to-rent-googles-tpus-in-a-direct-challenge-to-nvidias-ai-chip-dominance/" rel="noopener" target="_blank">The Decoder 2026-02-27</a></td>
+</tr>
+<tr id="b23">
+<td><span class="rh">Mistral</span><span class="rh-sub"><span class="vh">（</span>Le Chat<span class="vh">）</span></span></td>
+<td>Cerebras</td>
+<td>規模未載明；Cerebras 專屬推論型錄列有 Mistral Small、Large 3、Devstral 2、Mixtral（企業洽詢）；2026 年狀況查無公開資料</td>
+<td>2025 年度回顧（日期未載）</td>
+<td>廠商聲明</td>
+<td><span class="g g-c" title="等級 C：廠商宣稱或規格，未揭露方法">C</span></td>
+<td class="src"><a href="https://www.cerebras.ai/blog/2026Insights" rel="noopener" target="_blank">Cerebras blog 2025 回顧</a>、<a href="https://inference-docs.cerebras.ai/dedicated/overview" rel="noopener" target="_blank">Cerebras docs Dedicated Inference</a></td>
+</tr>
+<tr id="b24">
+<td><span class="rh">SpaceXAI</span><span class="rh-sub"><span class="vh">（</span>xAI，Grok<span class="vh">）</span></span></td>
+<td>NVIDIA Vera Rubin</td>
+<td>規模、用途（訓練或推論）與模型均未載明；NVIDIA 的 Vera Rubin 量產新聞稿把 SpaceXAI 列在採用 NVIDIA Confidential Computing 的雲端業者名單中</td>
+<td class="num">2026-05-31</td>
+<td>廠商聲明</td>
+<td><span class="g g-c" title="等級 C：廠商宣稱或規格，未揭露方法">C</span></td>
+<td class="src"><a href="https://investor.nvidia.com/news/press-release-details/2026/NVIDIA-Vera-Rubin-Ramps-Into-Full-Production-to-Power-Agentic-AI-Factories-Worldwide/default.aspx" rel="noopener" target="_blank">NVIDIA IR 2026-05-31</a></td>
+</tr>
+</tbody>
+</table></div></figure>
+<ul>
+<li id="b25">規模欄的基準各異（「最高」「選購權」「報導」），GW、晶片數與金額不能相加，也不能換算成 tokens/s。</li>
+<li id="b26">沒有任何來源把 Amazon Bedrock、Google Vertex AI、Microsoft Azure 或第一方 API 上的某個 Claude / GPT 端點對應到特定晶片。Anthropic 自述同時使用 Trainium、TPU 與 NVIDIA GPU，所讀的 Trainium 與 TPU 來源也都沒有指出 200K 或 1M-token 的長 context 請求跑在哪種硬體。OpenAI 的 GPT-6 系列已在 Bedrock 與 Azure 上架，這些端點的晶片同樣未揭露（<a href="https://developers.openai.com/api/docs/guides/amazon-bedrock" rel="noopener" target="_blank">OpenAI on Amazon Bedrock</a>）。</li>
+<li id="b27">Anthropic 的 Trainium2 用量<span class="g g-d" title="等級 D：本文推算，附算式">D</span>：Rainier 約 50 萬顆 Trainium2（2025-10-29）、Trainium 已部署「超過 100 萬顆」（2025-12-02，<a href="https://www.datacenterdynamics.com/en/news/aws-makes-trainium3-ultraservers-generally-available/" rel="noopener" target="_blank">DataCenterDynamics</a>）、Jassy 稱已 "landed over 1.4 million Trainium two chips"（2026-02-05，<a href="https://www.fool.com/earnings/call-transcripts/2026/02/05/amazon-amzn-q4-2025-earnings-call-transcript/" rel="noopener" target="_blank">Motley Fool 逐字稿</a>）、Claude 跑在「超過 100 萬顆 Trainium2」上（2026-07-31，<a href="https://www.aboutamazon.com/news/aws/amazon-ai-chips-business-history" rel="noopener" target="_blank">About Amazon 晶片事業</a>），四項數字互相相容。以 1.0 ÷ 1.4 ≈ 71% 估算，Claude 占 Trainium2 機隊的多數，其餘留給 Bedrock 的其他模型與外部客戶；後兩個數字相隔近 6 個月，這是本文推算，不是廠商所說。</li>
+<li id="b28">Amazon Nova 已陳述：Nova 2 系列支援最高 1M tokens 的 context 與 65,536 輸出 tokens（<a href="https://docs.aws.amazon.com/nova/latest/nova2-userguide/what-is-nova-2.html" rel="noopener" target="_blank">Nova 2 developer guide</a>）；Bedrock 延遲最佳化推論支援 Nova Pro，但文件沒有說明用哪種晶片（<a href="https://docs.aws.amazon.com/bedrock/latest/userguide/latency-optimized-inference.html" rel="noopener" target="_blank">Bedrock 延遲最佳化推論</a>）；About Amazon（2026-07-31）寫 Peter DeSantis「領導涵蓋 AI 模型、自研晶片與量子運算的新組織」，這是組織安排，不是對應關係（<a href="https://www.aboutamazon.com/news/aws/amazon-ai-chips-business-history" rel="noopener" target="_blank">About Amazon 晶片事業</a>）。未陳述：Nova 是否在 Trainium 上訓練或服務，所讀頁面皆未載明，查無公開資料（未做專門搜尋）。</li>
+<li id="b29">NVIDIA 的 Groq 3 LPX 公開點名的使用者只有 Nebius（Token Factory）與 Groq（<a href="https://nvidianews.nvidia.com/news/nvidia-groq-3-lpx-now-in-full-production-with-world-class-speed-for-agentic-ai" rel="noopener" target="_blank">NVIDIA 新聞稿，2026-08-24</a>）；沒有任何私有模型被說明跑在 LPX 上，OpenAI Ultrafast 的來源只寫 NVIDIA GPU，未提到 LPX。</li>
+<li id="b30">「約 300 tokens/s」的歸屬不一致：VentureBeat（2026-09-29）把「300 tokens per second」放在 GPT-6.1 Sol 發表報導的標題，稱為新的 Ultrafast tier；SemiAnalysis（2026-09-30）把約 300 tokens/s 歸給 GPT-6.1 Sol Ultrafast；本章第 2 節反推 GPT-6 Astra 標準速度時，假設 300 也適用於 GPT-6 Astra Ultrafast。三者是否指同一個端點，來源沒有釐清。</li>
+<li id="b31">查無公開資料（本次未研究）：OpenAI 自研晶片、Microsoft 自家加速器與 MAI 模型的服務晶片、Meta 自家晶片、xAI 自有叢集與 Grok 的服務晶片（僅有<a class="xref" href="#t5-1">表 5-1</a> 的 NVIDIA 名單一項）、Mistral 自家部署晶片、Gemini 在 GPU 上的服務。Inferentia：所讀來源沒有任何私有前沿模型被說明跑在 Inferentia 上，本次未研究 Inferentia 的服務案例。</li>
+</ul>
+</div>
+<details class="srcs"><summary>本節來源（43）</summary><ul><li><a href="https://www.aboutamazon.com/news/aws/aws-project-rainier-ai-trainium-chips-compute-cluster" target="_blank" rel="noopener">About Amazon Project Rainier</a></li><li><a href="https://www.aboutamazon.com/news/aws/amazon-ai-chips-business-history" target="_blank" rel="noopener">About Amazon 晶片事業</a></li><li><a href="https://aws.amazon.com/ai/machine-learning/trainium/customers/" target="_blank" rel="noopener">AWS Trainium customers</a></li><li><a href="https://aws.amazon.com/blogs/aws/amazon-ec2-trn2-instances-and-trn2-ultraservers-for-aiml-training-and-inference-is-now-available/" target="_blank" rel="noopener">AWS News Blog</a></li><li><a href="https://www.aboutamazon.com/news/company-news/amazon-invests-additional-5-billion-anthropic-ai" target="_blank" rel="noopener">About Amazon Anthropic 追加投資</a></li><li><a href="https://www.anthropic.com/news/expanding-our-use-of-google-cloud-tpus-and-services" target="_blank" rel="noopener">Anthropic 2025-10-23</a></li><li><a href="https://cloud.google.com/blog/products/compute/ironwood-tpus-and-new-axion-based-vms-for-your-ai-workloads" target="_blank" rel="noopener">Google Cloud blog</a></li><li><a href="https://www.anthropic.com/news/google-broadcom-partnership-compute" target="_blank" rel="noopener">Anthropic 2026-04-06</a></li><li><a href="https://thenextweb.com/news/anthropic-google-broadcom-compute-deal" target="_blank" rel="noopener">TNW</a></li><li><a href="https://inferencex.semianalysis.com/blog/tpu-inferencex-full-steam" target="_blank" rel="noopener">SemiAnalysis InferenceX</a></li><li><a href="https://newsletter.semianalysis.com/p/tpuv7-google-takes-a-swing-at-the" target="_blank" rel="noopener">SemiAnalysis TPUv7</a></li><li><a href="https://moorinsightsstrategy.com/field-notes/amd-advancing-ai-2026-helios-ships-venice-swings-and-the-software-moat-narrows/" target="_blank" rel="noopener">Moor Insights 2026-07-24</a></li><li><a href="https://finance.yahoo.com/technology/ai/articles/amd-expected-launch-next-generation-100622118.html" target="_blank" rel="noopener">Reuters via Yahoo Finance 2026-07-23</a></li><li><a href="https://www.cerebras.ai/blog/openai-codexspark" target="_blank" rel="noopener">Cerebras blog 2026-02-12</a></li><li><a href="https://www.techzine.eu/news/analytics/138754/openai-swaps-nvidia-for-cerebras-with-gpt-5-3-codex-spark/" target="_blank" rel="noopener">Techzine 2026-02-13</a></li><li><a href="https://openai.com/index/previewing-ultrafast/" target="_blank" rel="noopener">OpenAI Ultrafast 預覽</a></li><li><a href="https://www.cerebras.ai/blog/how-cerebras-serves-gpt-5-6-sol-at-up-to-750-tokens-per-second" target="_blank" rel="noopener">Cerebras blog 2026-08-27</a></li><li><a href="https://investors.cerebras.ai/news-releases/news-release-details/cerebras-systems-announces-strong-first-quarter-2026-results" target="_blank" rel="noopener">Cerebras Q1 2026 results</a></li><li><a href="https://www.sec.gov/Archives/edgar/data/2021728/000162828026025762/cerebras-sx1april2026.htm" target="_blank" rel="noopener">Cerebras S-1</a></li><li><a href="https://newsletter.semianalysis.com/p/cerebras-faster-tokens-please" target="_blank" rel="noopener">SemiAnalysis</a></li><li><a href="https://www.viksnewsletter.com/p/cerebras-ipo-and-the-scaling-bottlenecks" target="_blank" rel="noopener">Vik&#x27;s Newsletter</a></li><li><a href="https://blogs.nvidia.com/blog/gpus-openai-gpt-6-astra-ultrafast/" target="_blank" rel="noopener">NVIDIA blog 2026-10-01</a></li><li><a href="https://venturebeat.com/technology/openais-gpt-6-1-sol-offers-astra-like-performance-at-1-5th-price-a-new-ultrafast-tier-clocks-at-300-tokens-per-second" target="_blank" rel="noopener">VentureBeat 2026-09-29</a></li><li><a href="https://officechai.com/ai/openais-gpt-6-1-sol-ultrafast-is-not-running-on-cerebras-but-on-nvidia-gpus-says-semi-analysis/" target="_blank" rel="noopener">OfficeChai 2026-09-30</a></li><li><a href="https://finance.biggo.com/news/ff824066-1b87-4f34-97d6-90fde6ef0de8" target="_blank" rel="noopener">BigGo Finance 2026-09-30</a></li><li><a href="https://newsletter.semianalysis.com/p/aws-trainium3-deep-dive-a-potential" target="_blank" rel="noopener">SemiAnalysis Trainium3 深度分析</a></li><li><a href="https://www.aboutamazon.com/news/aws/amazon-open-ai-strategic-partnership-investment" target="_blank" rel="noopener">About Amazon OpenAI 合作</a></li><li><a href="https://www.shacknews.com/article/149205/google-3-2-quadrillion-monthly-ai-tokens" target="_blank" rel="noopener">Shacknews Pichai I/O</a></li><li><a href="https://www.aboutamazon.com/news/aws/aws-cerebras-ai-inference" target="_blank" rel="noopener">About Amazon AWS + Cerebras</a></li><li><a href="https://www.sec.gov/Archives/edgar/data/2021728/000162828026056186/cbrsannouncesfinancialresu.htm" target="_blank" rel="noopener">Cerebras Q2 2026 results</a></li><li><a href="https://www.aboutamazon.com/news/aws/trainium-3-ultraserver-faster-ai-training-lower-cost" target="_blank" rel="noopener">About Amazon Trainium3</a></li><li><a href="https://www.aboutamazon.com/news/company-news/amazon-ceo-andy-jassy-2025-letter-to-shareholders" target="_blank" rel="noopener">Amazon 股東信</a></li><li><a href="https://www.fool.com/earnings/call-transcripts/2026/04/29/amazon-amzn-q1-2026-earnings-call-transcript/" target="_blank" rel="noopener">Q1 2026 財報電話會</a></li><li><a href="https://the-decoder.com/meta-signs-multi-billion-dollar-deal-to-rent-googles-tpus-in-a-direct-challenge-to-nvidias-ai-chip-dominance/" target="_blank" rel="noopener">The Decoder 2026-02-27</a></li><li><a href="https://www.cerebras.ai/blog/2026Insights" target="_blank" rel="noopener">Cerebras blog 2025 回顧</a></li><li><a href="https://inference-docs.cerebras.ai/dedicated/overview" target="_blank" rel="noopener">Cerebras docs Dedicated Inference</a></li><li><a href="https://investor.nvidia.com/news/press-release-details/2026/NVIDIA-Vera-Rubin-Ramps-Into-Full-Production-to-Power-Agentic-AI-Factories-Worldwide/default.aspx" target="_blank" rel="noopener">NVIDIA IR 2026-05-31</a></li><li><a href="https://developers.openai.com/api/docs/guides/amazon-bedrock" target="_blank" rel="noopener">OpenAI on Amazon Bedrock</a></li><li><a href="https://www.datacenterdynamics.com/en/news/aws-makes-trainium3-ultraservers-generally-available/" target="_blank" rel="noopener">DataCenterDynamics</a></li><li><a href="https://www.fool.com/earnings/call-transcripts/2026/02/05/amazon-amzn-q4-2025-earnings-call-transcript/" target="_blank" rel="noopener">Motley Fool 逐字稿</a></li><li><a href="https://docs.aws.amazon.com/nova/latest/nova2-userguide/what-is-nova-2.html" target="_blank" rel="noopener">Nova 2 developer guide</a></li><li><a href="https://docs.aws.amazon.com/bedrock/latest/userguide/latency-optimized-inference.html" target="_blank" rel="noopener">Bedrock 延遲最佳化推論</a></li><li><a href="https://nvidianews.nvidia.com/news/nvidia-groq-3-lpx-now-in-full-production-with-world-class-speed-for-agentic-ai" target="_blank" rel="noopener">NVIDIA 新聞稿，2026-08-24</a></li></ul></details></section>
+<section class="panel" role="tabpanel" id="s2" aria-labelledby="tab-s2"><div class="panel-head"><h2>公開可得的 TPS / TTFT 統計與 fast mode</h2><div class="sec-lead prose"><p id="b32">2026-10-04 的獨立量測顯示，旗艦推理模型在第一方 API 標準層級的輸出速度約 45–92 tokens/s（各 effort 的範圍：GPT-6 Astra 44.9–51.6、Claude Fable 5.1 48.6–68.2、Claude Opus 5.5 72.2–92.4），Gemini 3.8 Flash（high）為 236.5 tokens/s；TTFT 在 reasoning 關閉時為 0.56–1.05 s，Anthropic 與 OpenAI 第一方 API 在 max effort 時為 126–705 s。fast 與 priority 層級在 OR 即時流量中有獨立量測（Anthropic fast mode 在 Claude Opus 5.5 上為 118 對 71 tokens/s，1.66×，價格 2×；OpenAI Fast 為 0.96–1.31×），OpenAI Ultrafast（6× 價格）、Cerebras 上的 Codex-Spark 與 GPT-5.6 Sol Ultrafast 沒有獨立量測，而且沒有任何一筆獨立量測附有晶片資訊。</p>
+</div></div>
+<div class="subtabs"><div class="subtablist" role="tablist" aria-label="公開可得的 TPS / TTFT 統計與 fast mode"><button type="button" class="subtab" role="tab" id="tab-s2-1" aria-controls="s2-1" aria-selected="true">(a) 第三方量測</button><button type="button" class="subtab" role="tab" id="tab-s2-2" aria-controls="s2-2" aria-selected="false">(b) Fast、priority 與 ultrafast 層…</button><button type="button" class="subtab" role="tab" id="tab-s2-3" aria-controls="s2-3" aria-selected="false">(c) 同一個模型上的硬體效應</button><button type="button" class="subtab" role="tab" id="tab-s2-4" aria-controls="s2-4" aria-selected="false">(d) 各加速器上的私有模型數字</button></div><div class="subpanel on" role="tabpanel" id="s2-1" aria-labelledby="tab-s2-1"><div class="prose"><h3>(a) 第三方量測：Artificial Analysis 與 OpenRouter</h3><ul>
+<li id="b33"><strong>Artificial Analysis（AA，等級 <span class="g g-a" title="等級 A：獨立第三方量測">A</span>）</strong>：從單一位置（Google Cloud us-central1-a 的 VM）發出的合成單一串流測試。預設工作負載為約 10K input tokens、至少 1,500 answer tokens，1K 與 10K 每天測 8 次、100K 每週測 1 次；數值為過去 72 小時的中位數（100K 為過去 14 天）；token 一律用 tiktoken o200k_base 計算。AA 要求供應商不得把 AA 流量導向專屬或非公開資源（<a href="https://artificialanalysis.ai/methodology/performance-benchmarking" rel="noopener" target="_blank">AA 方法論</a>）。</li>
+<li id="b34">AA 的 TTFT 在有 reasoning 的 Claude 與 GPT 變體上等於「第一個 answer token」的時間，含隱藏的 thinking（<span class="g g-d" title="等級 D：本文推算，附算式">D</span>：AA 原始表中這些列的 TTFT 與 time to first answer token 兩欄數值相同），所以只適合比較同一模型的不同 effort。AA model page 的「TTFT」是 time to first chunk，定義不同：Claude Opus 5.5 low 在 Anthropic API 上，leaderboard 為 12.39 s、model page 為 4.07 s。</li>
+<li id="b35"><strong>OpenRouter（OR，等級 <span class="g g-a" title="等級 A：獨立第三方量測">A</span>）</strong>：真實客戶流量的遙測，每個端點取 30 分鐘窗口的 p50–p99「latency」與「throughput」及請求數；本文把 latency 當 TTFT、throughput 當 tokens/s（OR 的欄位定義未逐字確認）。prompt 長度、輸出長度與 effort 由客戶決定，端點之間的客戶組成不同，不嚴格可比；請求數 &lt; 100 的端點樣本過薄，不列入<a class="xref" href="#t5-5">表 5-5</a>。</li>
+<li id="b36">兩個來源都不是服務水準保證，同一端點的水準也不同：GPT-6 Luna 在 OpenAI API 上，AA 為 120.5–140.7 tokens/s（各 effort）、OR 為 82–83。AA 同一端點的兩次讀數（leaderboard 為 00:36 UTC、model page 為 06:53 UTC）在 19 個可比列上，10K 速度中位數相差 1.7%、最大 15.9%（GPT-6 Astra max，OpenAI API：51.6 → 59.8），16 列在 5% 以內<span class="g g-d" title="等級 D：本文推算，附算式">D</span>，所以小於約 5% 的端點差異視為雜訊。</li>
+</ul>
+
+<figure class="tbl" data-cols="4" data-rows="79" id="t5-2"><figcaption><strong>表 5-2 AA 各端點的輸出速度與 TTFT</strong>（10K-token prompt；72 小時中位數；2026-10-04 00:36 UTC 快照；等級 <span class="g g-a" title="等級 A：獨立第三方量測">A</span>；來源：<a href="https://artificialanalysis.ai/leaderboards/providers" rel="noopener" target="_blank">AA providers leaderboard</a>。AA 寫「Claude 4.5 Haiku」者即 Claude Haiku 4.5；無後綴的列 TTFT 為 17–21 s，應為 reasoning 變體（推論）。‡ 的列取自 AA Google 供應商頁，快照時間不同，且不在 leaderboard 的「現行」清單內，來源為 <a href="https://artificialanalysis.ai/providers/google" rel="noopener" target="_blank">AA Google 供應商頁</a>）</figcaption><div aria-label="表 5-2 AA 各端點的輸出速度與 TTFT" class="tbl-scroll" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th class="w2" scope="col">模型（AA 變體標籤）</th>
+<th class="w1" scope="col">端點</th>
+<th class="w1" scope="col">輸出 tokens/s 中位（p5–p95）</th>
+<th scope="col">TTFT 中位（s）</th>
+</tr>
+</thead>
+<tbody>
+<tr id="b37">
+<td class="rowhead">Claude Fable 5.1 (low with fallback)</td>
+<td>Anthropic API</td>
+<td class="num">48.6 (43–67)</td>
+<td class="num">4.49</td>
+</tr>
+<tr id="b38">
+<td class="rowhead">Claude Fable 5.1 (medium with fallback)</td>
+<td>Anthropic API</td>
+<td class="num">51.5 (44–67)</td>
+<td class="num">8.79</td>
+</tr>
+<tr id="b39">
+<td class="rowhead">Claude Fable 5.1 (high with fallback)</td>
+<td>Anthropic API</td>
+<td class="num">53.1 (42–81)</td>
+<td class="num">25.00</td>
+</tr>
+<tr id="b40">
+<td class="rowhead">Claude Fable 5.1 (xhigh with fallback)</td>
+<td>Anthropic API</td>
+<td class="num">59.2 (47–84)</td>
+<td class="num">106.70</td>
+</tr>
+<tr id="b41">
+<td class="rowhead">Claude Fable 5.1 (max with fallback)</td>
+<td>Anthropic API</td>
+<td class="num">68.2 (57–74)</td>
+<td class="num">238.66</td>
+</tr>
+<tr id="b42">
+<td class="rowhead">Claude Opus 5.5 (low with fallback)</td>
+<td>Anthropic API</td>
+<td class="num">72.2 (60–88)</td>
+<td class="num">12.39</td>
+</tr>
+<tr id="b43">
+<td class="rowhead">Claude Opus 5.5 (low with fallback)</td>
+<td>Amazon Bedrock</td>
+<td class="num">57.6 (46–75)</td>
+<td class="num">13.48</td>
+</tr>
+<tr id="b44">
+<td class="rowhead">Claude Opus 5.5 (low with fallback)</td>
+<td>Google Vertex AI</td>
+<td class="num">71.7 (64–90)</td>
+<td class="num">14.38</td>
+</tr>
+<tr id="b45">
+<td class="rowhead">Claude Opus 5.5 (medium with fallback)</td>
+<td>Anthropic API</td>
+<td class="num">72.8 (60–90)</td>
+<td class="num">25.75</td>
+</tr>
+<tr id="b46">
+<td class="rowhead">Claude Opus 5.5 (high with fallback)</td>
+<td>Anthropic API</td>
+<td class="num">73.4 (61–89)</td>
+<td class="num">38.91</td>
+</tr>
+<tr id="b47">
+<td class="rowhead">Claude Opus 5.5 (xhigh with fallback)</td>
+<td>Anthropic API</td>
+<td class="num">79.6 (66–92)</td>
+<td class="num">141.03</td>
+</tr>
+<tr id="b48">
+<td class="rowhead">Claude Opus 5.5 (max with fallback)</td>
+<td>Anthropic API</td>
+<td class="num">92.4 (82–101)</td>
+<td class="num">704.69</td>
+</tr>
+<tr id="b49">
+<td class="rowhead">Claude Sonnet 5.5 (low with fallback)</td>
+<td>Anthropic API</td>
+<td class="num">92.6 (78–157)</td>
+<td class="num">1.19</td>
+</tr>
+<tr id="b50">
+<td class="rowhead">Claude Sonnet 5.5 (low with fallback)</td>
+<td>Amazon Bedrock</td>
+<td class="num">94.6 (79–154)</td>
+<td class="num">1.25</td>
+</tr>
+<tr id="b51">
+<td class="rowhead">Claude Sonnet 5.5 (low with fallback)</td>
+<td>Google Vertex AI</td>
+<td class="num">96.0 (81–151)</td>
+<td class="num">1.36</td>
+</tr>
+<tr id="b52">
+<td class="rowhead">Claude Sonnet 5.5 (medium with fallback)</td>
+<td>Anthropic API</td>
+<td class="num">92.0 (82–129)</td>
+<td class="num">1.34</td>
+</tr>
+<tr id="b53">
+<td class="rowhead">Claude Sonnet 5.5 (high with fallback)</td>
+<td>Anthropic API</td>
+<td class="num">101.0 (87–124)</td>
+<td class="num">12.20</td>
+</tr>
+<tr id="b54">
+<td class="rowhead">Claude Sonnet 5.5 (xhigh with fallback)</td>
+<td>Anthropic API</td>
+<td class="num">101.2 (86–161)</td>
+<td class="num">34.69</td>
+</tr>
+<tr id="b55">
+<td class="rowhead">Claude Sonnet 5.5 (max with fallback)</td>
+<td>Anthropic API</td>
+<td class="num">132.2 (122–148)</td>
+<td class="num">428.36</td>
+</tr>
+<tr id="b56">
+<td class="rowhead">Claude Sonnet 5.5 (max with fallback)</td>
+<td>Amazon Bedrock</td>
+<td class="num">129.5 (112–149)</td>
+<td class="num">341.05</td>
+</tr>
+<tr id="b57">
+<td class="rowhead">Claude Sonnet 5.5 (max with fallback)</td>
+<td>Google Vertex AI</td>
+<td class="num">133.8 (113–147)</td>
+<td class="num">435.41</td>
+</tr>
+<tr id="b58">
+<td class="rowhead">Claude Haiku 4.5 (non-reasoning)</td>
+<td>Anthropic API</td>
+<td class="num">88.5 (76–124)</td>
+<td class="num">0.56</td>
+</tr>
+<tr id="b59">
+<td class="rowhead">Claude Haiku 4.5 (non-reasoning)</td>
+<td>Amazon Bedrock</td>
+<td class="num">99.8 (85–197)</td>
+<td class="num">0.80</td>
+</tr>
+<tr id="b60">
+<td class="rowhead">Claude Haiku 4.5 (non-reasoning)</td>
+<td>Google Vertex AI</td>
+<td class="num">86.9 (72–145)</td>
+<td class="num">0.68</td>
+</tr>
+<tr id="b61">
+<td class="rowhead">Claude Haiku 4.5 (non-reasoning)</td>
+<td>Microsoft Azure</td>
+<td class="num">90.8 (77–151)</td>
+<td class="num">0.99</td>
+</tr>
+<tr id="b62">
+<td><span class="rh">Claude Haiku 4.5</span><span class="rh-sub"><span class="vh">（</span>AA 無後綴<span class="vh">）</span></span></td>
+<td>Anthropic API</td>
+<td class="num">97.4 (76–160)</td>
+<td class="num">19.33</td>
+</tr>
+<tr id="b63">
+<td><span class="rh">Claude Haiku 4.5</span><span class="rh-sub"><span class="vh">（</span>AA 無後綴<span class="vh">）</span></span></td>
+<td>Amazon Bedrock</td>
+<td class="num">132.2 (93–221)</td>
+<td class="num">20.67</td>
+</tr>
+<tr id="b64">
+<td><span class="rh">Claude Haiku 4.5</span><span class="rh-sub"><span class="vh">（</span>AA 無後綴<span class="vh">）</span></span></td>
+<td>Google Vertex AI</td>
+<td class="num">94.9 (81–187)</td>
+<td class="num">17.19</td>
+</tr>
+<tr id="b65">
+<td><span class="rh">Claude Haiku 4.5</span><span class="rh-sub"><span class="vh">（</span>AA 無後綴<span class="vh">）</span></span></td>
+<td>Microsoft Azure</td>
+<td class="num">97.9 (76–171)</td>
+<td class="num">20.16</td>
+</tr>
+<tr id="b66">
+<td class="rowhead">GPT-6 Astra (low)</td>
+<td>OpenAI API</td>
+<td class="num">50.7 (38–73)</td>
+<td class="num">2.65</td>
+</tr>
+<tr id="b67">
+<td class="rowhead">GPT-6 Astra (low)</td>
+<td>Microsoft Azure</td>
+<td class="num">54.9 (45–91)</td>
+<td class="num">3.16</td>
+</tr>
+<tr id="b68">
+<td class="rowhead">GPT-6 Astra (medium)</td>
+<td>OpenAI API</td>
+<td class="num">44.9 (38–59)</td>
+<td class="num">6.21</td>
+</tr>
+<tr id="b69">
+<td class="rowhead">GPT-6 Astra (high)</td>
+<td>OpenAI API</td>
+<td class="num">45.4 (36–57)</td>
+<td class="num">65.56</td>
+</tr>
+<tr id="b70">
+<td class="rowhead">GPT-6 Astra (xhigh)</td>
+<td>OpenAI API</td>
+<td class="num">49.3 (36–62)</td>
+<td class="num">181.00</td>
+</tr>
+<tr id="b71">
+<td class="rowhead">GPT-6 Astra (max)</td>
+<td>OpenAI API</td>
+<td class="num">51.6 (44–67)</td>
+<td class="num">320.14</td>
+</tr>
+<tr id="b72">
+<td class="rowhead">GPT-6 Astra (max)</td>
+<td>Amazon Bedrock</td>
+<td class="num">79.5 (51–95)</td>
+<td class="num">346.83</td>
+</tr>
+<tr id="b73">
+<td class="rowhead">GPT-6 Astra (max)</td>
+<td>Microsoft Azure</td>
+<td class="num">69.4 (53–89)</td>
+<td class="num">343.27</td>
+</tr>
+<tr id="b74">
+<td class="rowhead">GPT-6.1 Sol (low)</td>
+<td>OpenAI API</td>
+<td class="num">54.7 (37–74)</td>
+<td class="num">3.25</td>
+</tr>
+<tr id="b75">
+<td class="rowhead">GPT-6.1 Sol (medium)</td>
+<td>OpenAI API</td>
+<td class="num">45.4 (34–68)</td>
+<td class="num">5.59</td>
+</tr>
+<tr id="b76">
+<td class="rowhead">GPT-6.1 Sol (high)</td>
+<td>OpenAI API</td>
+<td class="num">58.2 (39–68)</td>
+<td class="num">57.61</td>
+</tr>
+<tr id="b77">
+<td class="rowhead">GPT-6.1 Sol (xhigh)</td>
+<td>OpenAI API</td>
+<td class="num">53.4 (45–67)</td>
+<td class="num">110.28</td>
+</tr>
+<tr id="b78">
+<td class="rowhead">GPT-6.1 Sol (max)</td>
+<td>OpenAI API</td>
+<td class="num">52.1 (46–67)</td>
+<td class="num">269.34</td>
+</tr>
+<tr id="b79">
+<td class="rowhead">GPT-6 Luna (non-reasoning)</td>
+<td>OpenAI API</td>
+<td class="num">131.0 (93–170)</td>
+<td class="num">0.68</td>
+</tr>
+<tr id="b80">
+<td class="rowhead">GPT-6 Luna (low)</td>
+<td>OpenAI API</td>
+<td class="num">120.5 (98–163)</td>
+<td class="num">2.06</td>
+</tr>
+<tr id="b81">
+<td class="rowhead">GPT-6 Luna (high)</td>
+<td>OpenAI API</td>
+<td class="num">133.3 (82–169)</td>
+<td class="num">13.92</td>
+</tr>
+<tr id="b82">
+<td class="rowhead">GPT-6 Luna (xhigh)</td>
+<td>OpenAI API</td>
+<td class="num">136.4 (94–157)</td>
+<td class="num">22.85</td>
+</tr>
+<tr id="b83">
+<td class="rowhead">GPT-6 Luna (max)</td>
+<td>OpenAI API</td>
+<td class="num">132.5 (103–187)</td>
+<td class="num">125.75</td>
+</tr>
+<tr id="b84">
+<td class="rowhead">GPT-6 Luna (max)</td>
+<td>Microsoft Azure</td>
+<td class="num">211.8 (164–360)</td>
+<td class="num">59.57</td>
+</tr>
+<tr id="b85">
+<td class="rowhead">GPT-5.6 Terra (non-reasoning)</td>
+<td>OpenAI API</td>
+<td class="num">87.4 (72–122)</td>
+<td class="num">0.72</td>
+</tr>
+<tr id="b86">
+<td class="rowhead">GPT-5.6 Terra (non-reasoning)</td>
+<td>Amazon Bedrock</td>
+<td class="num">108.2 (92–172)</td>
+<td class="num">0.72</td>
+</tr>
+<tr id="b87">
+<td class="rowhead">GPT-5.6 Terra (low)</td>
+<td>OpenAI API</td>
+<td class="num">84.8 (71–144)</td>
+<td class="num">1.66</td>
+</tr>
+<tr id="b88">
+<td class="rowhead">GPT-5.6 Terra (medium)</td>
+<td>OpenAI API</td>
+<td class="num">76.2 (62–114)</td>
+<td class="num">2.39</td>
+</tr>
+<tr id="b89">
+<td class="rowhead">GPT-5.6 Terra (high)</td>
+<td>OpenAI API</td>
+<td class="num">85.0 (66–145)</td>
+<td class="num">3.08</td>
+</tr>
+<tr id="b90">
+<td class="rowhead">GPT-5.6 Terra (high)</td>
+<td>Microsoft Azure</td>
+<td class="num">117.4 (102–168)</td>
+<td class="num">2.86</td>
+</tr>
+<tr id="b91">
+<td class="rowhead">GPT-5.6 Terra (xhigh)</td>
+<td>OpenAI API</td>
+<td class="num">91.5 (74–143)</td>
+<td class="num">24.24</td>
+</tr>
+<tr id="b92">
+<td class="rowhead">GPT-5.6 Terra (xhigh)</td>
+<td>Microsoft Azure</td>
+<td class="num">124.7 (105–164)</td>
+<td class="num">21.86</td>
+</tr>
+<tr id="b93">
+<td class="rowhead">GPT-5.6 Terra (max)</td>
+<td>OpenAI API</td>
+<td class="num">102.5 (79–176)</td>
+<td class="num">156.49</td>
+</tr>
+<tr id="b94">
+<td class="rowhead">GPT-5.6 Terra (max)</td>
+<td>Amazon Bedrock</td>
+<td class="num">133.7 (101–208)</td>
+<td class="num">150.22</td>
+</tr>
+<tr id="b95">
+<td class="rowhead">GPT-5.5 Instant (June 2026)</td>
+<td>OpenAI API</td>
+<td class="num">117.6 (100–188)</td>
+<td class="num">0.92</td>
+</tr>
+<tr id="b96">
+<td class="rowhead">GPT-5.3 Codex (xhigh)</td>
+<td>OpenAI API</td>
+<td class="num">94.6 (70–126)</td>
+<td class="num">71.47</td>
+</tr>
+<tr id="b97">
+<td class="rowhead">Gemini 3.1 Pro Preview</td>
+<td>Google AI Studio</td>
+<td class="num">116.8 (100–145)</td>
+<td class="num">24.14</td>
+</tr>
+<tr id="b98">
+<td class="rowhead">Gemini 3.1 Pro Preview</td>
+<td>Google Vertex AI</td>
+<td class="num">99.9 (96–107)</td>
+<td class="num">26.44</td>
+</tr>
+<tr id="b99">
+<td class="rowhead">Gemini 3.8 Flash (high)</td>
+<td>Google AI Studio</td>
+<td class="num">236.5 (186–349)</td>
+<td class="num">14.73</td>
+</tr>
+<tr id="b100">
+<td class="rowhead">Gemini 3.7 Flash (low reasoning)‡</td>
+<td>Google AI Studio</td>
+<td class="num">292.7 (–)</td>
+<td class="num">1.41</td>
+</tr>
+<tr id="b101">
+<td class="rowhead">Gemini 3.5 Flash (minimal reasoning)‡</td>
+<td>Google AI Studio</td>
+<td class="num">196.8 (–)</td>
+<td class="num">0.97</td>
+</tr>
+<tr id="b102">
+<td class="rowhead">Gemini 3.5 Flash-Lite</td>
+<td>Google AI Studio</td>
+<td class="num">360.0 (263–470)</td>
+<td class="num">8.82</td>
+</tr>
+<tr id="b103">
+<td class="rowhead">Nova 2.0 Pro Preview (non-reasoning)</td>
+<td>Amazon Bedrock</td>
+<td class="num">106.9 (93–136)</td>
+<td class="num">1.01</td>
+</tr>
+<tr id="b104">
+<td class="rowhead">Nova 2.0 Pro Preview (low)</td>
+<td>Amazon Bedrock</td>
+<td class="num">125.3 (109–150)</td>
+<td class="num">13.25</td>
+</tr>
+<tr id="b105">
+<td class="rowhead">Nova 2.0 Pro Preview (medium)</td>
+<td>Amazon Bedrock</td>
+<td class="num">119.4 (108–162)</td>
+<td class="num">12.87</td>
+</tr>
+<tr id="b106">
+<td class="rowhead">Nova 2.0 Lite (non-reasoning)</td>
+<td>Amazon Bedrock</td>
+<td class="num">169.9 (117–225)</td>
+<td class="num">1.05</td>
+</tr>
+<tr id="b107">
+<td class="rowhead">Nova 2.0 Lite (low)</td>
+<td>Amazon Bedrock</td>
+<td class="num">147.5 (100–263)</td>
+<td class="num">10.76</td>
+</tr>
+<tr id="b108">
+<td class="rowhead">Nova 2.0 Lite (medium)</td>
+<td>Amazon Bedrock</td>
+<td class="num">197.4 (144–258)</td>
+<td class="num">14.74</td>
+</tr>
+<tr id="b109">
+<td class="rowhead">Nova 2.0 Lite (high)</td>
+<td>Amazon Bedrock</td>
+<td class="num">185.9 (135–269)</td>
+<td class="num">17.44</td>
+</tr>
+<tr id="b110">
+<td class="rowhead">Nova Micro</td>
+<td>Amazon Bedrock</td>
+<td class="num">279.6 (200–352)</td>
+<td class="num">0.87</td>
+</tr>
+<tr id="b111">
+<td class="rowhead">Grok 4.7 (low)</td>
+<td>SpaceXAI (xAI) API</td>
+<td class="num">76.3 (57–96)</td>
+<td class="num">8.92</td>
+</tr>
+<tr id="b112">
+<td class="rowhead">Grok 4.7 (high)</td>
+<td>SpaceXAI (xAI) API</td>
+<td class="num">77.8 (63–114)</td>
+<td class="num">30.21</td>
+</tr>
+<tr id="b113">
+<td class="rowhead">Grok 4.7 (xhigh)</td>
+<td>SpaceXAI (xAI) API</td>
+<td class="num">79.0 (58–107)</td>
+<td class="num">49.32</td>
+</tr>
+<tr id="b114">
+<td class="rowhead">Muse Spark 1.3 (xhigh)</td>
+<td>Meta Model API</td>
+<td class="num">142.4 (69–306)</td>
+<td class="num">39.81</td>
+</tr>
+<tr id="b115">
+<td class="rowhead">Muse Spark 1.3 (max)</td>
+<td>Meta Model API</td>
+<td class="num">129.0 (73–189)</td>
+<td class="num">53.10</td>
+</tr>
+</tbody>
+</table></div></figure>
+<ul>
+<li id="b116">速度隨 effort 上升只出現在 Anthropic 模型（low 到 max：Fable 5.1 為 48.6 → 68.2、Opus 5.5 為 72.2 → 92.4、Sonnet 5.5 為 92.6 → 132.2 tokens/s），OpenAI 的 Astra 與 Sol 不單調；來源沒有解釋原因。</li>
+<li id="b117">AA 模型層級的列沒有端點資料：Mistral Medium 3.5 為 165.4 tokens/s、TTFT 2.30 s（第一個 answer token 為 14.4 s），Mistral Large 3 為 79.0 tokens/s、TTFT 1.13 s（<a href="https://artificialanalysis.ai/leaderboards/models" rel="noopener" target="_blank">AA models leaderboard</a>）。Gemini 4 Argon 與 Gemini 3.8 Flash 的 low、medium 變體尚無速度資料；Gemini 3.6 Flash 與 3.1 Flash-Lite 的 AA 數字本次未取得。</li>
+<li id="b118">AA 的模型索引（933 個 slug）在 2026-10-04 沒有 GPT-5.3-Codex-Spark、任何 Ultrafast 變體、任何 OpenAI Fast 變體或任何 Claude fast 變體（<a href="https://artificialanalysis.ai/models" rel="noopener" target="_blank">AA 模型索引</a>）。</li>
+<li id="b119">AA 只從美國的單一區域發出請求，沒有亞洲（例如台灣）發出的量測，客戶的區域延遲本章無法回答。</li>
+</ul>
+
+<figure class="tbl" data-cols="8" data-rows="24" id="t5-3"><figcaption><strong>表 5-3 AA model page：prompt 長度與 10 個並行請求的影響</strong>（1K、10K、100K tokens；1K 與 10K 為 72 小時中位數，100K 為 14 天中位數；2026-10-04 06:53 UTC 讀取；等級 <span class="g g-a" title="等級 A：獨立第三方量測">A</span>；TTFT 為 time to first chunk；§ 為 00:35–00:37 UTC 的頁面副本；來源為各模型的 AA providers 頁，例如 <a href="https://artificialanalysis.ai/models/claude-4-5-haiku/providers" rel="noopener" target="_blank">Claude Haiku 4.5</a>、<a href="https://artificialanalysis.ai/models/claude-opus-5-5-low/providers" rel="noopener" target="_blank">Claude Opus 5.5 low</a>、<a href="https://artificialanalysis.ai/models/gpt-6-astra/providers" rel="noopener" target="_blank">GPT-6 Astra</a>、<a href="https://artificialanalysis.ai/models/gpt-5-6-sol/providers" rel="noopener" target="_blank">GPT-5.6 Sol</a>、<a href="https://artificialanalysis.ai/models/gemini-3-1-pro-preview/providers" rel="noopener" target="_blank">Gemini 3.1 Pro Preview</a>）</figcaption><div aria-label="表 5-3 AA model page：prompt 長度與 10 個並行請求的影響" class="tbl-scroll" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th class="w2" scope="col">模型（變體）</th>
+<th scope="col">端點</th>
+<th scope="col">1K：tokens/s；TTFT s</th>
+<th class="w1" scope="col">10K：tokens/s；TTFT s（p5–p95）</th>
+<th scope="col">100K：tokens/s；TTFT s</th>
+<th scope="col">10 並行 1K：tokens/s；TTFT s</th>
+<th scope="col">100K ÷ 10K 速度<span class="g g-d" title="等級 D：本文推算，附算式">D</span></th>
+<th scope="col">快取命中率</th>
+</tr>
+</thead>
+<tbody>
+<tr id="b120">
+<td class="rowhead">Claude Haiku 4.5 (non-reasoning)</td>
+<td>Bedrock</td>
+<td class="num">130.3；0.59</td>
+<td class="num">100.5；0.80（0.70–1.05）</td>
+<td class="num">121.8；3.48</td>
+<td class="num">128.7；0.71</td>
+<td class="num">1.21×</td>
+<td class="num">67%</td>
+</tr>
+<tr id="b121">
+<td class="rowhead">Claude Haiku 4.5 (non-reasoning)</td>
+<td>Azure</td>
+<td class="num">103.1；0.80</td>
+<td class="num">89.3；0.97（0.78–1.49）</td>
+<td class="num">85.6；3.27</td>
+<td class="num">116.5；0.93</td>
+<td class="num">0.96×</td>
+<td class="num">91%</td>
+</tr>
+<tr id="b122">
+<td class="rowhead">Claude Haiku 4.5 (non-reasoning)</td>
+<td>Vertex</td>
+<td class="num">108.6；0.60</td>
+<td class="num">85.5；0.68（0.47–0.87）</td>
+<td class="num">122.9；4.54</td>
+<td class="num">117.2；0.62</td>
+<td class="num">1.44×</td>
+<td class="num">88%</td>
+</tr>
+<tr id="b123">
+<td class="rowhead">Claude Haiku 4.5 (non-reasoning)</td>
+<td>Anthropic</td>
+<td class="num">105.5；0.48</td>
+<td class="num">84.1；0.55（0.51–1.54）</td>
+<td class="num">100.4；2.48</td>
+<td class="num">111.5；0.50</td>
+<td class="num">1.19×</td>
+<td class="num">80%</td>
+</tr>
+<tr id="b124">
+<td class="rowhead">Claude Sonnet 5.5 (low effort)</td>
+<td>Vertex</td>
+<td class="num">101.6；1.33</td>
+<td class="num">98.5；1.43（0.81–2.67）</td>
+<td class="num">114.8；12.12</td>
+<td class="num">112.7；1.00</td>
+<td class="num">1.17×</td>
+<td class="muted">–</td>
+</tr>
+<tr id="b125">
+<td class="rowhead">Claude Sonnet 5.5 (low effort)</td>
+<td>Bedrock</td>
+<td class="num">96.3；0.92</td>
+<td class="num">94.6；1.26（1.15–3.26）</td>
+<td class="num">117.5；5.17</td>
+<td class="num">114.9；0.89</td>
+<td class="num">1.24×</td>
+<td class="muted">–</td>
+</tr>
+<tr id="b126">
+<td class="rowhead">Claude Sonnet 5.5 (low effort)</td>
+<td>Anthropic</td>
+<td class="num">105.2；0.83</td>
+<td class="num">92.6；1.16（0.66–3.76）</td>
+<td class="num">115.7；2.97</td>
+<td class="num">110.9；0.82</td>
+<td class="num">1.25×</td>
+<td class="num">99%</td>
+</tr>
+<tr id="b127">
+<td class="rowhead">Claude Opus 5.5 (low effort)</td>
+<td>Vertex</td>
+<td class="num">79.1；8.44</td>
+<td class="num">72.8；6.46（1.90–20.19）</td>
+<td class="num">70.9；12.18</td>
+<td class="num">81.3；2.78</td>
+<td class="num">0.97×</td>
+<td class="num">90%</td>
+</tr>
+<tr id="b128">
+<td class="rowhead">Claude Opus 5.5 (low effort)</td>
+<td>Anthropic</td>
+<td class="num">74.8；4.74</td>
+<td class="num">71.0；4.07（1.32–29.45）</td>
+<td class="num">75.5；16.92</td>
+<td class="num">78.4；5.89</td>
+<td class="num">1.06×</td>
+<td class="num">100%</td>
+</tr>
+<tr id="b129">
+<td class="rowhead">Claude Opus 5.5 (low effort)</td>
+<td>Bedrock</td>
+<td class="num">62.4；8.17</td>
+<td class="num">56.5；6.63（2.11–30.73）</td>
+<td class="num">69.5；13.42</td>
+<td class="num">63.1；5.00</td>
+<td class="num">1.23×</td>
+<td class="num">100%</td>
+</tr>
+<tr id="b130">
+<td class="rowhead">Claude Opus 5.5 (medium effort)§</td>
+<td>Anthropic</td>
+<td class="num">79.5；12.04</td>
+<td class="num">71.9；22.18（6.84–60.02）</td>
+<td class="num">82.6；21.18</td>
+<td class="num">79.3；10.78</td>
+<td class="num">1.15×</td>
+<td class="num">100%</td>
+</tr>
+<tr id="b131">
+<td class="rowhead">GPT-6 Astra (max effort)</td>
+<td>Bedrock</td>
+<td class="num">89.0；136.87</td>
+<td class="num">81.4；268.12（98.42–529.33）</td>
+<td class="num">64.2；236.47</td>
+<td class="num">90.6；77.58</td>
+<td class="num">0.79×</td>
+<td class="num">99%</td>
+</tr>
+<tr id="b132">
+<td class="rowhead">GPT-6 Astra (max effort)</td>
+<td>Azure</td>
+<td class="num">71.3；204.04</td>
+<td class="num">65.5；312.75（158.15–526.99）</td>
+<td class="num">69.6；257.24</td>
+<td class="num">76.6；128.79</td>
+<td class="num">1.06×</td>
+<td class="num">98%</td>
+</tr>
+<tr id="b133">
+<td class="rowhead">GPT-6 Astra (max effort)</td>
+<td>OpenAI</td>
+<td class="num">62.6；201.15</td>
+<td class="num">59.8；276.50（118.57–480.66）</td>
+<td class="num">59.9；275.98</td>
+<td class="num">65.4；108.46</td>
+<td class="num">1.00×</td>
+<td class="num">99%</td>
+</tr>
+<tr id="b134">
+<td class="rowhead">GPT-6 Luna (max effort)</td>
+<td>Azure</td>
+<td class="num">220.6；55.79</td>
+<td class="num">208.9；54.88（26.55–135.79）</td>
+<td class="num">231.9；29.25</td>
+<td class="num">231.4；28.40</td>
+<td class="num">1.11×</td>
+<td class="muted">–</td>
+</tr>
+<tr id="b135">
+<td class="rowhead">GPT-6 Luna (max effort)</td>
+<td>OpenAI</td>
+<td class="num">136.4；84.00</td>
+<td class="num">140.7；107.01（27.66–203.65）</td>
+<td class="num">126.8；43.62</td>
+<td class="num">160.6；43.73</td>
+<td class="num">0.90×</td>
+<td class="num">99%</td>
+</tr>
+<tr id="b136">
+<td class="rowhead">GPT-5.6 Sol (max effort)</td>
+<td>Bedrock</td>
+<td class="muted">–</td>
+<td class="num">95.0；96.63（22.34–325.92）</td>
+<td class="num">108.3；34.69</td>
+<td class="muted">–</td>
+<td class="num">1.14×</td>
+<td class="num">94%</td>
+</tr>
+<tr id="b137">
+<td class="rowhead">GPT-5.6 Sol (max effort)</td>
+<td>Azure</td>
+<td class="muted">–</td>
+<td class="num">90.9；123.98（18.18–280.62）</td>
+<td class="num">116.8；50.51</td>
+<td class="muted">–</td>
+<td class="num">1.28×</td>
+<td class="num">99%</td>
+</tr>
+<tr id="b138">
+<td class="rowhead">GPT-5.6 Sol (max effort)</td>
+<td>OpenAI</td>
+<td class="muted">–</td>
+<td class="num">79.6；106.10（18.63–337.93）</td>
+<td class="num">92.0；97.70</td>
+<td class="muted">–</td>
+<td class="num">1.16×</td>
+<td class="num">99%</td>
+</tr>
+<tr id="b139">
+<td class="rowhead">GPT-5.6 Terra (non-reasoning)</td>
+<td>Bedrock</td>
+<td class="num">114.4；0.49</td>
+<td class="num">108.2；0.72（0.50–2.06）</td>
+<td class="num">126.0；2.38</td>
+<td class="num">143.4；0.46</td>
+<td class="num">1.16×</td>
+<td class="num">99%</td>
+</tr>
+<tr id="b140">
+<td class="rowhead">GPT-5.6 Terra (non-reasoning)</td>
+<td>OpenAI</td>
+<td class="num">99.4；0.69</td>
+<td class="num">91.7；0.72（0.60–2.22）</td>
+<td class="num">106.9；1.17</td>
+<td class="num">110.6；0.76</td>
+<td class="num">1.17×</td>
+<td class="num">99%</td>
+</tr>
+<tr id="b141">
+<td class="rowhead">Gemini 3.8 Flash (high)§</td>
+<td>AI Studio</td>
+<td class="num">270.4；11.49</td>
+<td class="num">242.3；16.13（8.86–70.99）</td>
+<td class="num">226.0；16.37</td>
+<td class="num">283.3；12.08</td>
+<td class="num">0.93×</td>
+<td class="num">89%</td>
+</tr>
+<tr id="b142">
+<td class="rowhead">Gemini 3.1 Pro Preview§</td>
+<td>AI Studio</td>
+<td class="num">129.8；24.67</td>
+<td class="num">113.6；24.14（15.40–73.18）</td>
+<td class="num">108.1；35.39</td>
+<td class="num">135.8；21.74</td>
+<td class="num">0.95×</td>
+<td class="num">93%</td>
+</tr>
+<tr id="b143">
+<td class="rowhead">Gemini 3.1 Pro Preview§</td>
+<td>Vertex</td>
+<td class="num">98.9；18.12</td>
+<td class="num">100.0；26.44（13.06–67.57）</td>
+<td class="num">165.0；41.21</td>
+<td class="num">97.7；24.61</td>
+<td class="num">1.65×</td>
+<td class="num">78%</td>
+</tr>
+</tbody>
+</table></div></figure>
+<ul>
+<li id="b144">100K 對 10K 的速度比<span class="g g-d" title="等級 D：本文推算，附算式">D</span>：24 列的中位數為 1.15×，18 列 ≥ 1.0、6 列 &lt; 1.0（最低為 GPT-6 Astra max 在 Bedrock 的 0.79×），來源沒有說明差異來自什麼。兩欄的平均窗口不同（14 天對 72 小時）。</li>
+<li id="b145">10 個並行 1K 請求下的每串流速度是單一 1K 請求的 0.99–1.25×（21 列，中位數 1.05×，<span class="g g-d" title="等級 D：本文推算，附算式">D</span>）：在 AA 的並行度內，每串流速度沒有下降。</li>
+<li id="b146">長 prompt 主要拉長 TTFT：Claude Haiku 4.5 non-reasoning 從 10K 的 0.55–0.97 s 到 100K 的 2.48–4.54 s；GPT-5.6 Terra non-reasoning 從 0.72 s 到 1.17 s（OpenAI）與 2.38 s（Bedrock）。AA 同時列出快取命中率（67–100%）；其定義未能從所讀頁面確認，若代表 prompt cache 命中，表中長 prompt 的 TTFT 是熱快取數字，冷啟動的 prefill 時間無法由此看出（推論，未驗證）。</li>
+</ul>
+
+<figure class="tbl" data-cols="6" data-rows="16" id="t5-4"><figcaption><strong>表 5-4 同一模型在不同雲端的 AA 速度</strong>（儲存格為「輸出 tokens/s；TTFT s」；10K-token prompt；2026-10-04；等級 <span class="g g-a" title="等級 A：獨立第三方量測">A</span>；無標記的列取自 00:36 UTC 的 leaderboard，‡ 的列取自 06:53 UTC 的 model page，其 TTFT 為 time to first chunk，定義與 leaderboard 不同；最右欄為 D：最快端點 ÷ 最慢端點的 tokens/s）</figcaption><div aria-label="表 5-4 同一模型在不同雲端的 AA 速度" class="tbl-scroll" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th class="w2" scope="col">模型（AA 變體）</th>
+<th class="w1" scope="col">第一方 API</th>
+<th scope="col">Amazon Bedrock</th>
+<th scope="col">Google Vertex AI</th>
+<th scope="col">Microsoft Azure</th>
+<th class="w1" scope="col">最快 ÷ 最慢<span class="g g-d" title="等級 D：本文推算，附算式">D</span></th>
+</tr>
+</thead>
+<tbody>
+<tr id="b147">
+<td><span class="rh">Claude Opus 5.5</span><span class="rh-sub"><span class="vh">（</span>low with fallback<span class="vh">）</span></span></td>
+<td class="num">72.2；12.39（Anthropic）</td>
+<td class="num">57.6；13.48</td>
+<td class="num">71.7；14.38</td>
+<td class="muted">–</td>
+<td>1.25×（Anthropic ÷ Bedrock）</td>
+</tr>
+<tr id="b148">
+<td><span class="rh">Claude Sonnet 5.5</span><span class="rh-sub"><span class="vh">（</span>low with fallback<span class="vh">）</span></span></td>
+<td class="num">92.6；1.19（Anthropic）</td>
+<td class="num">94.6；1.25</td>
+<td class="num">96；1.36</td>
+<td class="muted">–</td>
+<td>1.04×（Vertex ÷ Anthropic）</td>
+</tr>
+<tr id="b149">
+<td><span class="rh">Claude Sonnet 5.5</span><span class="rh-sub"><span class="vh">（</span>max with fallback<span class="vh">）</span></span></td>
+<td class="num">132.2；428.36（Anthropic）</td>
+<td class="num">129.5；341.05</td>
+<td class="num">133.8；435.41</td>
+<td class="muted">–</td>
+<td>1.03×（Vertex ÷ Bedrock）</td>
+</tr>
+<tr id="b150">
+<td><span class="rh">Claude Haiku 4.5</span><span class="rh-sub"><span class="vh">（</span>non-reasoning<span class="vh">）</span></span></td>
+<td class="num">88.5；0.56（Anthropic）</td>
+<td class="num">99.8；0.8</td>
+<td class="num">86.9；0.68</td>
+<td class="num">90.8；0.99</td>
+<td>1.15×（Bedrock ÷ Vertex）</td>
+</tr>
+<tr id="b151">
+<td><span class="rh">Claude Haiku 4.5</span><span class="rh-sub"><span class="vh">（</span>AA 無後綴<span class="vh">）</span></span></td>
+<td class="num">97.4；19.33（Anthropic）</td>
+<td class="num">132.2；20.67</td>
+<td class="num">94.9；17.19</td>
+<td class="num">97.9；20.16</td>
+<td>1.39×（Bedrock ÷ Vertex）</td>
+</tr>
+<tr id="b152">
+<td><span class="rh">GPT-6 Astra</span><span class="rh-sub"><span class="vh">（</span>low<span class="vh">）</span></span></td>
+<td class="num">50.7；2.65（OpenAI）</td>
+<td class="muted">–</td>
+<td class="muted">–</td>
+<td class="num">54.9；3.16</td>
+<td class="num">1.08×（Azure ÷ OpenAI）</td>
+</tr>
+<tr id="b153">
+<td><span class="rh">GPT-6 Astra</span><span class="rh-sub"><span class="vh">（</span>max<span class="vh">）</span></span></td>
+<td class="num">51.6；320.14（OpenAI）</td>
+<td class="num">79.5；346.83</td>
+<td class="muted">–</td>
+<td class="num">69.4；343.27</td>
+<td>1.54×（Bedrock ÷ OpenAI）</td>
+</tr>
+<tr id="b154">
+<td><span class="rh">GPT-6 Luna</span><span class="rh-sub"><span class="vh">（</span>max<span class="vh">）</span></span></td>
+<td class="num">132.5；125.75（OpenAI）</td>
+<td class="muted">–</td>
+<td class="muted">–</td>
+<td class="num">211.8；59.57</td>
+<td class="num">1.60×（Azure ÷ OpenAI）</td>
+</tr>
+<tr id="b155">
+<td><span class="rh">GPT-5.6 Terra</span><span class="rh-sub"><span class="vh">（</span>non-reasoning<span class="vh">）</span></span></td>
+<td class="num">87.4；0.72（OpenAI）</td>
+<td class="num">108.2；0.72</td>
+<td class="muted">–</td>
+<td class="muted">–</td>
+<td>1.24×（Bedrock ÷ OpenAI）</td>
+</tr>
+<tr id="b156">
+<td><span class="rh">GPT-5.6 Terra</span><span class="rh-sub"><span class="vh">（</span>high<span class="vh">）</span></span></td>
+<td class="num">85；3.08（OpenAI）</td>
+<td class="muted">–</td>
+<td class="muted">–</td>
+<td class="num">117.4；2.86</td>
+<td class="num">1.38×（Azure ÷ OpenAI）</td>
+</tr>
+<tr id="b157">
+<td><span class="rh">GPT-5.6 Terra</span><span class="rh-sub"><span class="vh">（</span>xhigh<span class="vh">）</span></span></td>
+<td class="num">91.5；24.24（OpenAI）</td>
+<td class="muted">–</td>
+<td class="muted">–</td>
+<td class="num">124.7；21.86</td>
+<td class="num">1.36×（Azure ÷ OpenAI）</td>
+</tr>
+<tr id="b158">
+<td><span class="rh">GPT-5.6 Terra</span><span class="rh-sub"><span class="vh">（</span>max<span class="vh">）</span></span></td>
+<td class="num">102.5；156.49（OpenAI）</td>
+<td class="num">133.7；150.22</td>
+<td class="muted">–</td>
+<td class="muted">–</td>
+<td>1.30×（Bedrock ÷ OpenAI）</td>
+</tr>
+<tr id="b159">
+<td class="rowhead">Gemini 3.1 Pro Preview</td>
+<td class="num">116.8；24.14（AI Studio）</td>
+<td class="muted">–</td>
+<td class="num">99.9；26.44</td>
+<td class="muted">–</td>
+<td>1.17×（AI Studio ÷ Vertex）</td>
+</tr>
+<tr id="b160">
+<td class="rowhead">Claude Opus 4.8（max effort，舊版）‡</td>
+<td class="num">58.9；62.22（Anthropic）</td>
+<td class="num">59.9；35.79</td>
+<td class="num">61.8；31.9</td>
+<td class="muted">–</td>
+<td>1.05×（Vertex ÷ Anthropic）</td>
+</tr>
+<tr id="b161">
+<td class="rowhead">GPT-5.6 Sol（max effort）‡</td>
+<td class="num">79.6；106.1（OpenAI）</td>
+<td class="num">95；96.63</td>
+<td class="muted">–</td>
+<td class="num">90.9；123.98</td>
+<td>1.19×（Bedrock ÷ OpenAI）</td>
+</tr>
+<tr id="b162">
+<td class="rowhead">Grok 4.3（non-reasoning，已被 4.7 取代）‡</td>
+<td class="num">105.7；0.78（xAI）</td>
+<td class="num">230.2；0.64</td>
+<td class="muted">–</td>
+<td class="muted">–</td>
+<td class="num">2.18×（Bedrock ÷ xAI）</td>
+</tr>
+</tbody>
+</table></div></figure>
+<ul>
+<li id="b163">現行模型的雲端差異為 1.03–1.60×，沒有一個來源把端點對應到晶片，所以這些差異不能歸因於晶片。Sonnet 5.5 low 與 max（1.04×、1.03×）在雜訊範圍內，Astra low 的 1.08× 接近雜訊上限。</li>
+<li id="b164">Claude 的 6 組比較沒有固定的贏家（最快者在 Anthropic、Vertex、Bedrock 各有出現，差異 1.03–1.39×）；Opus 5.5 low 在 Bedrock 慢 20%（57.6 對 72.2 tokens/s）。</li>
+<li id="b165">OpenAI 模型的 8 組比較中，OpenAI API 全是最慢的端點，Bedrock 或 Azure 快 1.08–1.60×。OR 的即時流量顯示相反的方向（見<a class="xref" href="#t5-5">表 5-5</a> 後的說明）。</li>
+<li id="b166">Gemini 3.1 Pro Preview 在 Google 自家的兩個端點之間仍差 1.17×（AI Studio 116.8、Vertex 99.9 tokens/s）。舊版模型的最大差異為 Grok 4.3 non-reasoning 在 Bedrock 230.2、在 xAI API 105.7（2.18×）。</li>
+</ul>
+
+<figure class="tbl" data-cols="5" data-rows="38" id="t5-5"><figcaption><strong>表 5-5 OpenRouter 即時流量的標準層級速度</strong>（2026-10-04 06:54–06:56 UTC；30 分鐘窗口；等級 <span class="g g-a" title="等級 A：獨立第三方量測">A</span>；只列請求數 ≥ 100 的端點；來源：OR 各模型頁，<a href="https://openrouter.ai/anthropic/claude-opus-5.5" rel="noopener" target="_blank">Claude Opus 5.5</a>、<a href="https://openrouter.ai/anthropic/claude-sonnet-5.5" rel="noopener" target="_blank">Claude Sonnet 5.5</a>、<a href="https://openrouter.ai/anthropic/claude-haiku-4.5" rel="noopener" target="_blank">Claude Haiku 4.5</a>、<a href="https://openrouter.ai/anthropic/claude-fable-5.1" rel="noopener" target="_blank">Claude Fable 5.1</a>、<a href="https://openrouter.ai/openai/gpt-6-astra" rel="noopener" target="_blank">GPT-6 Astra</a>、<a href="https://openrouter.ai/openai/gpt-6.1-sol" rel="noopener" target="_blank">GPT-6.1 Sol</a>、<a href="https://openrouter.ai/openai/gpt-6-luna" rel="noopener" target="_blank">GPT-6 Luna</a>、<a href="https://openrouter.ai/openai/gpt-5.6-sol" rel="noopener" target="_blank">GPT-5.6 Sol</a>、<a href="https://openrouter.ai/google/gemini-3.8-flash" rel="noopener" target="_blank">Gemini 3.8 Flash</a>、<a href="https://openrouter.ai/x-ai/grok-4.7" rel="noopener" target="_blank">Grok 4.7</a>；括號內為 p90；帶地區的端點為資料落地端點，價格加 10%）</figcaption><div aria-label="表 5-5 OpenRouter 即時流量的標準層級速度" class="tbl-scroll" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th class="w1" scope="col">模型</th>
+<th class="w1" scope="col">端點（OpenRouter 標籤）</th>
+<th scope="col">tokens/s p50（p90）</th>
+<th scope="col">latency s p50（p90）</th>
+<th scope="col">30 分鐘請求數</th>
+</tr>
+</thead>
+<tbody>
+<tr id="b167">
+<td class="rowhead">Claude Opus 5.5</td>
+<td>Anthropic <code>anthropic</code></td>
+<td class="num">71.0 (102)</td>
+<td class="num">3.72 (5.44)</td>
+<td class="num">9,367</td>
+</tr>
+<tr id="b168">
+<td class="rowhead">Claude Opus 5.5</td>
+<td>Claude Platform on AWS <code>claude-on-aws</code></td>
+<td class="num">71.0 (102)</td>
+<td class="num">4.43 (6.23)</td>
+<td class="num">33,162</td>
+</tr>
+<tr id="b169">
+<td class="rowhead">Claude Opus 5.5</td>
+<td>Amazon Bedrock <code>amazon-bedrock</code></td>
+<td class="num">71.0 (89)</td>
+<td class="num">4.64 (10.85)</td>
+<td class="num">10,346</td>
+</tr>
+<tr id="b170">
+<td class="rowhead">Claude Opus 5.5</td>
+<td>Google Vertex <code>google-vertex/global</code></td>
+<td class="num">82.0 (105)</td>
+<td class="num">3.05 (5.19)</td>
+<td class="num">2,923</td>
+</tr>
+<tr id="b171">
+<td class="rowhead">Claude Opus 5.5</td>
+<td>Azure <code>azure/global</code></td>
+<td class="num">81.0 (111)</td>
+<td class="num">3.72 (4.92)</td>
+<td class="num">728</td>
+</tr>
+<tr id="b172">
+<td class="rowhead">Claude Opus 5.5</td>
+<td>Google Vertex <code>google-vertex/europe</code></td>
+<td class="num">98.0 (120)</td>
+<td class="num">2.38 (3.71)</td>
+<td class="num">131</td>
+</tr>
+<tr id="b173">
+<td class="rowhead">Claude Sonnet 5.5</td>
+<td>Anthropic <code>anthropic</code></td>
+<td class="num">92.0 (137)</td>
+<td class="num">2.14 (4.12)</td>
+<td class="num">9,197</td>
+</tr>
+<tr id="b174">
+<td class="rowhead">Claude Sonnet 5.5</td>
+<td>Claude Platform on AWS <code>claude-on-aws</code></td>
+<td class="num">101.0 (148)</td>
+<td class="num">1.91 (7.15)</td>
+<td class="num">23,255</td>
+</tr>
+<tr id="b175">
+<td class="rowhead">Claude Sonnet 5.5</td>
+<td>Google Vertex <code>google-vertex/global</code></td>
+<td class="num">94.0 (144)</td>
+<td class="num">2.29 (5.31)</td>
+<td class="num">10,854</td>
+</tr>
+<tr id="b176">
+<td class="rowhead">Claude Sonnet 5.5</td>
+<td>Azure <code>azure/global</code></td>
+<td class="num">54.0 (146)</td>
+<td class="num">1.00 (2.82)</td>
+<td class="num">5,494</td>
+</tr>
+<tr id="b177">
+<td class="rowhead">Claude Sonnet 5.5</td>
+<td>Google Vertex <code>google-vertex/europe</code></td>
+<td class="num">92.5 (132)</td>
+<td class="num">1.98 (3.33)</td>
+<td class="num">1,197</td>
+</tr>
+<tr id="b178">
+<td class="rowhead">Claude Sonnet 5.5</td>
+<td>Amazon Bedrock <code>amazon-bedrock</code></td>
+<td class="num">120.0 (165)</td>
+<td class="num">1.09 (3.74)</td>
+<td class="num">1,175</td>
+</tr>
+<tr id="b179">
+<td class="rowhead">Claude Haiku 4.5</td>
+<td>Anthropic <code>anthropic</code></td>
+<td class="num">78.0 (114)</td>
+<td class="num">0.59 (1.11)</td>
+<td class="num">6,319</td>
+</tr>
+<tr id="b180">
+<td class="rowhead">Claude Haiku 4.5</td>
+<td>Amazon Bedrock <code>amazon-bedrock/global</code></td>
+<td class="num">66.0 (125)</td>
+<td class="num">0.75 (1.56)</td>
+<td class="num">41,880</td>
+</tr>
+<tr id="b181">
+<td class="rowhead">Claude Haiku 4.5</td>
+<td>Google Vertex <code>google-vertex/global</code></td>
+<td class="num">84.0 (123)</td>
+<td class="num">0.98 (3.74)</td>
+<td class="num">916</td>
+</tr>
+<tr id="b182">
+<td class="rowhead">Claude Haiku 4.5</td>
+<td>Azure <code>azure/global</code></td>
+<td class="num">84.0 (113)</td>
+<td class="num">0.42 (0.91)</td>
+<td class="num">530</td>
+</tr>
+<tr id="b183">
+<td class="rowhead">Claude Haiku 4.5</td>
+<td>Amazon Bedrock <code>amazon-bedrock/us</code></td>
+<td class="num">76.0 (112)</td>
+<td class="num">0.75 (1.01)</td>
+<td class="num">266</td>
+</tr>
+<tr id="b184">
+<td class="rowhead">Claude Haiku 4.5</td>
+<td>Google Vertex <code>google-vertex/europe</code></td>
+<td class="num">79.0 (88)</td>
+<td class="num">0.65 (0.80)</td>
+<td class="num">155</td>
+</tr>
+<tr id="b185">
+<td class="rowhead">Claude Fable 5.1</td>
+<td>Anthropic <code>anthropic</code></td>
+<td class="num">52.0 (77)</td>
+<td class="num">4.30 (6.49)</td>
+<td class="num">5,268</td>
+</tr>
+<tr id="b186">
+<td class="rowhead">Claude Fable 5.1</td>
+<td>Google Vertex <code>google-vertex/global</code></td>
+<td class="num">62.0 (83)</td>
+<td class="num">2.17 (7.26)</td>
+<td class="num">182</td>
+</tr>
+<tr id="b187">
+<td class="rowhead">GPT-6 Astra</td>
+<td>OpenAI <code>openai</code></td>
+<td class="num">40.0 (58)</td>
+<td class="num">3.54 (14.64)</td>
+<td class="num">12,041</td>
+</tr>
+<tr id="b188">
+<td class="rowhead">GPT-6 Astra</td>
+<td>Azure <code>azure</code></td>
+<td class="num">29.0 (44)</td>
+<td class="num">4.72 (11.75)</td>
+<td class="num">23,612</td>
+</tr>
+<tr id="b189">
+<td class="rowhead">GPT-6 Astra</td>
+<td>Azure <code>azure/us</code></td>
+<td class="num">33.0 (40)</td>
+<td class="num">7.99 (92.89)</td>
+<td class="num">181</td>
+</tr>
+<tr id="b190">
+<td class="rowhead">GPT-6.1 Sol</td>
+<td>OpenAI <code>openai</code></td>
+<td class="num">47.0 (66)</td>
+<td class="num">6.03 (33.13)</td>
+<td class="num">52,932</td>
+</tr>
+<tr id="b191">
+<td class="rowhead">GPT-6.1 Sol</td>
+<td>Azure <code>azure</code></td>
+<td class="num">46.0 (63)</td>
+<td class="num">5.22 (13.17)</td>
+<td class="num">8,696</td>
+</tr>
+<tr id="b192">
+<td class="rowhead">GPT-6.1 Sol</td>
+<td>Azure <code>azure/us</code></td>
+<td class="num">38.0 (61)</td>
+<td class="num">5.18 (11.75)</td>
+<td class="num">1,001</td>
+</tr>
+<tr id="b193">
+<td class="rowhead">GPT-6.1 Sol</td>
+<td>Amazon Bedrock <code>amazon-bedrock/us-east-1</code></td>
+<td class="num">21.0 (62)</td>
+<td class="num">16.63 (34.00)</td>
+<td class="num">139</td>
+</tr>
+<tr id="b194">
+<td class="rowhead">GPT-6 Luna</td>
+<td>OpenAI <code>openai</code></td>
+<td class="num">83.0 (128)</td>
+<td class="num">2.24 (7.19)</td>
+<td class="num">333,872</td>
+</tr>
+<tr id="b195">
+<td class="rowhead">GPT-6 Luna</td>
+<td>Azure <code>azure</code></td>
+<td class="num">77.0 (166)</td>
+<td class="num">3.04 (9.41)</td>
+<td class="num">71,722</td>
+</tr>
+<tr id="b196">
+<td class="rowhead">GPT-6 Luna</td>
+<td>Amazon Bedrock <code>amazon-bedrock/us-east-1</code></td>
+<td class="num">26.0 (72)</td>
+<td class="num">9.74 (22.05)</td>
+<td class="num">2,715</td>
+</tr>
+<tr id="b197">
+<td class="rowhead">GPT-6 Luna</td>
+<td>Azure <code>azure/eu</code></td>
+<td class="num">155.0 (182)</td>
+<td class="num">3.64 (10.43)</td>
+<td class="num">1,011</td>
+</tr>
+<tr id="b198">
+<td class="rowhead">GPT-6 Luna</td>
+<td>Azure <code>azure/us</code></td>
+<td class="num">50.0 (102)</td>
+<td class="num">1.89 (4.28)</td>
+<td class="num">270</td>
+</tr>
+<tr id="b199">
+<td class="rowhead">GPT-5.6 Sol</td>
+<td>OpenAI <code>openai</code></td>
+<td class="num">76.0 (135)</td>
+<td class="num">2.61 (8.68)</td>
+<td class="num">22,578</td>
+</tr>
+<tr id="b200">
+<td class="rowhead">GPT-5.6 Sol</td>
+<td>Azure <code>azure</code></td>
+<td class="num">56.0 (79)</td>
+<td class="num">4.29 (9.61)</td>
+<td class="num">13,426</td>
+</tr>
+<tr id="b201">
+<td class="rowhead">Gemini 3.8 Flash</td>
+<td>Google AI Studio <code>google-ai-studio</code></td>
+<td class="num">153.0 (277)</td>
+<td class="num">1.47 (2.96)</td>
+<td class="num">27,899</td>
+</tr>
+<tr id="b202">
+<td class="rowhead">Gemini 3.8 Flash</td>
+<td>Google Vertex <code>google-vertex/global</code></td>
+<td class="num">95.0 (157)</td>
+<td class="num">2.12 (4.62)</td>
+<td class="num">111,590</td>
+</tr>
+<tr id="b203">
+<td class="rowhead">Grok 4.7</td>
+<td>SpaceXAI <code>xai/zdr</code></td>
+<td class="num">80.0 (130)</td>
+<td class="num">1.91 (9.23)</td>
+<td class="num">7,149</td>
+</tr>
+<tr id="b204">
+<td class="rowhead">Grok 4.7</td>
+<td>SpaceXAI <code>xai</code></td>
+<td class="num">76.0 (116)</td>
+<td class="num">2.15 (7.77)</td>
+<td class="num">3,911</td>
+</tr>
+</tbody>
+</table></div></figure>
+<ul>
+<li id="b205">方向與 AA 不一致<span class="g g-d" title="等級 D：本文推算，附算式">D</span>：OpenAI 模型在 OR 上，Bedrock 比第一方慢（GPT-6 Luna 26 對 83 tokens/s，0.31×，2,715 筆請求；GPT-6.1 Sol 21 對 47，0.45×，139 筆），Azure 的 GPT-6 Astra 也慢（29 對 40，0.73×，23,612 筆），而 AA 的合成測試中 Bedrock 與 Azure 都比第一方快（<a class="xref" href="#t5-4">表 5-4</a>）。請求數 &lt; 100 的 GPT-5.6 Sol 在 Bedrock 為 40 tokens/s（66 筆），第一方為 76，同樣是相反方向。可能原因是 AA 以 max effort 與固定 10K prompt 測試，OR 是各客戶自選的 effort 與 prompt；本文沒有資料可以驗證。</li>
+<li id="b206">Gemini 3.8 Flash 的方向與 AA 一致：AI Studio 153 對 Vertex 95 tokens/s（1.61×，Vertex 有 111,590 筆請求）。</li>
+<li id="b207">尾端延遲<span class="g g-d" title="等級 D：本文推算，附算式">D</span>：表中 38 列的 p90 latency 為 p50 的 1.2–11.6 倍，中位數 2.3 倍；最高的是 GPT-6.1 Sol 第一方（6.03 → 33.13 s，5.5×，52,932 筆）與 Azure eastus2 的 GPT-6 Astra（7.99 → 92.89 s，11.6×，181 筆）。容量規劃不能只看 p50。</li>
+<li id="b208">OR 另有 Claude Platform on AWS 作為獨立的 Claude 端點，Opus 5.5 在窗口內的請求數（33,162）多於 Anthropic API（9,367）與 Bedrock（10,346）。區域端點的速度各異（Opus 5.5 在 Vertex eu 為 98 tokens/s、131 筆；global 為 82），OR 的資料沒有亞洲區域。</li>
+</ul>
+</div></div><div class="subpanel" role="tabpanel" id="s2-2" aria-labelledby="tab-s2-2"><div class="prose"><h3>(b) Fast、priority 與 ultrafast 層級</h3><p id="b209">各家的速度層級價格為標準價的 1.8–6×（Google Priority 1.8×、Anthropic 與 OpenAI Fast 2×、Bedrock Priority 1.75×、OpenAI Ultrafast 6×），獨立量測到的 tokens/s 增幅只有 0.96–1.66×（Opus 5.5 fast 1.66×、OpenAI Fast 0.96–1.31×、Gemini Priority 1.10–1.18×）；OpenAI Fast 的實際效果在 TTFT（latency 縮短約 1.65–3.9×，取兩次快照）。</p>
+
+<figure class="tbl" data-cols="7" data-rows="11" id="t5-6"><figcaption><strong>表 5-6 各雲端與模型廠商的 fast、priority、ultrafast 變體</strong>（2026-10-04 讀取；速度宣稱為廠商說法，等級 <span class="g g-c" title="等級 C：廠商宣稱或規格，未揭露方法">C</span>；價格與限制取自廠商文件，等級 <span class="g g-b" title="等級 B：廠商或夥伴公布，且揭露方法">B</span>；獨立量測見<a class="xref" href="#t5-7">表 5-7</a> 與<a class="xref" href="#t5-8">表 5-8</a>）</figcaption><div aria-label="表 5-6 各雲端與模型廠商的 fast、priority、ultrafast 變體" class="tbl-scroll" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th class="w2" scope="col">模式（狀態）</th>
+<th class="w3" scope="col">廠商的速度宣稱<span class="g g-c" title="等級 C：廠商宣稱或規格，未揭露方法">C</span></th>
+<th class="w2" scope="col">價格倍數</th>
+<th class="w3" scope="col">範圍與限制</th>
+<th class="w2" scope="col">背後硬體</th>
+<th class="w2" scope="col">獨立量測</th>
+<th class="src" scope="col">來源</th>
+</tr>
+</thead>
+<tbody>
+<tr id="b210">
+<td>Anthropic fast mode（research preview；<code>speed: "fast"</code>）</td>
+<td>"up to 2.5x higher output tokens per second"；效益在 OTPS 而非 TTFT；同一組權重</td>
+<td>2×：Opus 5.5 $8 / $40；Opus 5、Opus 4.8 $10 / $50；&gt; 200K 輸入同樣加價</td>
+<td>Opus 5.5、Opus 5、Opus 4.8；僅 Claude API，不在 Bedrock、Claude Platform on AWS、Google Cloud、Microsoft Foundry；需向客戶經理申請或候補；切換速度使 prompt cache 失效</td>
+<td class="muted">未揭露</td>
+<td>有：Opus 5.5 為 118 對 71 tokens/s（<a class="xref" href="#t5-7">表 5-7</a>）</td>
+<td class="src"><a href="https://platform.claude.com/docs/en/build-with-claude/fast-mode" rel="noopener" target="_blank">Claude fast mode</a>、<a href="https://platform.claude.com/docs/en/about-claude/pricing" rel="noopener" target="_blank">Claude pricing</a></td>
+</tr>
+<tr id="b211">
+<td class="rowhead">Anthropic Priority Tier</td>
+<td>無速度宣稱；只減少「server overloaded」錯誤</td>
+<td>承諾制</td>
+<td>不再開放購買新的 capacity commitments，僅既有合約</td>
+<td class="muted">未揭露</td>
+<td class="muted">無</td>
+<td class="src"><a href="https://platform.claude.com/docs/en/api/service-tiers" rel="noopener" target="_blank">Claude service tiers</a></td>
+</tr>
+<tr id="b212">
+<td>OpenAI Fast mode（<code>service_tier: "fast"</code> 或 <code>"priority"</code>；2026-07-30 由 Priority 改名）</td>
+<td>"up to 2.5× faster speeds and more consistent latency"</td>
+<td>2×：GPT-6 Astra $20 / $100；GPT-6.1 Sol $4 / $20；GPT-6 Luna $0.20 / $1.00；GPT-5.6 Sol $8 / $40；GPT-5.5 為 2.5×</td>
+<td>GPT-6 與 GPT-5.6 全系列；GPT-6 不支援 EU data residency；Astra 的 Fast 無 latency SLA；流量每 15 分鐘增幅超過 50% 會降為標準</td>
+<td class="muted">未揭露</td>
+<td>有：tokens/s 0.96–1.31×，latency 縮短 1.65–2.31×（<a class="xref" href="#t5-7">表 5-7</a>）</td>
+<td class="src"><a href="https://developers.openai.com/api/docs/guides/fast-mode" rel="noopener" target="_blank">OpenAI Fast mode</a>、<a href="https://developers.openai.com/api/docs/pricing" rel="noopener" target="_blank">OpenAI pricing</a></td>
+</tr>
+<tr id="b213">
+<td>OpenAI Ultrafast（GPT-6 Astra；<code>service_tier: "ultrafast"</code>）</td>
+<td>媒體：「up to 300 generated tokens per second」、API 最高 6×、Codex 最高 8×；NVIDIA：最高 8×</td>
+<td>6× 標準、3× Fast：Astra $60 / $300；&gt; 272K 輸入 $120 / $450；GPT-6.1 Sol Ultrafast 報導為 $12 / $60</td>
+<td>Astra 為 "broadly available"，GPT-5.6 Sol 為預覽，GPT-6.1 Sol「數日內」（2026-09-29 的說法）；僅支援美國 data residency 與 global processing</td>
+<td>NVIDIA GPU（NVIDIA，2026-10-01）；GPT-6.1 Sol Ultrafast 報導為 NVIDIA 低 batch size、非 Cerebras（SemiAnalysis，2026-09-30，未證實）</td>
+<td>無：OR 有端點但窗口內無流量，AA 無列</td>
+<td class="src"><a href="https://developers.openai.com/api/docs/guides/ultrafast-mode" rel="noopener" target="_blank">OpenAI Ultrafast mode</a>、<a href="https://venturebeat.com/technology/openais-gpt-6-1-sol-offers-astra-like-performance-at-1-5th-price-a-new-ultrafast-tier-clocks-at-300-tokens-per-second" rel="noopener" target="_blank">VentureBeat</a>、<a href="https://blogs.nvidia.com/blog/gpus-openai-gpt-6-astra-ultrafast/" rel="noopener" target="_blank">NVIDIA 部落格</a></td>
+</tr>
+<tr id="b214">
+<td><span class="rh">OpenAI GPT-5.6 Sol Ultrafast</span><span class="rh-sub"><span class="vh">（</span>limited preview，2026-08-13<span class="vh">）</span></span></td>
+<td>"up to 750 output tokens per second"；媒體："up to 14x"；GDPval 任務快 5.6×、Humanity's Last Exam 端到端快 6.9×（Cerebras 自測）</td>
+<td class="muted">未揭露</td>
+<td>僅 API，限 "a select group of customers"；Cerebras：與標準相同的架構、權重、精度、context 與 reasoning 設定</td>
+<td>Cerebras CS-3（多套系統）</td>
+<td class="muted">無</td>
+<td class="src"><a href="https://www.cerebras.ai/blog/accelerating-gpt-5-6-sol-ultrafast-with-openai" rel="noopener" target="_blank">Cerebras 2026-08-13</a>、<a href="https://www.cerebras.ai/blog/how-cerebras-serves-gpt-5-6-sol-at-up-to-750-tokens-per-second" rel="noopener" target="_blank">Cerebras 2026-08-27</a>、<a class="unread" href="https://the-decoder.com/gpt-5-6-sol-goes-14x-faster-as-openai-launches-ultrafast-mode-powered-by-cerebras/" rel="noopener" target="_blank" title="查核時無法重讀此頁；所引內容另有其他來源佐證">The Decoder</a></td>
+</tr>
+<tr id="b215">
+<td><span class="rh">OpenAI GPT-5.3-Codex-Spark</span><span class="rh-sub"><span class="vh">（</span>research preview，2026-02-12<span class="vh">）</span></span></td>
+<td>"over 1,000 tokens/s"；SemiAnalysis：「最高 2,000 tok/sec/user」（分析師）</td>
+<td>無 API 定價</td>
+<td>ChatGPT Pro 的 Codex；API 僅限 design partners；是較小的另一個模型，不是 GPT-5.3-Codex 的層級</td>
+<td>Cerebras WSE-3</td>
+<td class="muted">無</td>
+<td class="src"><a href="https://www.cerebras.ai/blog/openai-codexspark" rel="noopener" target="_blank">Cerebras blog 2026-02-12</a>、<a href="https://newsletter.semianalysis.com/p/cerebras-faster-tokens-please" rel="noopener" target="_blank">SemiAnalysis</a></td>
+</tr>
+<tr id="b216">
+<td>Google Priority inference（Preview；<code>service_tier: "priority"</code>）</td>
+<td>"lower latency and the highest reliability"；延遲「Seconds」對標準的「Seconds to minutes」</td>
+<td>文件寫「貴 75–100%」，實際 1.8×：Gemini 3.8 Flash $1.35 / $6.75；Gemini 3.1 Pro Preview $3.60 / $21.60（≤ 200K）</td>
+<td>Gemini 3.8、3.7、3.6、3.5 Flash，3.5 與 3.1 Flash-Lite，3.1 Pro Preview，2.5 系列；預設速率上限為標準的 0.3×，溢出降為標準並以標準價計</td>
+<td>未揭露（Google 稱 Gemini 在 TPU 上服務）</td>
+<td>有：tokens/s 1.10–1.18×，latency 未縮短（<a class="xref" href="#t5-7">表 5-7</a>）</td>
+<td class="src"><a href="https://ai.google.dev/gemini-api/docs/priority-inference" rel="noopener" target="_blank">Gemini priority inference</a>、<a href="https://ai.google.dev/gemini-api/docs/pricing" rel="noopener" target="_blank">Gemini pricing</a></td>
+</tr>
+<tr id="b217">
+<td>Amazon Bedrock latency-optimized inference（Preview，2024-12 起）</td>
+<td>"significantly reduced latency without compromising accuracy"；Claude 3.5 Haiku "up to 60% faster inference speed"</td>
+<td>Claude 3.5 Haiku $1 / $5 對標準 $0.80 / $4（+25%）</td>
+<td>僅 Nova Pro、Claude 3.5 Haiku、Llama 3.1 405B 與 70B；US East（Ohio）、US West（Oregon），Nova Pro 另含 N. Virginia；沒有現行 Claude、Nova 2 或 GPT；超出配額退回標準</td>
+<td>AWS Trainium2 加軟體最佳化（AWS，2024-12-02 與 12-03）</td>
+<td>AWS 自測（等級 <span class="g g-b" title="等級 B：廠商或夥伴公布，且揭露方法">B</span>，2025-01-28，<a class="xref" href="#t5-8">表 5-8</a>）；AA 無（Claude 3.5 Haiku 已無供應商）</td>
+<td class="src"><a href="https://docs.aws.amazon.com/bedrock/latest/userguide/latency-optimized-inference.html" rel="noopener" target="_blank">Bedrock 延遲最佳化推論</a>、<a href="https://claude.com/blog/trainium2-and-distillation" rel="noopener" target="_blank">Anthropic 2024-12</a></td>
+</tr>
+<tr id="b218">
+<td>Amazon Bedrock Priority tier（<code>service_tier: "priority"</code>）</td>
+<td>"delivers the fastest response times for a price premium"</td>
+<td class="num">+75%（Flex 為 −50%）</td>
+<td>支援模型列在各模型卡片，Claude 與 GPT 是否支援未擷取；與 Standard、Flex 共用 on-demand 配額</td>
+<td class="muted">未揭露</td>
+<td class="muted">無</td>
+<td class="src"><a href="https://docs.aws.amazon.com/bedrock/latest/userguide/service-tiers-inference.html" rel="noopener" target="_blank">Bedrock service tiers</a>、<a href="https://aws.amazon.com/bedrock/pricing/" rel="noopener" target="_blank">Bedrock pricing</a></td>
+</tr>
+<tr id="b219">
+<td>Azure（Microsoft Foundry）priority processing</td>
+<td>已發布的延遲目標：gpt-6-sol、gpt-5.6-sol "99% &gt; 80 TPS"；gpt-5.6-terra "99% &gt; 70 TPS"；gpt-5.5 "99% &gt; 50 TPS"</td>
+<td>文件只寫定價見 Azure OpenAI pricing page，倍數未擷取</td>
+<td>Global Standard 與 US Data Zone Standard；表中沒有 gpt-6-astra、gpt-6.1-sol、gpt-6-luna；目標以每 5 分鐘的 p50 請求延遲計</td>
+<td class="muted">未揭露</td>
+<td class="muted">無</td>
+<td class="src"><a href="https://learn.microsoft.com/en-us/azure/foundry/openai/concepts/priority-processing" rel="noopener" target="_blank">Azure priority processing</a></td>
+</tr>
+<tr id="b220">
+<td><span class="rh">AWS 與 Cerebras 的分離式推論</span><span class="rh-sub"><span class="vh">（</span>已宣布未出貨；2026-03-13 宣布，Cerebras 於 2026-08-12 預期 2027 Q1<span class="vh">）</span></span></td>
+<td>AWS："an order of magnitude faster and higher performance than what's available today"；Cerebras："up to 3,000 tokens per second"</td>
+<td class="muted">未揭露</td>
+<td>只透過 Bedrock；開源 LLM 與 Nova 預計「later this year」（2026-03 的說法）；沒有區域、模型 ID 與價格</td>
+<td>Trainium3 做 prefill、Cerebras CS-3 做 decode，以 EFA 連接</td>
+<td class="muted">無</td>
+<td class="src"><a href="https://www.aboutamazon.com/news/aws/aws-cerebras-ai-inference" rel="noopener" target="_blank">About Amazon</a>、<a href="https://www.sec.gov/Archives/edgar/data/2021728/000162828026056186/cbrsannouncesfinancialresu.htm" rel="noopener" target="_blank">Cerebras Q2 2026 財報</a></td>
+</tr>
+</tbody>
+</table></div></figure>
+<ul>
+<li id="b221">其他層級：xAI Priority 的速度宣稱查無公開資料，OR 列出 Grok 4.7 Priority 為 $4 / $12（2×），窗口內無流量；Google 的 Gemini 3.5 Flash-Lite 是較便宜的另一個模型而非層級（$0.30 / $2.50；AA 360.0 tokens/s、p5–p95 為 263–470，TTFT 8.82 s）；OpenAI Flex 為標準價的 0.5×，實測見<a class="xref" href="#t5-7">表 5-7</a>。</li>
+</ul>
+
+<figure class="tbl" data-cols="7" data-rows="15" id="t5-7"><figcaption><strong>表 5-7 OpenRouter 即時流量中各速度層級對標準層級的實測</strong>（2026-10-04 06:54–06:56 UTC；30 分鐘窗口；等級 <span class="g g-a" title="等級 A：獨立第三方量測">A</span>；倍數為 D：該層 ÷ 標準的 tokens/s，標準 ÷ 該層的 latency；價格倍數取自 OR 列出的輸入價；† 為請求數 &lt; 100，Astra Fast 僅 7 筆，134.82 s 不具代表性）</figcaption><div aria-label="表 5-7 OpenRouter 即時流量中各速度層級對標準層級的實測" class="tbl-scroll" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th class="w2" scope="col">模型與層級（OpenRouter 標籤）</th>
+<th class="w1" scope="col">價格倍數（$/1M 輸入 / 輸出）</th>
+<th scope="col">tokens/s p50：標準 → 該層</th>
+<th scope="col">速度倍數<span class="g g-d" title="等級 D：本文推算，附算式">D</span></th>
+<th scope="col">latency s p50：標準 → 該層</th>
+<th scope="col">latency 縮短倍數<span class="g g-d" title="等級 D：本文推算，附算式">D</span></th>
+<th scope="col">30 分鐘請求數</th>
+</tr>
+</thead>
+<tbody>
+<tr id="b222">
+<td>Claude Opus 5.5 Fast / Priority <code>anthropic/fast</code></td>
+<td class="num">2×（8 / 40）</td>
+<td class="num">71.0 → 118.0</td>
+<td class="num">1.66×</td>
+<td class="num">3.72 → 2.92</td>
+<td class="num">1.27×</td>
+<td class="num">185</td>
+</tr>
+<tr id="b223">
+<td class="rowhead">GPT-6 Astra Flex <code>openai/flex</code></td>
+<td class="num">0.5×（5 / 25）</td>
+<td class="num">40.0 → 50.0</td>
+<td class="num">1.25×</td>
+<td class="num">3.54 → 2.61</td>
+<td class="num">1.36×</td>
+<td class="num">747</td>
+</tr>
+<tr id="b224">
+<td class="rowhead">GPT-6 Astra Fast / Priority <code>openai/fast</code></td>
+<td class="num">2×（20 / 100）</td>
+<td class="num">40.0 → 45.0</td>
+<td class="num">1.12×</td>
+<td class="num">3.54 → 134.82</td>
+<td class="num">0.03×</td>
+<td class="num">7†</td>
+</tr>
+<tr id="b225">
+<td class="rowhead">GPT-6 Astra Ultrafast <code>openai/ultrafast</code></td>
+<td class="num">6×（60 / 300）</td>
+<td>無流量</td>
+<td class="muted">–</td>
+<td>無流量</td>
+<td class="muted">–</td>
+<td class="num">0</td>
+</tr>
+<tr id="b226">
+<td class="rowhead">GPT-6.1 Sol Flex <code>openai/flex</code></td>
+<td class="num">0.5×（1 / 5）</td>
+<td class="num">47.0 → 43.5</td>
+<td class="num">0.93×</td>
+<td class="num">6.03 → 5.64</td>
+<td class="num">1.07×</td>
+<td class="num">2,213</td>
+</tr>
+<tr id="b227">
+<td class="rowhead">GPT-6.1 Sol Fast / Priority <code>openai/fast</code></td>
+<td class="num">2×（4 / 20）</td>
+<td class="num">47.0 → 61.5</td>
+<td class="num">1.31×</td>
+<td class="num">6.03 → 2.73</td>
+<td class="num">2.21×</td>
+<td class="num">106</td>
+</tr>
+<tr id="b228">
+<td class="rowhead">GPT-6 Luna Flex <code>openai/flex</code></td>
+<td class="num">0.5×（0.05 / 0.25）</td>
+<td class="num">83.0 → 32.0</td>
+<td class="num">0.39×</td>
+<td class="num">2.24 → 3.49</td>
+<td class="num">0.64×</td>
+<td class="num">49,553</td>
+</tr>
+<tr id="b229">
+<td class="rowhead">GPT-6 Luna Fast / Priority <code>openai/fast</code></td>
+<td class="num">2×（0.2 / 1）</td>
+<td class="num">83.0 → 97.0</td>
+<td class="num">1.17×</td>
+<td class="num">2.24 → 0.97</td>
+<td class="num">2.31×</td>
+<td class="num">7,131</td>
+</tr>
+<tr id="b230">
+<td class="rowhead">GPT-5.6 Sol Flex <code>openai/flex</code></td>
+<td class="num">0.5×（1 / 5）</td>
+<td class="num">76.0 → 92.0</td>
+<td class="num">1.21×</td>
+<td class="num">2.61 → 2.32</td>
+<td class="num">1.12×</td>
+<td class="num">496</td>
+</tr>
+<tr id="b231">
+<td class="rowhead">GPT-5.6 Sol Fast / Priority <code>openai/fast</code></td>
+<td class="num">2×（4 / 20）</td>
+<td class="num">76.0 → 73.0</td>
+<td class="num">0.96×</td>
+<td class="num">2.61 → 1.58</td>
+<td class="num">1.65×</td>
+<td class="num">65†</td>
+</tr>
+<tr id="b232">
+<td class="rowhead">Gemini 3.8 Flash Flex <code>google-ai-studio/flex</code></td>
+<td class="num">0.5×（0.375 / 1.875）</td>
+<td class="num">153.0 → 156.0</td>
+<td class="num">1.02×</td>
+<td class="num">1.47 → 1.66</td>
+<td class="num">0.89×</td>
+<td class="num">16,023</td>
+</tr>
+<tr id="b233">
+<td>Gemini 3.8 Flash Fast / Priority <code>google-ai-studio/priority</code></td>
+<td class="num">1.8×（1.35 / 6.75）</td>
+<td class="num">153.0 → 169.0</td>
+<td class="num">1.10×</td>
+<td class="num">1.47 → 1.49</td>
+<td class="num">0.99×</td>
+<td class="num">2,269</td>
+</tr>
+<tr id="b234">
+<td>Gemini 3.8 Flash Fast / Priority <code>google-vertex/global/priority</code></td>
+<td class="num">1.8×（1.35 / 6.75）</td>
+<td class="num">95.0 → 112.0</td>
+<td class="num">1.18×</td>
+<td class="num">2.12 → 2.77</td>
+<td class="num">0.77×</td>
+<td class="num">281</td>
+</tr>
+<tr id="b235">
+<td>Gemini 3.8 Flash Flex <code>google-vertex/global/flex</code></td>
+<td class="num">0.5×（0.375 / 1.875）</td>
+<td class="num">95.0 → 64.0</td>
+<td class="num">0.67×</td>
+<td class="num">2.12 → 13.33</td>
+<td class="num">0.16×</td>
+<td class="num">274</td>
+</tr>
+<tr id="b236">
+<td class="rowhead">Grok 4.7 Fast / Priority <code>xai/priority</code></td>
+<td class="num">2×（4 / 12）</td>
+<td>無流量</td>
+<td class="muted">–</td>
+<td>無流量</td>
+<td class="muted">–</td>
+<td class="num">0</td>
+</tr>
+</tbody>
+</table></div></figure>
+<ul>
+<li id="b237">Anthropic fast mode<span class="g g-d" title="等級 D：本文推算，附算式">D</span>：p50 為 118 ÷ 71 = 1.66×，p90 為 242 ÷ 102 = 2.37×，價格 2×；廠商的「最高 2.5×」只與 p90 相符，樣本為單一窗口的 185 筆請求。Anthropic 說效益集中在 OTPS，而 latency p50 也從 3.72 s 降到 2.92 s（1.27×）。</li>
+<li id="b238">OpenAI Fast 的 tokens/s 增幅小（Luna 1.17×、GPT-6.1 Sol 1.31×、GPT-5.6 Sol 0.96×），「最高 2.5×」在這些窗口沒有出現，效果主要在 TTFT（Luna 2.24 → 0.97 s、GPT-6.1 Sol 6.03 → 2.73 s、GPT-5.6 Sol 2.61 → 1.58 s）。同一端點數分鐘後的第二次快照（07:02 UTC）顯示 Fast 層的數字會波動：速度 Luna 97 與 106、GPT-6.1 Sol 61.5 與 52.5 tokens/s，相差 9–17%；latency 縮短倍數 Luna 2.31× 與 1.96×（2.24 → 0.97 與 1.14 s）、GPT-6.1 Sol 2.21× 與 3.92×（6.03 → 2.73 與 5.88 → 1.50 s，<span class="g g-d" title="等級 D：本文推算，附算式">D</span>），所以 10–15% 內的倍數差異不具意義。</li>
+<li id="b239">Google Priority 的行為像可靠度與排隊層級：tokens/s 多 10–18%，latency 沒有下降（AI Studio 1.47 → 1.49 s；Vertex 2.12 → 2.77 s）。OpenAI Flex 在 Luna 上只有標準速度的 0.39×（32 對 83 tokens/s），在 GPT-6 Astra 上卻是 1.25×，不同模型不一致。</li>
+<li id="b240">價格 ÷ 速度<span class="g g-d" title="等級 D：本文推算，附算式">D</span>：Fast 與 Priority 的價格倍數（1.8–2×）高於實測速度倍數，每單位每使用者速度的價格上升 1.2–2.1×（Opus 5.5 為 2 ÷ 1.66 = 1.20；GPT-5.6 Sol 為 2 ÷ 0.96 = 2.08）；Ultrafast 為 6× 價格換最高 6–8× 速度（廠商說法），每單位速度的價格約持平或更高。</li>
+<li id="b241">Ultrafast 沒有獨立量測，只能檢查廠商數字是否自洽<span class="g g-d" title="等級 D：本文推算，附算式">D</span>：若「300 tokens/s」與「最高 8×」都指 GPT-6 Astra Ultrafast，隱含的標準速度為 300 ÷ 8 ≈ 38 tokens/s，接近 OR 的 40、低於 AA 的 44.9–51.6；GPT-5.6 Sol 的「最高 14×」隱含標準速度 750 ÷ 14 ≈ 54 tokens/s，低於 AA（79.6–95.0，max effort）與 OR（76），對實測標準速度只有 750 ÷ 79.6 = 9.4×、750 ÷ 76 = 9.9×。Cerebras 的「比 Fable 5 快 11×」與 AA 現在的 Claude Fable 5.1 max 相符（750 ÷ 68.2 = 11.0；Cerebras 寫的是 Fable 5，版本可能不同），其「比 Opus 4.8 fast 快 5×」隱含 Opus 4.8 fast 約 150 tokens/s，為 AA 現值 58.9 的 2.5×（兩個數字相隔七週）。</li>
+<li id="b242">Codex-Spark 的提速不全來自晶片：OpenAI 同時以 WebSocket 路徑把 client-server overhead 降 80%、per-token overhead 降 30%、TTFT 降 50%（Techzine 轉述，C，<a href="https://www.techzine.eu/news/analytics/138754/openai-swaps-nvidia-for-cerebras-with-gpt-5-3-codex-spark/" rel="noopener" target="_blank">Techzine</a>）；SemiAnalysis 估計它是約 120B 的蒸餾模型、約跑在 3 片 wafer 上（分析師推測）。</li>
+</ul>
+
+<figure class="tbl" data-cols="7" data-rows="2" id="t5-8"><figcaption><strong>表 5-8 Bedrock latency-optimized inference 對標準模式</strong>（AWS 自測，2025-01-28；約 1,600 次 API 呼叫、橫跨數日；input 100–100,000 tokens、output 100–1,000 tokens；client 在 us-west-2、模型在 us-east-2；等級 <span class="g g-b" title="等級 B：廠商或夥伴公布，且揭露方法">B</span>；來源：<a href="https://aws.amazon.com/blogs/machine-learning/optimizing-ai-responsiveness-a-practical-guide-to-amazon-bedrock-latency-optimized-inference/" rel="noopener" target="_blank">AWS ML Blog</a>；標準 → 最佳化）</figcaption><div aria-label="表 5-8 Bedrock latency-optimized inference 對標準模式" class="tbl-scroll" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th class="w1" scope="col">模型</th>
+<th scope="col">TTFT P50（s）</th>
+<th scope="col">TTFT P90（s）</th>
+<th scope="col">輸出 tokens/s P50</th>
+<th scope="col">輸出 tokens/s P90</th>
+<th scope="col">P50 速度倍數<span class="g g-d" title="等級 D：本文推算，附算式">D</span></th>
+<th scope="col">P90 速度倍數<span class="g g-d" title="等級 D：本文推算，附算式">D</span></th>
+</tr>
+</thead>
+<tbody>
+<tr id="b243">
+<td class="rowhead">Claude 3.5 Haiku</td>
+<td class="num">1.1 → 0.6</td>
+<td class="num">2.9 → 1.4</td>
+<td class="num">48.4 → 85.9</td>
+<td class="num">67.4 → 152.0</td>
+<td class="num">1.77×</td>
+<td class="num">2.26×</td>
+</tr>
+<tr id="b244">
+<td class="rowhead">Llama 3.1 70B</td>
+<td class="num">0.9 → 0.4</td>
+<td class="num">42.8 → 1.2</td>
+<td class="num">30.2 → 137.0</td>
+<td class="num">32.4 → 203.7</td>
+<td class="num">4.54×</td>
+<td class="num">6.29×</td>
+</tr>
+</tbody>
+</table></div></figure>
+<ul>
+<li id="b245">這是 Trainium2 上唯一有方法說明的私有模型服務端數字，而且是一個已停用的模型（AA 對 Claude 3.5 Haiku 寫「No API providers are currently available」，<a href="https://artificialanalysis.ai/models/claude-3-5-haiku/providers" rel="noopener" target="_blank">AA Claude 3.5 Haiku</a>）。AWS 的測試文章本身沒有提到 Trainium；晶片歸屬來自 AWS 的另外兩篇公告："purpose-built AI chips like AWS Trainium2 and advanced software optimizations"（<a href="https://aws.amazon.com/about-aws/whats-new/2024/12/latency-optimized-inference-foundation-models-amazon-bedrock/" rel="noopener" target="_blank">AWS What's New，2024-12-02</a>）與 "Trainium2 chips are already powering the latency-optimized versions of Llama 3.1 405B and Claude 3.5 Haiku"（<a href="https://aws.amazon.com/blogs/aws/amazon-ec2-trn2-instances-and-trn2-ultraservers-for-aiml-training-and-inference-is-now-available/" rel="noopener" target="_blank">AWS News Blog，2024-12-03</a>）。</li>
+<li id="b246">兩個數字不一致：Anthropic 說 Claude 3.5 Haiku "up to 60% faster"（2024-12-03，<span class="g g-c" title="等級 C：廠商宣稱或規格，未揭露方法">C</span>），AWS 自測的 P50 為 +77%（85.9 ÷ 48.4 = 1.77）；兩者量的指標與條件不同，來源沒有調和。Llama 3.1 70B 的標準模式 TTFT P90 為 42.8 s，顯示基準線排隊嚴重，P90 的約 36 倍改善（42.8 ÷ 1.2）高估了硬體效應<span class="g g-d" title="等級 D：本文推算，附算式">D</span>。</li>
+<li id="b247">狀態：到 2026-10-04 文件仍寫「in preview release」；支援模型沒有任何現行 Claude、Nova 2 或 GPT，所以 Trainium2 對現行 Claude 的每使用者速度沒有公開數字。</li>
+</ul>
+</div></div><div class="subpanel" role="tabpanel" id="s2-3" aria-labelledby="tab-s2-3"><div class="prose"><h3>(c) 同一個模型上的硬體效應</h3><p id="b248">同一個私有模型在不同晶片上的獨立量測不存在：最接近的是廠商對同一組權重在不同硬體上的倍數宣稱（GPT-5.6 Sol 在 Cerebras 最高 750 tokens/s，對實測標準速度 76–95 約 8–10×），以及開源權重模型在多家供應商上的 AA 數字（gpt-oss-120b 在 Cerebras 為 1,781、在 Bedrock 為 86 tokens/s，相差 20.7×）。後者是硬體與服務堆疊的合併效應，AA 不揭露端點的硬體。</p>
+
+<figure class="tbl" data-cols="7" data-rows="7" id="t5-9"><figcaption><strong>表 5-9 同一個模型在不同硬體或端點上的公開比較</strong>（私有模型列在前，開源權重模型作為量級參考；日期見各列；倍數為 D）</figcaption><div aria-label="表 5-9 同一個模型在不同硬體或端點上的公開比較" class="tbl-scroll" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th class="w2" scope="col">比較與日期</th>
+<th class="w2" scope="col">模型</th>
+<th class="w2" scope="col">硬體與出處</th>
+<th class="w3" scope="col">公開數字</th>
+<th class="w2" scope="col">倍數<span class="g g-d" title="等級 D：本文推算，附算式">D</span></th>
+<th scope="col">等級</th>
+<th class="src" scope="col">來源</th>
+</tr>
+</thead>
+<tbody>
+<tr id="b249">
+<td><span class="rh">標準 vs Ultrafast</span><span class="rh-sub"><span class="vh">（</span>2026-08-13 起<span class="vh">）</span></span></td>
+<td>GPT-5.6 Sol（私有）</td>
+<td>標準：未揭露；Ultrafast：Cerebras CS-3（Cerebras 與 OpenAI 的說法）</td>
+<td>標準 76 tokens/s（OR p50）、79.6–95.0（AA，max effort，10K）；Ultrafast「最高 750」</td>
+<td>750 ÷ 79.6 = 9.4×；750 ÷ 76 = 9.9×；OpenAI 稱最高 14×</td>
+<td>Ultrafast 為 <span class="g g-c" title="等級 C：廠商宣稱或規格，未揭露方法">C</span>，標準為 <span class="g g-a" title="等級 A：獨立第三方量測">A</span></td>
+<td class="src"><a href="https://openai.com/index/previewing-ultrafast/" rel="noopener" target="_blank">OpenAI 預覽</a>、<a href="https://www.cerebras.ai/blog/how-cerebras-serves-gpt-5-6-sol-at-up-to-750-tokens-per-second" rel="noopener" target="_blank">Cerebras</a></td>
+</tr>
+<tr id="b250">
+<td><span class="rh">標準 vs Ultrafast</span><span class="rh-sub"><span class="vh">（</span>2026-10-01<span class="vh">）</span></span></td>
+<td>GPT-6 Astra（私有）</td>
+<td>標準：未揭露；Ultrafast：NVIDIA GPU（NVIDIA 部落格）</td>
+<td>標準 44.9–51.6（AA，OpenAI API）、40（OR）；Ultrafast「最高 300」、「最高 8×」</td>
+<td>300 ÷ 40–51.6 = 5.8–7.5×；8× 隱含標準約 38 tokens/s</td>
+<td>Ultrafast 為 <span class="g g-c" title="等級 C：廠商宣稱或規格，未揭露方法">C</span>，標準為 <span class="g g-a" title="等級 A：獨立第三方量測">A</span></td>
+<td class="src"><a href="https://blogs.nvidia.com/blog/gpus-openai-gpt-6-astra-ultrafast/" rel="noopener" target="_blank">NVIDIA 部落格</a>、<a href="https://venturebeat.com/technology/openais-gpt-6-1-sol-offers-astra-like-performance-at-1-5th-price-a-new-ultrafast-tier-clocks-at-300-tokens-per-second" rel="noopener" target="_blank">VentureBeat</a></td>
+</tr>
+<tr id="b251">
+<td><span class="rh">標準 vs latency-optimized</span><span class="rh-sub"><span class="vh">（</span>2025-01-28<span class="vh">）</span></span></td>
+<td>Claude 3.5 Haiku（私有，已停用）</td>
+<td>Trainium2 加軟體最佳化（AWS）</td>
+<td class="num">48.4 → 85.9 tokens/s（P50）</td>
+<td class="num">1.77×</td>
+<td><span class="g g-b" title="等級 B：廠商或夥伴公布，且揭露方法">B</span></td>
+<td class="src"><a href="https://aws.amazon.com/blogs/machine-learning/optimizing-ai-responsiveness-a-practical-guide-to-amazon-bedrock-latency-optimized-inference/" rel="noopener" target="_blank">AWS ML Blog</a></td>
+</tr>
+<tr id="b252">
+<td><span class="rh">同廠商兩個端點</span><span class="rh-sub"><span class="vh">（</span>2026-10-04<span class="vh">）</span></span></td>
+<td>Gemini 3.1 Pro Preview（私有）</td>
+<td>AI Studio 與 Vertex 皆為 Google 端點，晶片未揭露（Google 稱 Gemini 在 TPU 上服務）</td>
+<td>AI Studio 116.8、Vertex 99.9 tokens/s（AA，10K）</td>
+<td class="num">1.17×</td>
+<td><span class="g g-a" title="等級 A：獨立第三方量測">A</span></td>
+<td class="src"><a href="https://artificialanalysis.ai/leaderboards/providers" rel="noopener" target="_blank">AA providers leaderboard</a></td>
+</tr>
+<tr id="b253">
+<td><span class="rh">多家供應商</span><span class="rh-sub"><span class="vh">（</span>2026-10-04<span class="vh">）</span></span></td>
+<td>gpt-oss-120b high（開源權重，參考）</td>
+<td>AA 不揭露硬體；Cerebras 為 wafer-scale ASIC，SambaNova、Groq 為 ASIC，其餘為 GPU 雲或一般雲（類型為本文標示，<span class="g g-d" title="等級 D：本文推算，附算式">D</span>）</td>
+<td>tokens/s：Cerebras 1,781；SambaNova 709；Groq 471；Azure 314；DeepInfra（Turbo）277；Nebius 240；Crusoe 205；Novita 184；Amazon Bedrock 86；DeepInfra（標準）51；CoreWeave 44；Google Vertex 40。TTFT：Cerebras 0.43 s、Crusoe 0.39 s、Vertex 38.59 s</td>
+<td>Cerebras ÷ Azure = 5.7×；÷ Bedrock = 20.7×</td>
+<td>速度為 <span class="g g-a" title="等級 A：獨立第三方量測">A</span>，類型為 <span class="g g-d" title="等級 D：本文推算，附算式">D</span></td>
+<td class="src"><a href="https://artificialanalysis.ai/models/gpt-oss-120b/providers" rel="noopener" target="_blank">AA gpt-oss-120b</a></td>
+</tr>
+<tr id="b254">
+<td><span class="rh">跨晶片，每晶片吞吐量</span><span class="rh-sub"><span class="vh">（</span>2026-09-07<span class="vh">）</span></span></td>
+<td>Qwen3.5-397B FP8（開源權重，參考）</td>
+<td>Ironwood 對 B200、B300；8K 輸入 / 1K 輸出、aggregated serving；SemiAnalysis InferenceX 預覽</td>
+<td>20 tokens/s/user 時每晶片 9,364 / 8,903 / 8,925 total tokens/s；concurrency 256 的平均 TTFT 5.41 / 3.75 / 2.40 s</td>
+<td>Ironwood ÷ B200 約 1.05×；TTFT 5.41 ÷ 3.75 = 1.44×</td>
+<td><span class="g g-a" title="等級 A：獨立第三方量測">A</span>（吞吐量）</td>
+<td class="src"><a href="https://inferencex.semianalysis.com/blog/tpu-inferencex-full-steam" rel="noopener" target="_blank">SemiAnalysis InferenceX</a></td>
+</tr>
+<tr id="b255">
+<td><span class="rh">Trainium2 → Trainium3</span><span class="rh-sub"><span class="vh">（</span>2025-12-02<span class="vh">）</span></span></td>
+<td>gpt-oss（開源權重，AWS 測試）</td>
+<td>Trn3 UltraServer 對 Trn2 UltraServer（AWS）</td>
+<td>每晶片 throughput "3x"、回應 "4x faster"；無絕對值、無方法</td>
+<td>3×；4×（廠商倍數）</td>
+<td><span class="g g-c" title="等級 C：廠商宣稱或規格，未揭露方法">C</span></td>
+<td class="src"><a href="https://www.aboutamazon.com/news/aws/trainium-3-ultraserver-faster-ai-training-lower-cost" rel="noopener" target="_blank">About Amazon</a></td>
+</tr>
+</tbody>
+</table></div></figure>
+<ul>
+<li id="b256"><a class="xref" href="#t5-4">表 5-4</a> 的雲端差異（1.03–1.60×）不能當成晶片差異：沒有來源把端點對應到晶片，Gemini 3.1 Pro 在 Google 自家兩個端點之間就差 1.17×，顯示端點差異可來自服務設定。</li>
+<li id="b257">gpt-oss-120b 的 Cerebras 實測 1,781 tokens/s 只有其宣稱「約 3,000」的 59%（1,781 ÷ 3,000），TTFT 也不是最低（Crusoe 0.39 s 較低）。</li>
+</ul>
+</div></div><div class="subpanel" role="tabpanel" id="s2-4" aria-labelledby="tab-s2-4"><div class="prose"><h3>(d) 各加速器上的私有模型數字</h3>
+<figure class="tbl" data-cols="6" data-rows="5" id="t5-10"><figcaption><strong>表 5-10 各加速器：私有模型的公開速度數字與缺口</strong>（承接<a class="xref" href="#t5-1">表 5-1</a>；等級見各列）</figcaption><div aria-label="表 5-10 各加速器：私有模型的公開速度數字與缺口" class="tbl-scroll" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th class="w1" scope="col">加速器</th>
+<th class="w2" scope="col"><a class="xref" href="#t5-1">表 5-1</a> 中對應的私有模型</th>
+<th class="w3" scope="col">公開的每使用者速度（私有模型）</th>
+<th scope="col">等級</th>
+<th scope="col">獨立量測</th>
+<th class="w2" scope="col">缺口</th>
+</tr>
+</thead>
+<tbody>
+<tr id="b258">
+<td class="rowhead">AWS Trainium</td>
+<td>Claude（Rainier；Trainium2 / 3 / 4 承諾）；Claude 3.5 Haiku（Bedrock latency-optimized）</td>
+<td>只有已停用的 Claude 3.5 Haiku：85.9 tokens/s（P50），標準為 48.4（Trainium2，2025-01-28）；Trainium3 只有相對倍數</td>
+<td><span class="g g-b" title="等級 B：廠商或夥伴公布，且揭露方法">B</span>；<span class="g g-c" title="等級 C：廠商宣稱或規格，未揭露方法">C</span></td>
+<td class="muted">無</td>
+<td>現行 Claude 在哪種晶片上服務、tokens/s、TTFT</td>
+</tr>
+<tr id="b259">
+<td class="rowhead">AWS Inferentia</td>
+<td class="muted">無</td>
+<td>查無公開資料：所讀來源沒有任何私有前沿模型說明跑在 Inferentia 上</td>
+<td class="muted">–</td>
+<td class="muted">–</td>
+<td>本次未研究</td>
+</tr>
+<tr id="b260">
+<td class="rowhead">Google TPU</td>
+<td>Gemini（Google：在 TPU 上訓練並服務）；Claude（Anthropic：在 TPU 上訓練並執行）</td>
+<td>Gemini 3.1 Pro Preview 99.9–116.8、Gemini 3.8 Flash 236.5–248.6、Gemini 3.5 Flash-Lite 360.0 tokens/s（AA，10K；端點的晶片世代未揭露）；規模：Google 全產品 3.2 quadrillion tokens/月（2026-05-19）≈ 1.2 billion tokens/s（<span class="g g-d" title="等級 D：本文推算，附算式">D</span>：3.2e15 ÷ (30 × 86,400)，未區分 input 與 output）</td>
+<td><span class="g g-a" title="等級 A：獨立第三方量測">A</span>（速度）；<span class="g g-c" title="等級 C：廠商宣稱或規格，未揭露方法">C</span>（對應與規模）</td>
+<td>AA 量的是端點，不是晶片</td>
+<td>TPU 世代、每晶片 tokens/s、input 與 output 比例</td>
+</tr>
+<tr id="b261">
+<td><span class="rh">NVIDIA GPU</span><span class="rh-sub"><span class="vh">（</span>含 AMD<span class="vh">）</span></span></td>
+<td>GPT-6 Astra Ultrafast；GPT-6.1 Sol Ultrafast（媒體報導）；Claude、OpenAI、SpaceXAI 的採購承諾</td>
+<td>Astra Ultrafast "up to 300 tokens per second"、"up to 8X"；其他私有模型沒有晶片對應；AMD 只有承諾規模，沒有任何私有模型的服務數字</td>
+<td><span class="g g-c" title="等級 C：廠商宣稱或規格，未揭露方法">C</span></td>
+<td class="muted">無</td>
+<td>標準層級的晶片對應、每 GPU 的 tokens/s</td>
+</tr>
+<tr id="b262">
+<td class="rowhead">Cerebras</td>
+<td>GPT-5.3-Codex-Spark；GPT-5.6 Sol Ultrafast；Mistral Le Chat</td>
+<td>Codex-Spark "over 1,000"（SemiAnalysis：最高 2,000）、Sol Ultrafast "up to 750" tokens/s</td>
+<td><span class="g g-c" title="等級 C：廠商宣稱或規格，未揭露方法">C</span></td>
+<td>無（AA 無列）</td>
+<td>實測速度、每系統吞吐量、系統數量</td>
+</tr>
+</tbody>
+</table></div></figure>
+</div></div></div>
+<details class="srcs"><summary>本節來源（51）</summary><ul><li><a href="https://artificialanalysis.ai/methodology/performance-benchmarking" target="_blank" rel="noopener">AA 方法論</a></li><li><a href="https://artificialanalysis.ai/leaderboards/providers" target="_blank" rel="noopener">AA providers leaderboard</a></li><li><a href="https://artificialanalysis.ai/providers/google" target="_blank" rel="noopener">AA Google 供應商頁</a></li><li><a href="https://artificialanalysis.ai/leaderboards/models" target="_blank" rel="noopener">AA models leaderboard</a></li><li><a href="https://artificialanalysis.ai/models" target="_blank" rel="noopener">AA 模型索引</a></li><li><a href="https://artificialanalysis.ai/models/claude-4-5-haiku/providers" target="_blank" rel="noopener">Claude Haiku 4.5</a></li><li><a href="https://artificialanalysis.ai/models/claude-opus-5-5-low/providers" target="_blank" rel="noopener">Claude Opus 5.5 low</a></li><li><a href="https://artificialanalysis.ai/models/gpt-6-astra/providers" target="_blank" rel="noopener">GPT-6 Astra</a></li><li><a href="https://artificialanalysis.ai/models/gpt-5-6-sol/providers" target="_blank" rel="noopener">GPT-5.6 Sol</a></li><li><a href="https://artificialanalysis.ai/models/gemini-3-1-pro-preview/providers" target="_blank" rel="noopener">Gemini 3.1 Pro Preview</a></li><li><a href="https://openrouter.ai/anthropic/claude-opus-5.5" target="_blank" rel="noopener">Claude Opus 5.5</a></li><li><a href="https://openrouter.ai/anthropic/claude-sonnet-5.5" target="_blank" rel="noopener">Claude Sonnet 5.5</a></li><li><a href="https://openrouter.ai/anthropic/claude-haiku-4.5" target="_blank" rel="noopener">Claude Haiku 4.5</a></li><li><a href="https://openrouter.ai/anthropic/claude-fable-5.1" target="_blank" rel="noopener">Claude Fable 5.1</a></li><li><a href="https://openrouter.ai/openai/gpt-6-astra" target="_blank" rel="noopener">GPT-6 Astra</a></li><li><a href="https://openrouter.ai/openai/gpt-6.1-sol" target="_blank" rel="noopener">GPT-6.1 Sol</a></li><li><a href="https://openrouter.ai/openai/gpt-6-luna" target="_blank" rel="noopener">GPT-6 Luna</a></li><li><a href="https://openrouter.ai/openai/gpt-5.6-sol" target="_blank" rel="noopener">GPT-5.6 Sol</a></li><li><a href="https://openrouter.ai/google/gemini-3.8-flash" target="_blank" rel="noopener">Gemini 3.8 Flash</a></li><li><a href="https://openrouter.ai/x-ai/grok-4.7" target="_blank" rel="noopener">Grok 4.7</a></li><li><a href="https://platform.claude.com/docs/en/build-with-claude/fast-mode" target="_blank" rel="noopener">Claude fast mode</a></li><li><a href="https://platform.claude.com/docs/en/about-claude/pricing" target="_blank" rel="noopener">Claude pricing</a></li><li><a href="https://platform.claude.com/docs/en/api/service-tiers" target="_blank" rel="noopener">Claude service tiers</a></li><li><a href="https://developers.openai.com/api/docs/guides/fast-mode" target="_blank" rel="noopener">OpenAI Fast mode</a></li><li><a href="https://developers.openai.com/api/docs/pricing" target="_blank" rel="noopener">OpenAI pricing</a></li><li><a href="https://developers.openai.com/api/docs/guides/ultrafast-mode" target="_blank" rel="noopener">OpenAI Ultrafast mode</a></li><li><a href="https://venturebeat.com/technology/openais-gpt-6-1-sol-offers-astra-like-performance-at-1-5th-price-a-new-ultrafast-tier-clocks-at-300-tokens-per-second" target="_blank" rel="noopener">VentureBeat</a></li><li><a href="https://blogs.nvidia.com/blog/gpus-openai-gpt-6-astra-ultrafast/" target="_blank" rel="noopener">NVIDIA 部落格</a></li><li><a href="https://www.cerebras.ai/blog/accelerating-gpt-5-6-sol-ultrafast-with-openai" target="_blank" rel="noopener">Cerebras 2026-08-13</a></li><li><a href="https://www.cerebras.ai/blog/how-cerebras-serves-gpt-5-6-sol-at-up-to-750-tokens-per-second" target="_blank" rel="noopener">Cerebras 2026-08-27</a></li><li><a href="https://the-decoder.com/gpt-5-6-sol-goes-14x-faster-as-openai-launches-ultrafast-mode-powered-by-cerebras/" target="_blank" rel="noopener">The Decoder</a></li><li><a href="https://www.cerebras.ai/blog/openai-codexspark" target="_blank" rel="noopener">Cerebras blog 2026-02-12</a></li><li><a href="https://newsletter.semianalysis.com/p/cerebras-faster-tokens-please" target="_blank" rel="noopener">SemiAnalysis</a></li><li><a href="https://ai.google.dev/gemini-api/docs/priority-inference" target="_blank" rel="noopener">Gemini priority inference</a></li><li><a href="https://ai.google.dev/gemini-api/docs/pricing" target="_blank" rel="noopener">Gemini pricing</a></li><li><a href="https://docs.aws.amazon.com/bedrock/latest/userguide/latency-optimized-inference.html" target="_blank" rel="noopener">Bedrock 延遲最佳化推論</a></li><li><a href="https://claude.com/blog/trainium2-and-distillation" target="_blank" rel="noopener">Anthropic 2024-12</a></li><li><a href="https://docs.aws.amazon.com/bedrock/latest/userguide/service-tiers-inference.html" target="_blank" rel="noopener">Bedrock service tiers</a></li><li><a href="https://aws.amazon.com/bedrock/pricing/" target="_blank" rel="noopener">Bedrock pricing</a></li><li><a href="https://learn.microsoft.com/en-us/azure/foundry/openai/concepts/priority-processing" target="_blank" rel="noopener">Azure priority processing</a></li><li><a href="https://www.aboutamazon.com/news/aws/aws-cerebras-ai-inference" target="_blank" rel="noopener">About Amazon</a></li><li><a href="https://www.sec.gov/Archives/edgar/data/2021728/000162828026056186/cbrsannouncesfinancialresu.htm" target="_blank" rel="noopener">Cerebras Q2 2026 財報</a></li><li><a href="https://www.techzine.eu/news/analytics/138754/openai-swaps-nvidia-for-cerebras-with-gpt-5-3-codex-spark/" target="_blank" rel="noopener">Techzine</a></li><li><a href="https://aws.amazon.com/blogs/machine-learning/optimizing-ai-responsiveness-a-practical-guide-to-amazon-bedrock-latency-optimized-inference/" target="_blank" rel="noopener">AWS ML Blog</a></li><li><a href="https://artificialanalysis.ai/models/claude-3-5-haiku/providers" target="_blank" rel="noopener">AA Claude 3.5 Haiku</a></li><li><a href="https://aws.amazon.com/about-aws/whats-new/2024/12/latency-optimized-inference-foundation-models-amazon-bedrock/" target="_blank" rel="noopener">AWS What&#x27;s New，2024-12-02</a></li><li><a href="https://aws.amazon.com/blogs/aws/amazon-ec2-trn2-instances-and-trn2-ultraservers-for-aiml-training-and-inference-is-now-available/" target="_blank" rel="noopener">AWS News Blog，2024-12-03</a></li><li><a href="https://openai.com/index/previewing-ultrafast/" target="_blank" rel="noopener">OpenAI 預覽</a></li><li><a href="https://artificialanalysis.ai/models/gpt-oss-120b/providers" target="_blank" rel="noopener">AA gpt-oss-120b</a></li><li><a href="https://inferencex.semianalysis.com/blog/tpu-inferencex-full-steam" target="_blank" rel="noopener">SemiAnalysis InferenceX</a></li><li><a href="https://www.aboutamazon.com/news/aws/trainium-3-ultraserver-faster-ai-training-lower-cost" target="_blank" rel="noopener">About Amazon</a></li></ul></details></section>
+<section class="panel" role="tabpanel" id="s3" aria-labelledby="tab-s3"><div class="panel-head"><h2>價格與 context window</h2><div class="sec-lead prose"><p id="b263">2026-10-04 現行旗艦的 context window 多為 1M tokens（GPT-6 系列為 1,050,000，Gemini 為 1,048,576），Grok 4.7 為 500K，Claude Haiku 4.5 為 200K；表中輸入價（每 1M tokens）從 Amazon Nova Micro 的 $0.035 到 Claude Fable 5.1 與 GPT-6 Astra 的 $10。長 prompt 加價在所讀來源中只見於 OpenAI（輸入超過 272K，整筆請求輸入 2×、輸出 1.5×）與 Gemini Pro（超過 200K，輸入 2×、輸出 1.5×），Anthropic 文件寫明 1M 全程標準價。</p>
+</div></div>
+<div class="subtabs"><div class="subtablist" role="tablist" aria-label="價格與 context window"><button type="button" class="subtab" role="tab" id="tab-s3-1" aria-controls="s3-1" aria-selected="true">表 5-11 現行私有模型的 c…</button><button type="button" class="subtab" role="tab" id="tab-s3-2" aria-controls="s3-2" aria-selected="false">表 5-12 同一模型在不同雲…</button></div><div class="subpanel on" role="tabpanel" id="s3-1" aria-labelledby="tab-s3-1"><div class="prose"><h3 class="ph">表 5-11 現行私有模型的 c…</h3>
+<figure class="tbl" data-cols="7" data-rows="23" id="t5-11"><figcaption><strong>表 5-11 現行私有模型的 context、最大輸出、價格與長 prompt 規則</strong>（2026-10-04 讀取；list price、標準層級、USD 每 1M tokens，價格欄依序為輸入 / 快取讀取 / 輸出；等級欄指價格與 context 的來源（B 為廠商文件，C 為 AA、OpenRouter 目錄、二手報導或廠商公告）；發布日取自維基百科與 OpenRouter 上架日，廠商公告頁未讀，等級 <span class="g g-c" title="等級 C：廠商宣稱或規格，未揭露方法">C</span>；「現行」指廠商文件列為 current 的 API 模型，文件未標 GA 或 Preview；來源：Anthropic 為 <a href="https://platform.claude.com/docs/en/models/overview" rel="noopener" target="_blank">Claude models overview</a>、<a href="https://platform.claude.com/docs/en/about-claude/pricing" rel="noopener" target="_blank">Claude pricing</a>、<a href="https://en.wikipedia.org/wiki/Claude_(AI)" rel="noopener" target="_blank">Wikipedia: Claude</a>；OpenAI 為 <a href="https://developers.openai.com/api/docs/pricing" rel="noopener" target="_blank">OpenAI pricing</a>、<a href="https://developers.openai.com/api/docs/models/gpt-6-astra" rel="noopener" target="_blank">GPT-6 Astra</a>、<a href="https://developers.openai.com/api/docs/models/gpt-6.1-sol" rel="noopener" target="_blank">GPT-6.1 Sol</a>、<a href="https://developers.openai.com/api/docs/models/gpt-6-luna" rel="noopener" target="_blank">GPT-6 Luna</a>、<a href="https://en.wikipedia.org/wiki/GPT-6" rel="noopener" target="_blank">Wikipedia: GPT-6</a>；Google 為 <a href="https://ai.google.dev/gemini-api/docs/pricing" rel="noopener" target="_blank">Gemini pricing</a>、<a href="https://ai.google.dev/gemini-api/docs/models/gemini-3.8-flash" rel="noopener" target="_blank">Gemini 3.8 Flash</a>、<a href="https://ai.google.dev/gemini-api/docs/models/gemini-3.1-pro-preview" rel="noopener" target="_blank">Gemini 3.1 Pro Preview</a>、<a href="https://ai.google.dev/gemini-api/docs/changelog" rel="noopener" target="_blank">Gemini API changelog</a>、<a href="https://blog.google/innovation-and-ai/models-and-research/gemini-models/gemini-4-argon/" rel="noopener" target="_blank">Google 部落格，2026-09-30</a>；Nova 為 <a href="https://docs.aws.amazon.com/nova/latest/nova2-userguide/what-is-nova-2.html" rel="noopener" target="_blank">Nova 2 developer guide</a> 與 <a href="https://artificialanalysis.ai/leaderboards/providers" rel="noopener" target="_blank">AA providers leaderboard</a>；Grok 為 <a href="https://docs.x.ai/docs/models" rel="noopener" target="_blank">xAI models documentation</a>；Muse Spark 與 Mistral 為 <a href="https://openrouter.ai/api/v1/models" rel="noopener" target="_blank">OpenRouter 模型目錄</a> 與 <a href="https://artificialanalysis.ai/leaderboards/models" rel="noopener" target="_blank">AA models leaderboard</a>；MAI 為 <a href="https://microsoft.ai/news/building-a-hillclimbing-machine-launching-seven-new-mai-models/" rel="noopener" target="_blank">Microsoft AI，2026-06-02</a>）</figcaption><div aria-label="表 5-11 現行私有模型的 context、最大輸出、價格與長 prompt 規則" class="tbl-scroll" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th class="w2" scope="col">模型（狀態）</th>
+<th class="w1" scope="col">發布日<span class="g g-c" title="等級 C：廠商宣稱或規格，未揭露方法">C</span></th>
+<th scope="col">context</th>
+<th scope="col">最大輸出</th>
+<th class="w2" scope="col">輸入 / 快取讀取 / 輸出</th>
+<th scope="col">等級（價格與 context）</th>
+<th class="w1" scope="col">長 prompt 規則</th>
+</tr>
+</thead>
+<tbody>
+<tr id="b264">
+<td><span class="rh">Anthropic Claude Fable 5.1</span><span class="rh-sub"><span class="vh">（</span>現行<span class="vh">）</span></span></td>
+<td class="num">2026-09-01</td>
+<td class="num">1M</td>
+<td class="num">128K</td>
+<td class="num">$10 / $0.25 / $50</td>
+<td><span class="g g-b" title="等級 B：廠商或夥伴公布，且揭露方法">B</span></td>
+<td>無加價，1M 全程標準價</td>
+</tr>
+<tr id="b265">
+<td><span class="rh">Anthropic Claude Mythos 5.1</span><span class="rh-sub"><span class="vh">（</span>limited availability，Project Glasswing<span class="vh">）</span></span></td>
+<td class="num">2026-09-01</td>
+<td class="num">1M</td>
+<td class="num">128K</td>
+<td class="num">$10 / $0.25 / $50</td>
+<td><span class="g g-b" title="等級 B：廠商或夥伴公布，且揭露方法">B</span></td>
+<td>無加價</td>
+</tr>
+<tr id="b266">
+<td><span class="rh">Anthropic Claude Opus 5.5</span><span class="rh-sub"><span class="vh">（</span>現行<span class="vh">）</span></span></td>
+<td class="num">2026-09-22</td>
+<td class="num">1M</td>
+<td class="num">128K</td>
+<td class="num">$4 / $0.20 / $20</td>
+<td><span class="g g-b" title="等級 B：廠商或夥伴公布，且揭露方法">B</span></td>
+<td>無加價</td>
+</tr>
+<tr id="b267">
+<td><span class="rh">Anthropic Claude Sonnet 5.5</span><span class="rh-sub"><span class="vh">（</span>現行<span class="vh">）</span></span></td>
+<td class="num">2026-09-28</td>
+<td class="num">1M</td>
+<td class="num">128K</td>
+<td class="num">$2 / $0.20 / $10</td>
+<td><span class="g g-b" title="等級 B：廠商或夥伴公布，且揭露方法">B</span></td>
+<td>無加價</td>
+</tr>
+<tr id="b268">
+<td><span class="rh">Anthropic Claude Haiku 4.5</span><span class="rh-sub"><span class="vh">（</span>現行；文件寫最早 2026-10-15 可退役<span class="vh">）</span></span></td>
+<td class="num">2025-10-15</td>
+<td class="num">200K</td>
+<td class="num">64K</td>
+<td class="num">$1 / $0.10 / $5</td>
+<td><span class="g g-b" title="等級 B：廠商或夥伴公布，且揭露方法">B</span></td>
+<td>不適用（200K）</td>
+</tr>
+<tr id="b269">
+<td><span class="rh">OpenAI GPT-6 Astra</span><span class="rh-sub"><span class="vh">（</span>現行<span class="vh">）</span></span></td>
+<td>2026-09-03 limited preview；2026-09-04 公開</td>
+<td class="num">1,050,000</td>
+<td class="num">128,000</td>
+<td class="num">$10 / $1.00 / $50</td>
+<td><span class="g g-b" title="等級 B：廠商或夥伴公布，且揭露方法">B</span></td>
+<td>超過 272K 輸入：整筆請求 $20 / $2.00 / $75</td>
+</tr>
+<tr id="b270">
+<td><span class="rh">OpenAI GPT-6.1 Sol</span><span class="rh-sub"><span class="vh">（</span>現行<span class="vh">）</span></span></td>
+<td class="num">2026-09-29</td>
+<td class="num">1,050,000</td>
+<td class="num">128,000</td>
+<td class="num">$2 / $0.10 / $10</td>
+<td><span class="g g-b" title="等級 B：廠商或夥伴公布，且揭露方法">B</span></td>
+<td>超過 272K：$4 / $0.20 / $15</td>
+</tr>
+<tr id="b271">
+<td><span class="rh">OpenAI GPT-6 Sol</span><span class="rh-sub"><span class="vh">（</span>現行<span class="vh">）</span></span></td>
+<td class="num">2026-09-22</td>
+<td class="num">1,050,000</td>
+<td class="num">128,000</td>
+<td class="num">$2 / $0.20 / $10</td>
+<td><span class="g g-b" title="等級 B：廠商或夥伴公布，且揭露方法">B</span></td>
+<td>超過 272K：$4 / $0.40 / $15</td>
+</tr>
+<tr id="b272">
+<td><span class="rh">OpenAI GPT-6 Luna</span><span class="rh-sub"><span class="vh">（</span>現行<span class="vh">）</span></span></td>
+<td class="num">2026-09-22</td>
+<td class="num">1,050,000</td>
+<td class="num">128,000</td>
+<td class="num">$0.10 / $0.01 / $0.50</td>
+<td><span class="g g-b" title="等級 B：廠商或夥伴公布，且揭露方法">B</span></td>
+<td>超過 272K：$0.20 / $0.02 / $0.75</td>
+</tr>
+<tr id="b273">
+<td><span class="rh">OpenAI GPT-5.6 Sol / Terra / Luna</span><span class="rh-sub"><span class="vh">（</span>現行<span class="vh">）</span></span></td>
+<td class="num">2026-07-09</td>
+<td class="num">1,050,000</td>
+<td class="num">128,000</td>
+<td>Sol $4 / $0.40 / $20；Terra $2 / $0.20 / $12；Luna $0.20 / $0.02 / $1.20</td>
+<td><span class="g g-b" title="等級 B：廠商或夥伴公布，且揭露方法">B</span>（Sol 價格有衝突）</td>
+<td>超過 272K：輸入與快取 2×、輸出 1.5×</td>
+</tr>
+<tr id="b274">
+<td><span class="rh">OpenAI GPT-5.3-Codex</span><span class="rh-sub"><span class="vh">（</span>現行<span class="vh">）</span></span></td>
+<td class="num">2026-02-05</td>
+<td class="num">400K（AA）</td>
+<td class="muted"><span class="chip chip-na">查無公開資料</span></td>
+<td class="num">$1.75 / $0.175 / $14</td>
+<td><span class="g g-b" title="等級 B：廠商或夥伴公布，且揭露方法">B</span>（價格）；<span class="g g-c" title="等級 C：廠商宣稱或規格，未揭露方法">C</span>（context）</td>
+<td>價格頁未列</td>
+</tr>
+<tr id="b275">
+<td><span class="rh">OpenAI GPT-5.3-Codex-Spark</span><span class="rh-sub"><span class="vh">（</span>research preview<span class="vh">）</span></span></td>
+<td class="num">2026-02-12</td>
+<td class="num">128K，僅文字（Cerebras）</td>
+<td class="muted"><span class="chip chip-na">查無公開資料</span></td>
+<td>無 API 定價</td>
+<td><span class="g g-c" title="等級 C：廠商宣稱或規格，未揭露方法">C</span></td>
+<td class="muted">–</td>
+</tr>
+<tr id="b276">
+<td><span class="rh">Google Gemini 3.8 Flash</span><span class="rh-sub"><span class="vh">（</span>GA 2026-09-02<span class="vh">）</span></span></td>
+<td class="num">2026-09-02</td>
+<td class="num">1,048,576 輸入</td>
+<td class="num">65,536</td>
+<td>至 2026-12-31 為 $0.75 / $0.075 / $3.75；2027-01-01 起 $1.50 / $0.15 / $7.50</td>
+<td><span class="g g-b" title="等級 B：廠商或夥伴公布，且揭露方法">B</span></td>
+<td>無長度分級</td>
+</tr>
+<tr id="b277">
+<td><span class="rh">Google Gemini 3.5 Flash-Lite</span><span class="rh-sub"><span class="vh">（</span>現行<span class="vh">）</span></span></td>
+<td class="num">2026-07-21</td>
+<td class="num">1,048,576</td>
+<td class="num">65,536</td>
+<td class="num">$0.30 / $0.03 / $2.50</td>
+<td><span class="g g-b" title="等級 B：廠商或夥伴公布，且揭露方法">B</span></td>
+<td>無長度分級</td>
+</tr>
+<tr id="b278">
+<td><span class="rh">Google Gemini 3.1 Pro Preview</span><span class="rh-sub"><span class="vh">（</span>Preview<span class="vh">）</span></span></td>
+<td class="num">2026-02-19</td>
+<td class="num">1,048,576 輸入</td>
+<td class="num">65,536</td>
+<td class="num">$2.00 / $0.20 / $12.00（≤ 200K）</td>
+<td><span class="g g-b" title="等級 B：廠商或夥伴公布，且揭露方法">B</span></td>
+<td>超過 200K：$4.00 / $0.40 / $18.00</td>
+</tr>
+<tr id="b279">
+<td><span class="rh">Google Gemini 4 Argon</span><span class="rh-sub"><span class="vh">（</span>已宣布未出貨：僅向受邀的資安防禦者推出，不在公開 API 清單<span class="vh">）</span></span></td>
+<td class="num">2026-09-30（宣布）</td>
+<td>輸入上限未載明</td>
+<td>1M（宣布；原為 64K）</td>
+<td>導入價 $2 / 快取輸入便宜 95% / $10；之後 $4 / – / $20</td>
+<td><span class="g g-c" title="等級 C：廠商宣稱或規格，未揭露方法">C</span></td>
+<td class="muted"><span class="chip chip-na">查無公開資料</span></td>
+</tr>
+<tr id="b280">
+<td><span class="rh">Amazon Nova 2 Lite</span><span class="rh-sub"><span class="vh">（</span>現行<span class="vh">）</span></span></td>
+<td>2025-12-02（OR 上架日；AA 為 2025-10-29）</td>
+<td class="num">1M</td>
+<td class="num">65,536</td>
+<td>$0.30 / 查無公開資料 / $2.50</td>
+<td><span class="g g-b" title="等級 B：廠商或夥伴公布，且揭露方法">B</span>（context、輸出）；<span class="g g-c" title="等級 C：廠商宣稱或規格，未揭露方法">C</span>（價格）</td>
+<td class="muted"><span class="chip chip-na">查無公開資料</span></td>
+</tr>
+<tr id="b281">
+<td><span class="rh">Amazon Nova 2 Pro</span><span class="rh-sub"><span class="vh">（</span>preview<span class="vh">）</span></span></td>
+<td>2025-12-02（模型 ID 日期）</td>
+<td class="num">256K（AA）</td>
+<td class="muted"><span class="chip chip-na">查無公開資料</span></td>
+<td class="num">$1.25 / $0.312（AA 單筆）/ $10</td>
+<td><span class="g g-c" title="等級 C：廠商宣稱或規格，未揭露方法">C</span></td>
+<td class="muted"><span class="chip chip-na">查無公開資料</span></td>
+</tr>
+<tr id="b282">
+<td class="rowhead">Amazon Nova Micro</td>
+<td class="muted"><span class="chip chip-na">查無公開資料</span></td>
+<td class="num">128K–130K</td>
+<td class="muted"><span class="chip chip-na">查無公開資料</span></td>
+<td class="num">$0.035 / $0.00875 / $0.14</td>
+<td><span class="g g-c" title="等級 C：廠商宣稱或規格，未揭露方法">C</span></td>
+<td class="muted"><span class="chip chip-na">查無公開資料</span></td>
+</tr>
+<tr id="b283">
+<td><span class="rh">SpaceXAI Grok 4.7</span><span class="rh-sub"><span class="vh">（</span>現行<span class="vh">）</span></span></td>
+<td class="num">2026-09-21</td>
+<td class="num">500K</td>
+<td class="num">450,000（OR）</td>
+<td class="num">$2.00 / $0.50 / $6.00</td>
+<td><span class="g g-b" title="等級 B：廠商或夥伴公布，且揭露方法">B</span>（輸入、輸出價）；<span class="g g-c" title="等級 C：廠商宣稱或規格，未揭露方法">C</span>（其餘）</td>
+<td>所讀頁面未列</td>
+</tr>
+<tr id="b284">
+<td class="rowhead">Meta Muse Spark 1.3</td>
+<td class="num">2026-09-02</td>
+<td class="num">1,048,576</td>
+<td class="num">943,718（OR）</td>
+<td>standard $1.25 / $0.15 / $4.25；contributor 層（資料留存）$0.10 / $0.002 / $0.20</td>
+<td><span class="g g-c" title="等級 C：廠商宣稱或規格，未揭露方法">C</span></td>
+<td class="muted"><span class="chip chip-na">查無公開資料</span></td>
+</tr>
+<tr id="b285">
+<td><span class="rh">Mistral Medium 3.5</span><span class="rh-sub"><span class="vh">（</span>AA 標示為 open weights<span class="vh">）</span></span></td>
+<td class="num">2026-04-29 至 04-30</td>
+<td class="num">256K</td>
+<td class="num">209,715（OR）</td>
+<td class="num">$1.50 / $0.15 / $7.50</td>
+<td><span class="g g-c" title="等級 C：廠商宣稱或規格，未揭露方法">C</span></td>
+<td class="muted"><span class="chip chip-na">查無公開資料</span></td>
+</tr>
+<tr id="b286">
+<td><span class="rh">Microsoft MAI-Thinking-1</span><span class="rh-sub"><span class="vh">（</span>Foundry public preview<span class="vh">）</span></span></td>
+<td>2026-06-02 宣布；2026-08-12 至 08-13 preview</td>
+<td>256K（二手來源）</td>
+<td>64K（二手來源）</td>
+<td class="muted"><span class="chip chip-na">查無公開資料</span></td>
+<td><span class="g g-c" title="等級 C：廠商宣稱或規格，未揭露方法">C</span></td>
+<td class="muted"><span class="chip chip-na">查無公開資料</span></td>
+</tr>
+</tbody>
+</table></div></figure>
+<ul>
+<li id="b287">價格預告：Gemini 3.8 Flash 的價格在 2027-01-01 變為兩倍（輸入 $0.75 → $1.50，輸出 $3.75 → $7.50）（<a href="https://ai.google.dev/gemini-api/docs/pricing" rel="noopener" target="_blank">Gemini pricing</a>）。</li>
+<li id="b288">Gemini 4 Argon（2026-09-30 宣布）：導入價 $2 / $10，導入期後 $4 / $20；輸出上限由 64K 提高到 1M tokens；先向 Fairwind Program 的資安防禦者推出，之後擴及付費 API 客戶與 Google AI Ultra 訂戶（<a href="https://blog.google/innovation-and-ai/models-and-research/gemini-models/gemini-4-argon/" rel="noopener" target="_blank">Google 部落格，2026-09-30</a>）。Long Decode Continuation（跨多次呼叫暫停再續寫長輸出的 API 功能）出自媒體報導（<a href="https://www.latent.space/p/ainews-gemini-4-argon-gdms-answer" rel="noopener" target="_blank">Latent Space AINews，2026-10-01</a>、<a class="unread" href="https://the-decoder.com/google-gemini-4-argon-closes-the-gap-with-openai-and-anthropic-but-doesnt-take-a-clear-lead/" rel="noopener" target="_blank" title="查核時無法重讀此頁；所引內容另有其他來源佐證">The Decoder，2026-10-01</a>）；公開 API 日期、模型 ID、輸入上限與長 prompt 分級查無公開資料。</li>
+<li id="b289">Claude 預告：The Decoder（2026-09-22）稱 Sonnet 5.5 與 Haiku 5.5「數週內」推出；截至 2026-10-04，模型文件已列 Sonnet 5.5，沒有 Haiku 5.5（<a class="unread" href="https://the-decoder.com/claude-opus-5-5-matches-fable-5-1-at-40-percent-lower-cost-as-anthropic-promises-to-fix-claudish-writing/" rel="noopener" target="_blank" title="查核時無法重讀此頁；所引內容另有其他來源佐證">The Decoder</a>、<a href="https://platform.claude.com/docs/en/models/overview" rel="noopener" target="_blank">Claude models overview</a>）。</li>
+<li id="b290">價格衝突：GPT-5.6 Sol 在 OpenAI 價格頁為 $4 / $0.40 / $20，頁面另註記 GPT-5.6 Sol 的 "promotional pricing is available at least through November 21, 2026"（<a href="https://developers.openai.com/api/docs/pricing" rel="noopener" target="_blank">OpenAI pricing</a>；Fast mode 文件有同一句）；OpenRouter 的 OpenAI 端點列 $2 / $0.20 / $10，Azure 端點列 $4 / $0.40 / $20（<a href="https://openrouter.ai/openai/gpt-5.6-sol" rel="noopener" target="_blank">OpenRouter GPT-5.6 Sol</a>）。哪一個是現行價無法由來源判定，<a class="xref" href="#t5-7">表 5-7</a> 的 GPT-5.6 Sol 價格倍數以 OR 的列價計算，倍數不受影響，但 OpenAI Fast 文件寫的是 $8 / $40。</li>
+<li id="b291">其他現行 Gemini 的列價：3.7 與 3.6 Flash $0.75 / $3.75；3.5 Flash $1.50 / $9.00；3.1 Flash-Lite $0.25 / $1.50（<a href="https://ai.google.dev/gemini-api/docs/pricing" rel="noopener" target="_blank">Gemini pricing</a>）。Muse Spark 與 Mistral 的價格取自第三方目錄，未讀廠商價格頁；Nova 的快取價格只有 Nova 2 Pro 的 AA 單筆資料。</li>
+<li id="b292">Tokenizer：Claude 4.7 以後的 tokenizer 對同一段文字約多產生 30% tokens（Anthropic 文件自述），所以跨廠商比較價格表時，同樣的文件在 Claude 上的 token 數較多（<a href="https://platform.claude.com/docs/en/about-claude/pricing" rel="noopener" target="_blank">Claude pricing</a>）。</li>
+</ul>
+</div></div><div class="subpanel" role="tabpanel" id="s3-2" aria-labelledby="tab-s3-2"><div class="prose"><h3 class="ph">表 5-12 同一模型在不同雲…</h3>
+<figure class="tbl" data-cols="5" data-rows="7" id="t5-12"><figcaption><strong>表 5-12 同一模型在不同雲端的 context window</strong>（AA 記錄各端點測試時接受的上限，目錄欄位，等級 <span class="g g-c" title="等級 C：廠商宣稱或規格，未揭露方法">C</span>；2026-10-04；「–」為 AA 沒有該端點；來源：<a href="https://artificialanalysis.ai/leaderboards/providers" rel="noopener" target="_blank">AA providers leaderboard</a>）</figcaption><div aria-label="表 5-12 同一模型在不同雲端的 context window" class="tbl-scroll" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th class="w1" scope="col">模型</th>
+<th scope="col">第一方 API</th>
+<th scope="col">Amazon Bedrock</th>
+<th scope="col">Google Vertex AI</th>
+<th scope="col">Microsoft Azure / Foundry</th>
+</tr>
+</thead>
+<tbody>
+<tr id="b293">
+<td class="rowhead">Claude Opus 5.5、Sonnet 5.5</td>
+<td class="num">1M</td>
+<td class="num">1M</td>
+<td class="num">1M</td>
+<td class="muted">未列</td>
+</tr>
+<tr id="b294">
+<td class="rowhead">Claude Haiku 4.5</td>
+<td class="num">200K</td>
+<td class="num">200K</td>
+<td class="num">200K</td>
+<td class="num">200K</td>
+</tr>
+<tr id="b295">
+<td class="rowhead">GPT-6 Astra</td>
+<td class="num">1M</td>
+<td class="num">524,288</td>
+<td class="muted">–</td>
+<td class="num">524,288</td>
+</tr>
+<tr id="b296">
+<td class="rowhead">GPT-6 Luna</td>
+<td class="num">1M</td>
+<td class="muted">–</td>
+<td class="muted">–</td>
+<td class="num">524,288</td>
+</tr>
+<tr id="b297">
+<td class="rowhead">GPT-5.6 Sol、Terra</td>
+<td class="num">1M</td>
+<td class="num">1M</td>
+<td class="muted">–</td>
+<td class="num">524,288</td>
+</tr>
+<tr id="b298">
+<td class="rowhead">GPT-5.5</td>
+<td class="num">1,050,000</td>
+<td class="num">272,000</td>
+<td class="muted">–</td>
+<td class="num">524,288</td>
+</tr>
+<tr id="b299">
+<td class="rowhead">Grok 4.3</td>
+<td class="num">1M</td>
+<td class="num">524,288</td>
+<td class="muted">–</td>
+<td class="num">200,000</td>
+</tr>
+</tbody>
+</table></div></figure>
+<ul>
+<li id="b300">衝突：OpenRouter 把 Bedrock 與 Azure 上 GPT-6 Astra、GPT-6.1 Sol、GPT-6 Luna 的每個端點都列為 1,050,000（<a href="https://openrouter.ai/openai/gpt-6-astra" rel="noopener" target="_blank">OpenRouter GPT-6 Astra</a>），與 AA 的 524,288 不符；若 AA 正確，第三方雲端的可用 context 約為第一方的一半。Anthropic 文件確認 Fable 5.1、Opus 5.5、Sonnet 5.5 在 Microsoft Foundry 與 Google Cloud 上都是 1M（<a href="https://platform.claude.com/docs/en/build-with-claude/claude-in-microsoft-foundry" rel="noopener" target="_blank">Claude in Microsoft Foundry</a>、<a href="https://platform.claude.com/docs/en/build-with-claude/claude-on-vertex-ai" rel="noopener" target="_blank">Claude on Vertex AI</a>），AA 對 Azure 的 Opus 5.5 與 Sonnet 5.5 沒有列。</li>
+<li id="b301">OpenAI 模型在 Bedrock 上的區域：GPT-6 Sol 與 GPT-6 Luna 在 us-east-1（N. Virginia），GPT-6 Astra 在 us-west-2（Oregon），皆可由 Bedrock Runtime 與 Mantle 呼叫（<a href="https://developers.openai.com/api/docs/guides/amazon-bedrock" rel="noopener" target="_blank">OpenAI on Amazon Bedrock</a>）。</li>
+<li id="b302">各雲端的價格：Claude 在 Bedrock 與 Google Cloud 的區域與多區域端點比全球端點貴 10%（<a href="https://platform.claude.com/docs/en/about-claude/pricing" rel="noopener" target="_blank">Claude pricing</a>）；OpenAI 對 2026-03-05 以後發布的模型，資料落地端點加價 10%（<a href="https://developers.openai.com/api/docs/pricing" rel="noopener" target="_blank">OpenAI pricing</a>）；OR 上的 GPT-6 Astra 在 Bedrock us-west-2 與 Azure eastus2 為 $11 / $55，與此一致。AA 目錄中 GPT-5.6 Terra 在 Bedrock 為 $2.75 / $16.5（快取 $0.28），比第一方的 $2 / $12 高 37.5%（<span class="g g-d" title="等級 D：本文推算，附算式">D</span>：2.75 ÷ 2）。Bedrock 另有 Priority tier +75%、Flex −50%（<a class="xref" href="#t5-6">表 5-6</a>）。</li>
+</ul>
+<p id="b303"><strong>長 prompt 的成本公式與算例</strong>（<span class="g g-d" title="等級 D：本文推算，附算式">D</span>；價格取自<a class="xref" href="#t5-11">表 5-11</a>；只比較價格表，不比較同一份文件的成本）</p>
+<p id="b304">OpenAI 的規則是整筆請求依輸入 token 數換檔：</p>
+<div class="formula"><span class="katex-display"><span class="katex"><span class="katex-mathml"><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>C</mi><mo>=</mo><mfrac><mrow><msub><mi>m</mi><mrow><mi>i</mi><mi>n</mi></mrow></msub><mrow><mo fence="true">(</mo><msub><mi>N</mi><mi>u</mi></msub><msub><mi>P</mi><mrow><mi>i</mi><mi>n</mi></mrow></msub><mo>+</mo><msub><mi>N</mi><mi>c</mi></msub><msub><mi>P</mi><mrow><mi>c</mi><mi>a</mi><mi>c</mi><mi>h</mi><mi>e</mi></mrow></msub><mo fence="true">)</mo></mrow><mo>+</mo><msub><mi>m</mi><mrow><mi>o</mi><mi>u</mi><mi>t</mi></mrow></msub><msub><mi>N</mi><mrow><mi>o</mi><mi>u</mi><mi>t</mi></mrow></msub><msub><mi>P</mi><mrow><mi>o</mi><mi>u</mi><mi>t</mi></mrow></msub></mrow><msup><mn>10</mn><mn>6</mn></msup></mfrac><mo separator="true">,</mo><mspace width="2em"></mspace><mrow><mo fence="true">(</mo><msub><mi>m</mi><mrow><mi>i</mi><mi>n</mi></mrow></msub><mo separator="true">,</mo><msub><mi>m</mi><mrow><mi>o</mi><mi>u</mi><mi>t</mi></mrow></msub><mo fence="true">)</mo></mrow><mo>=</mo><mrow><mo fence="true">{</mo><mtable columnalign="left left" columnspacing="1em" rowspacing="0.36em"><mtr><mtd><mstyle displaystyle="false" scriptlevel="0"><mrow><mo stretchy="false">(</mo><mn>1</mn><mo separator="true">,</mo><mtext> </mtext><mn>1</mn><mo stretchy="false">)</mo></mrow></mstyle></mtd><mtd><mstyle displaystyle="false" scriptlevel="0"><mrow><msub><mi>N</mi><mi>u</mi></msub><mo>+</mo><msub><mi>N</mi><mi>c</mi></msub><mo>≤</mo><mn>272,000</mn></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle displaystyle="false" scriptlevel="0"><mrow><mo stretchy="false">(</mo><mn>2</mn><mo separator="true">,</mo><mtext> </mtext><mn>1.5</mn><mo stretchy="false">)</mo></mrow></mstyle></mtd><mtd><mstyle displaystyle="false" scriptlevel="0"><mrow><msub><mi>N</mi><mi>u</mi></msub><mo>+</mo><msub><mi>N</mi><mi>c</mi></msub><mo>&gt;</mo><mn>272,000</mn></mrow></mstyle></mtd></mtr></mtable></mrow></mrow><annotation encoding="application/x-tex">C = \frac{m_{in}\left(N_{u} P_{in} + N_{c} P_{cache}\right) + m_{out} N_{out} P_{out}}{10^{6}}, \qquad \left(m_{in}, m_{out}\right) = \begin{cases} (1,\ 1) &amp; N_{u} + N_{c} \le 272{,}000 \\ (2,\ 1.5) &amp; N_{u} + N_{c} &gt; 272{,}000 \end{cases}</annotation></semantics></math></span><span aria-hidden="true" class="katex-html"><span class="katex-base"><span class="katex-strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.0715em;">C</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:2.113em;vertical-align:-0.686em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.427em;"><span style="top:-2.314em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord">1</span><span class="mord"><span class="mord">0</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.7401em;"><span style="top:-2.989em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">6</span></span></span></span></span></span></span></span></span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.677em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord"><span class="mord mathnormal">m</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3117em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight">in</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.1667em;"></span><span class="minner"><span class="mopen delimcenter" style="top:0em;">(</span><span class="mord"><span class="mord mathnormal" style="margin-right:0.109em;">N</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.1514em;"><span style="top:-2.55em;margin-left:-0.109em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight">u</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.1389em;">P</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3117em;"><span style="top:-2.55em;margin-left:-0.1389em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight">in</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.109em;">N</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.1514em;"><span style="top:-2.55em;margin-left:-0.109em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight">c</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.1389em;">P</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3361em;"><span style="top:-2.55em;margin-left:-0.1389em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight">c</span><span class="mord mathnormal mtight">a</span><span class="mord mathnormal mtight">c</span><span class="mord mathnormal mtight">h</span><span class="mord mathnormal mtight">e</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mclose delimcenter" style="top:0em;">)</span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mord"><span class="mord mathnormal">m</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.2806em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight">o</span><span class="mord mathnormal mtight">u</span><span class="mord mathnormal mtight">t</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.109em;">N</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.2806em;"><span style="top:-2.55em;margin-left:-0.109em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight">o</span><span class="mord mathnormal mtight">u</span><span class="mord mathnormal mtight">t</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.1389em;">P</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.2806em;"><span style="top:-2.55em;margin-left:-0.1389em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight">o</span><span class="mord mathnormal mtight">u</span><span class="mord mathnormal mtight">t</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.686em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span><span class="mpunct">,</span><span class="mspace" style="margin-right:2em;"></span><span class="mspace" style="margin-right:0.1667em;"></span><span class="minner"><span class="mopen delimcenter" style="top:0em;">(</span><span class="mord"><span class="mord mathnormal">m</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3117em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight">in</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord"><span class="mord mathnormal">m</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.2806em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight">o</span><span class="mord mathnormal mtight">u</span><span class="mord mathnormal mtight">t</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mclose delimcenter" style="top:0em;">)</span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:3em;vertical-align:-1.25em;"></span><span class="minner"><span class="mopen delimcenter" style="top:0em;"><span class="delimsizing size4">{</span></span><span class="mord"><span class="mtable"><span class="col-align-l"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.69em;"><span style="top:-3.69em;"><span class="pstrut" style="height:3.008em;"></span><span class="mord"><span class="mopen">(</span><span class="mord">1</span><span class="mpunct">,</span><span class="mspace"> </span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord">1</span><span class="mclose">)</span></span></span><span style="top:-2.25em;"><span class="pstrut" style="height:3.008em;"></span><span class="mord"><span class="mopen">(</span><span class="mord">2</span><span class="mpunct">,</span><span class="mspace"> </span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord">1.5</span><span class="mclose">)</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:1.19em;"><span></span></span></span></span></span><span class="arraycolsep" style="width:1em;"></span><span class="col-align-l"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.69em;"><span style="top:-3.69em;"><span class="pstrut" style="height:3.008em;"></span><span class="mord"><span class="mord"><span class="mord mathnormal" style="margin-right:0.109em;">N</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.1514em;"><span style="top:-2.55em;margin-left:-0.109em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight">u</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.109em;">N</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.1514em;"><span style="top:-2.55em;margin-left:-0.109em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight">c</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">≤</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mord">272</span><span class="mord"><span class="mpunct">,</span></span><span class="mord">000</span></span></span><span style="top:-2.25em;"><span class="pstrut" style="height:3.008em;"></span><span class="mord"><span class="mord"><span class="mord mathnormal" style="margin-right:0.109em;">N</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.1514em;"><span style="top:-2.55em;margin-left:-0.109em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight">u</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.109em;">N</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.1514em;"><span style="top:-2.55em;margin-left:-0.109em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight">c</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">&gt;</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mord">272</span><span class="mord"><span class="mpunct">,</span></span><span class="mord">000</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:1.19em;"><span></span></span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span></span></span></span></span></div>
+<p id="b305">其中 <code>N_u</code> 為未快取輸入 tokens，<code>N_c</code> 為快取讀取 tokens，<code>N_out</code> 為輸出 tokens，<code>P</code> 為<a class="xref" href="#t5-11">表 5-11</a> 的每 1M tokens 價格。Anthropic 的 <code>m_in</code> 與 <code>m_out</code> 恆為 1；Gemini Pro 的門檻為 200K，倍數相同（輸入 2×、輸出 1.5×）。</p>
+<ul>
+<li id="b306">500K tokens 的 prompt、不快取、只算輸入：Claude Opus 5.5 為 0.5 × $4 = $2.00；GPT-6 Astra 為 0.5 × $20 = $10.00（整筆改用長 context 價）；GPT-6.1 Sol 為 0.5 × $4 = $2.00；Gemini 3.1 Pro Preview 為 0.5 × $4 = $2.00。</li>
+<li id="b307">272K 的門檻：GPT-6 Astra 的 272,000 tokens 輸入為 272,000 × $10 ÷ 10^6 = $2.72，272,001 tokens 為 272,001 × $20 ÷ 10^6 = $5.44（約 2.0×）；Anthropic 沒有這個階梯。</li>
+<li id="b308">300K tokens、95% 快取讀取（<code>N_c</code> = 285,000、<code>N_u</code> = 15,000）、輸出 2K tokens 的單一請求：</li>
+</ul>
+<figure class="tbl" data-cols="3" data-rows="5"><div aria-label="資料表" class="tbl-scroll" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th class="w2" scope="col">模型</th>
+<th class="w2" scope="col">算式（美元）</th>
+<th class="w1" scope="col">單一請求成本</th>
+</tr>
+</thead>
+<tbody>
+<tr id="b309">
+<td class="rowhead">Claude Opus 5.5</td>
+<td>285,000 × 0.20 + 15,000 × 4 + 2,000 × 20，再 ÷ 10^6</td>
+<td class="num">$0.157</td>
+</tr>
+<tr id="b310">
+<td><span class="rh">GPT-6.1 Sol</span><span class="rh-sub"><span class="vh">（</span>長 context 價<span class="vh">）</span></span></td>
+<td>2 × (285,000 × 0.10 + 15,000 × 2) + 1.5 × 2,000 × 10，再 ÷ 10^6</td>
+<td class="num">$0.147</td>
+</tr>
+<tr id="b311">
+<td><span class="rh">GPT-6.1 Sol</span><span class="rh-sub"><span class="vh">（</span>假設仍為短 context 價<span class="vh">）</span></span></td>
+<td>285,000 × 0.10 + 15,000 × 2 + 2,000 × 10，再 ÷ 10^6</td>
+<td>$0.079（超過 272K 使整筆請求成本為 1.87×）</td>
+</tr>
+<tr id="b312">
+<td><span class="rh">GPT-6 Astra</span><span class="rh-sub"><span class="vh">（</span>長 context 價<span class="vh">）</span></span></td>
+<td>2 × (285,000 × 1 + 15,000 × 10) + 1.5 × 2,000 × 50，再 ÷ 10^6</td>
+<td class="num">$1.02</td>
+</tr>
+<tr id="b313">
+<td><span class="rh">Gemini 3.1 Pro Preview</span><span class="rh-sub"><span class="vh">（</span>&gt; 200K 價，不含快取儲存費<span class="vh">）</span></span></td>
+<td>285,000 × 0.40 + 15,000 × 4 + 2,000 × 18，再 ÷ 10^6</td>
+<td class="num">$0.210</td>
+</tr>
+</tbody>
+</table></div></figure>
+</div></div></div>
+<details class="srcs"><summary>本節來源（27）</summary><ul><li><a href="https://platform.claude.com/docs/en/models/overview" target="_blank" rel="noopener">Claude models overview</a></li><li><a href="https://platform.claude.com/docs/en/about-claude/pricing" target="_blank" rel="noopener">Claude pricing</a></li><li><a href="https://en.wikipedia.org/wiki/Claude_(AI)" target="_blank" rel="noopener">Wikipedia: Claude</a></li><li><a href="https://developers.openai.com/api/docs/pricing" target="_blank" rel="noopener">OpenAI pricing</a></li><li><a href="https://developers.openai.com/api/docs/models/gpt-6-astra" target="_blank" rel="noopener">GPT-6 Astra</a></li><li><a href="https://developers.openai.com/api/docs/models/gpt-6.1-sol" target="_blank" rel="noopener">GPT-6.1 Sol</a></li><li><a href="https://developers.openai.com/api/docs/models/gpt-6-luna" target="_blank" rel="noopener">GPT-6 Luna</a></li><li><a href="https://en.wikipedia.org/wiki/GPT-6" target="_blank" rel="noopener">Wikipedia: GPT-6</a></li><li><a href="https://ai.google.dev/gemini-api/docs/pricing" target="_blank" rel="noopener">Gemini pricing</a></li><li><a href="https://ai.google.dev/gemini-api/docs/models/gemini-3.8-flash" target="_blank" rel="noopener">Gemini 3.8 Flash</a></li><li><a href="https://ai.google.dev/gemini-api/docs/models/gemini-3.1-pro-preview" target="_blank" rel="noopener">Gemini 3.1 Pro Preview</a></li><li><a href="https://ai.google.dev/gemini-api/docs/changelog" target="_blank" rel="noopener">Gemini API changelog</a></li><li><a href="https://blog.google/innovation-and-ai/models-and-research/gemini-models/gemini-4-argon/" target="_blank" rel="noopener">Google 部落格，2026-09-30</a></li><li><a href="https://docs.aws.amazon.com/nova/latest/nova2-userguide/what-is-nova-2.html" target="_blank" rel="noopener">Nova 2 developer guide</a></li><li><a href="https://artificialanalysis.ai/leaderboards/providers" target="_blank" rel="noopener">AA providers leaderboard</a></li><li><a href="https://docs.x.ai/docs/models" target="_blank" rel="noopener">xAI models documentation</a></li><li><a href="https://openrouter.ai/api/v1/models" target="_blank" rel="noopener">OpenRouter 模型目錄</a></li><li><a href="https://artificialanalysis.ai/leaderboards/models" target="_blank" rel="noopener">AA models leaderboard</a></li><li><a href="https://microsoft.ai/news/building-a-hillclimbing-machine-launching-seven-new-mai-models/" target="_blank" rel="noopener">Microsoft AI，2026-06-02</a></li><li><a href="https://www.latent.space/p/ainews-gemini-4-argon-gdms-answer" target="_blank" rel="noopener">Latent Space AINews，2026-10-01</a></li><li><a href="https://the-decoder.com/google-gemini-4-argon-closes-the-gap-with-openai-and-anthropic-but-doesnt-take-a-clear-lead/" target="_blank" rel="noopener">The Decoder，2026-10-01</a></li><li><a href="https://the-decoder.com/claude-opus-5-5-matches-fable-5-1-at-40-percent-lower-cost-as-anthropic-promises-to-fix-claudish-writing/" target="_blank" rel="noopener">The Decoder</a></li><li><a href="https://openrouter.ai/openai/gpt-5.6-sol" target="_blank" rel="noopener">OpenRouter GPT-5.6 Sol</a></li><li><a href="https://openrouter.ai/openai/gpt-6-astra" target="_blank" rel="noopener">OpenRouter GPT-6 Astra</a></li><li><a href="https://platform.claude.com/docs/en/build-with-claude/claude-in-microsoft-foundry" target="_blank" rel="noopener">Claude in Microsoft Foundry</a></li><li><a href="https://platform.claude.com/docs/en/build-with-claude/claude-on-vertex-ai" target="_blank" rel="noopener">Claude on Vertex AI</a></li><li><a href="https://developers.openai.com/api/docs/guides/amazon-bedrock" target="_blank" rel="noopener">OpenAI on Amazon Bedrock</a></li></ul></details></section></div>
+<nav class="pager" aria-label="上一張與下一張"><a href="04-open-models.html"><span>← 04</span>開源模型效能</a><a class="nx" href="06-technique-matrix.html"><span>06 →</span>技術支援矩陣</a></nav>
+<footer class="foot"><span>資料截至 2026-10-04；逐項查核於 2026-10-05 完成。模型與價格每週在變，引用前請對照來源。</span><span class="code">IA-05 · REV 2026-10-05</span></footer>
+</main>
+</div>
+<script src="assets/site.js" defer></script>
+</body>
+</html>

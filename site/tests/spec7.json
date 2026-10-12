@@ -1,0 +1,6 @@
+[
+ {"url": "01-silicon.html", "name": "v7-ch1", "w": 1440, "h": 1250},
+ {"url": "01-silicon.html", "name": "v7-ch1-dark", "w": 1440, "h": 1000, "theme": "dark", "eval": ["document.querySelector('.widget').scrollIntoView()"]},
+ {"url": "01-silicon.html", "name": "v7-ch1-phone", "w": 390, "h": 1500, "dpr": 2, "eval": ["document.querySelector('.widget').scrollIntoView()"]},
+ {"url": "04-open-models.html#s3", "name": "v7-ch4-grid-phone", "w": 390, "h": 700, "dpr": 2, "eval": ["document.querySelector('#shg').scrollIntoView()", "document.querySelector('#shg .hm-scroll').scrollLeft = 260"]}
+]

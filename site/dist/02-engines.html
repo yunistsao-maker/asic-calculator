@@ -1,0 +1,831 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>推論引擎 · Inference ASIC Atlas</title>
+<meta name="description" content="同時涵蓋 GPU 與非 GPU 加速器的引擎只有 vLLM 與 SGLang。Trainium 仍在開發的只有 vLLM Neuron plugin（Beta），Inferentia2 的 NxD Inference 已進入維護模式，Cerebras 只有自己的專有堆疊；InferenceX 的 AgentX 快照中沒有任何一個引擎在所有模型與硬體上領先。">
+<meta name="color-scheme" content="light dark">
+<link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&amp;display=swap">
+<link rel="stylesheet" href="assets/site.css">
+<script>(function(){var d=document.documentElement;d.classList.add('js');try{var t=localStorage.getItem('ia-theme');if(t==='light'||t==='dark')d.setAttribute('data-theme',t)}catch(e){}})();</script>
+</head>
+<body><a class="skip" href="#sheet">跳到內容</a><header class="hdr"><div class="hdr-in"><a class="brand" href="index.html"><svg width="32" height="32" viewBox="0 0 32 32" aria-hidden="true"><rect class="k" x="7" y="7" width="18" height="18"></rect><circle cx="11" cy="11" r="1.6" fill="#F2B544"></circle><path class="p" d="M11 2v5M16 2v5M21 2v5M11 25v5M16 25v5M21 25v5M2 11h5M2 16h5M2 21h5M25 11h5M25 16h5M25 21h5" stroke-width="2" fill="none"></path></svg><span class="brand-t"><span class="brand-en">INFERENCE ASIC ATLAS</span><span class="brand-zh">推論晶片圖鑑</span></span></a><button type="button" class="hbtn menu-btn" id="menu-btn" aria-expanded="false" aria-controls="idx"><svg width="18" height="18" viewBox="0 0 18 18" aria-hidden="true"><path d="M2 4.5h14M2 9h14M2 13.5h14" stroke="currentColor" stroke-width="1.8" fill="none"></path></svg><span>章節</span></button><div class="hdr-tools"><span class="rev">REV 2026-10-05 · 12 SHEETS · 777 SOURCES</span><form id="hsearch" class="hsearch" action="search.html" method="get" role="search"><input name="q" type="search" placeholder="搜尋全站" aria-label="搜尋全站"><button type="submit" aria-label="搜尋"><svg width="18" height="18" viewBox="0 0 18 18" aria-hidden="true"><circle cx="7.5" cy="7.5" r="5" fill="none" stroke="currentColor" stroke-width="1.8"></circle><path d="M11.5 11.5L16 16" stroke="currentColor" stroke-width="1.8"></path></svg></button></form><button type="button" class="hbtn" id="theme-btn" aria-label="切換深色模式"><svg width="18" height="18" viewBox="0 0 18 18" aria-hidden="true"><circle cx="9" cy="9" r="7" fill="none" stroke="currentColor" stroke-width="1.6"></circle><path d="M9 2a7 7 0 0 1 0 14z" fill="currentColor"></path></svg></button></div></div></header>
+<div class="wrap">
+<nav class="idx" id="idx" aria-label="章節"><a href="index.html"><span class="n">00</span><span>總覽</span></a><div class="grp"><span class="grp-t">硬體 HARDWARE</span><a href="01-silicon.html"><span class="n">01</span><span>晶片與系統規格</span></a></div><div class="grp"><span class="grp-t">軟體 SOFTWARE</span><a href="02-engines.html" aria-current="page"><span class="n">02</span><span>推論引擎</span></a><a href="06-technique-matrix.html"><span class="n">06</span><span>技術支援矩陣</span></a></div><div class="grp"><span class="grp-t">模型 MODELS</span><a href="03-architectures.html"><span class="n">03</span><span>模型架構支援</span></a><a href="04-open-models.html"><span class="n">04</span><span>開源模型效能</span></a><a href="05-proprietary-models.html"><span class="n">05</span><span>私有模型效能</span></a></div><div class="grp"><span class="grp-t">情境 SCENARIOS</span><a href="07-long-context.html"><span class="n">07</span><span>長上下文 200K / 1M</span></a><a href="08-metrics.html"><span class="n">08</span><span>效能與成本</span></a><a href="09-deployment.html"><span class="n">09</span><span>部署模式</span></a></div><div class="grp"><span class="grp-t">規劃 PLANNING</span><a href="10-capacity.html"><span class="n">10</span><span>容量計算器</span></a><a href="11-evidence.html"><span class="n">11</span><span>估算依據</span></a><a href="12-sources.html"><span class="n">12</span><span>來源</span></a></div><div class="grp"><span class="grp-t">附錄 APPENDIX</span><a href="factcheck.html"><span class="n">A</span><span>查核紀錄</span></a></div></nav>
+<main id="sheet">
+<section class="sheet-head"><span class="sheet-code">SHEET 02 / 12 · ENGINES</span><h1>軟體堆疊與推論引擎</h1><p class="lead">同時涵蓋 GPU 與非 GPU 加速器的引擎只有 vLLM 與 SGLang。Trainium 仍在開發的只有 vLLM Neuron plugin（Beta），Inferentia2 的 NxD Inference 已進入維護模式，Cerebras 只有自己的專有堆疊；InferenceX 的 AgentX 快照中沒有任何一個引擎在所有模型與硬體上領先。</p><div class="conv prose"><p>資料基準日：2026-10-04；版本與日期取自當日的 PyPI 與各專案 repository 的預設分支。等級：<span class="g g-a" title="等級 A：獨立第三方量測">A</span>  = 獨立第三方量測；<span class="g g-b" title="等級 B：廠商或夥伴公布，且揭露方法">B</span>  = 廠商／專案文件，或揭露方法的 benchmark；<span class="g g-c" title="等級 C：廠商宣稱或規格，未揭露方法">C</span>  = 廠商宣稱或規格、未揭露方法；<span class="g g-d" title="等級 D：本文推算，附算式">D</span>  = 本文推算（附算式）。未另標等級的引擎功能敘述都來自專案文件<span class="g g-b" title="等級 B：廠商或夥伴公布，且揭露方法">B</span>。</p>
+</div></section>
+<div class="tabs"><div class="tablist" role="tablist" aria-label="本章的小節"><button type="button" class="tab" role="tab" id="tab-s1" aria-controls="s1" aria-selected="true"><span class="n">2.1</span><span>支援矩陣</span></button><button type="button" class="tab" role="tab" id="tab-s2" aria-controls="s2" aria-selected="false"><span class="n">2.2</span><span>優缺點</span></button><button type="button" class="tab" role="tab" id="tab-s3" aria-controls="s3" aria-selected="false"><span class="n">2.3</span><span>編譯式與動態</span></button></div>
+<section class="panel on" role="tabpanel" id="s1" aria-labelledby="tab-s1"><div class="panel-head"><h2>引擎 × 晶片支援矩陣</h2><div class="sec-lead prose"><p id="b1">7 類加速器中有 2 類只有 1 個可用堆疊：Cerebras（專有堆疊，沒有可自行安裝的引擎；經公開 API、Dedicated Inference 或地端採購的系統使用）與 NVIDIA LPX（由 Dynamo operator 部署預先編譯的 LPU build，文件標 experimental）（<a href="https://inference-docs.cerebras.ai/dedicated/overview" rel="noopener" target="_blank">Cerebras Dedicated</a>；<a href="https://github.com/ai-dynamo/dynamo/blob/main/deploy/operator/api/v1beta1/dynamocomponentdeployment_types.go" rel="noopener" target="_blank">Dynamo component types</a>）。AWS Inferentia2 只有 1 條 AWS 自家支援的路（NxD Inference，2026-05-20 宣布進入維護模式），另有 Hugging Face 的 Optimum Neuron 架在同一套凍結的 SDK 上；AWS Trainium 有 2 個堆疊，仍在開發的只有 vLLM Neuron plugin（Beta）（<a href="https://awsdocs-neuron.readthedocs-hosted.com/en/latest/about-neuron/announcements/neuron2.x/announce-nxdi-maintenance-support-2-31.html" rel="noopener" target="_blank">NxDI 維護公告</a>；<a href="https://github.com/vllm-project/vllm-neuron/blob/release-0.24.0.1.1.0/README.md" rel="noopener" target="_blank">vLLM Neuron README</a>）。同時涵蓋 GPU 與非 GPU 加速器、且文件列為支援的引擎只有 vLLM（NVIDIA、AMD、Trainium、Inferentia2、TPU）與 SGLang（NVIDIA、AMD、TPU）；TGI、llama.cpp、TileRT 與 TokenSpeed 只跨 NVIDIA 與 AMD 兩家 GPU（<a href="https://github.com/vllm-project/vllm/blob/main/docs/getting_started/installation/README.md" rel="noopener" target="_blank">vLLM installation</a>；<a href="https://github.com/sgl-project/sglang/blob/main/README.md" rel="noopener" target="_blank">SGLang README</a>）。</p>
+</div></div>
+<div class="prose"><p id="b2">狀態用語：<strong>正式</strong> = 專案文件列為支援，且未加 Beta 或 experimental 標示（不代表有商業 SLA）；<strong>Beta</strong> = 文件自標 Beta；<strong>實驗</strong> = 文件自標 experimental、preview 或 proof of concept；<strong>不支援</strong> = 文件明示不支援，或該硬體不在引擎的硬體清單；<strong>查無</strong> = 讀過的文件沒有提到。</p>
+</div>
+<div class="subtabs"><div class="subtablist" role="tablist" aria-label="引擎 × 晶片支援矩陣"><button type="button" class="subtab" role="tab" id="tab-s1-1" aria-controls="s1-1" aria-selected="true">引擎清單</button><button type="button" class="subtab" role="tab" id="tab-s1-2" aria-controls="s1-2" aria-selected="false">矩陣一：GPU 與 LPX</button><button type="button" class="subtab" role="tab" id="tab-s1-3" aria-controls="s1-3" aria-selected="false">矩陣二</button></div><div class="subpanel on" role="tabpanel" id="s1-1" aria-labelledby="tab-s1-1"><div class="prose"><h3>引擎清單</h3><figure class="tbl" data-cols="5" data-rows="16"><div aria-label="資料表" class="tbl-scroll" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th class="w1" scope="col">引擎</th>
+<th class="w2" scope="col">目前版本與日期</th>
+<th class="w2" scope="col">授權與維護者</th>
+<th class="w2" scope="col">定位</th>
+<th class="src" scope="col">來源</th>
+</tr>
+</thead>
+<tbody>
+<tr id="b3">
+<td class="rowhead">vLLM</td>
+<td>0.30.0（2026-09-22）；前 3 版為 0.29.0（2026-09-09）、0.28.0（2026-08-26）、0.27.0（2026-08-10），目標每 2 週 1 版</td>
+<td>Apache-2.0；社群專案，源自 UC Berkeley Sky Computing Lab</td>
+<td>通用 PyTorch 引擎；CUDA、ROCm、Intel XPU、CPU 在主幹，其他硬體走 out-of-tree plugin</td>
+<td class="src"><a href="https://pypi.org/pypi/vllm/json" rel="noopener" target="_blank">PyPI vllm</a>；<a href="https://github.com/vllm-project/vllm/blob/main/docs/contributing/release_process.md" rel="noopener" target="_blank">vLLM release process</a>；<a href="https://github.com/vllm-project/vllm/blob/main/README.md" rel="noopener" target="_blank">vLLM README</a></td>
+</tr>
+<tr id="b4">
+<td class="rowhead">SGLang</td>
+<td>0.5.21（2026-10-01）；0.5.20（2026-09-18）、0.5.19（2026-09-04）</td>
+<td>Apache-2.0；由非營利組織 LMSYS 代管</td>
+<td>PyTorch 引擎，定位 agentic workload 與大規模 serving；自帶 gateway 與 HiCache</td>
+<td class="src"><a href="https://pypi.org/pypi/sglang/json" rel="noopener" target="_blank">PyPI sglang</a>；<a href="https://github.com/sgl-project/sglang/blob/main/README.md" rel="noopener" target="_blank">SGLang README</a></td>
+</tr>
+<tr id="b5">
+<td class="rowhead">TensorRT-LLM</td>
+<td>穩定版 1.2.1（2026-04-20）；預覽版 1.3.0rc29（2026-09-29），約每週 1 個 rc</td>
+<td>Apache-2.0；NVIDIA</td>
+<td>只支援 NVIDIA GPU；1.2（2026-03-12）移除 TensorRT backend，PyTorch 成為唯一執行後端</td>
+<td class="src"><a href="https://pypi.org/pypi/tensorrt-llm/json" rel="noopener" target="_blank">PyPI tensorrt-llm</a>；<a href="https://github.com/NVIDIA/TensorRT-LLM/blob/main/docs/source/release-notes.md" rel="noopener" target="_blank">TRT-LLM release notes</a></td>
+</tr>
+<tr id="b6">
+<td><span class="rh">NVIDIA NIM</span><span class="rh-sub"><span class="vh">（</span>LLM／VLM<span class="vh">）</span></span></td>
+<td>2.0.13（release notes 頁面更新於 2026-10-02）</td>
+<td>授權查無；NVIDIA</td>
+<td>封裝層而非引擎：2.0 以 vLLM 為唯一 inference backend，2.0.13 內含 vLLM 0.28.0；<code>deepseek-v4.1-flash</code> 另以 SGLang image 發布</td>
+<td class="src"><a href="https://docs.nvidia.com/nim/large-language-models/latest/about-nim-llm/release-notes.html" rel="noopener" target="_blank">NIM release notes</a>；<a href="https://docs.nvidia.com/nim/large-language-models/latest/reference/architecture.html" rel="noopener" target="_blank">NIM architecture</a>；<a href="https://docs.nvidia.com/nim/large-language-models/latest/reference/1.x-migration-guide.html" rel="noopener" target="_blank">NIM migration guide</a></td>
+</tr>
+<tr id="b7">
+<td class="rowhead">NVIDIA Dynamo</td>
+<td>1.5.0（2026-09-18）；1.4.0（2026-08-14）、1.3.0（2026-07-20）</td>
+<td>Apache-2.0；NVIDIA</td>
+<td>引擎之上的編排層；1.5.0 綁定 SGLang 0.5.18、TensorRT-LLM 1.3.0rc25、vLLM 0.28.0</td>
+<td class="src"><a href="https://pypi.org/pypi/ai-dynamo/json" rel="noopener" target="_blank">PyPI ai-dynamo</a>；<a href="https://github.com/ai-dynamo/dynamo/blob/main/docs/fern/components/releases.data.ts" rel="noopener" target="_blank">Dynamo releases data</a>；<a href="https://github.com/ai-dynamo/dynamo/blob/main/README.md" rel="noopener" target="_blank">Dynamo README</a></td>
+</tr>
+<tr id="b8">
+<td class="rowhead">Hugging Face TGI</td>
+<td>3.3.6-dev0（Cargo 版號）；最後 commit 2026-03-21</td>
+<td>Apache-2.0；Hugging Face</td>
+<td>維護模式；README 建議改用 vLLM、SGLang、llama.cpp 或 MLX</td>
+<td class="src"><a href="https://github.com/huggingface/text-generation-inference/blob/main/README.md" rel="noopener" target="_blank">TGI README</a>；<a href="https://github.com/huggingface/text-generation-inference/blob/main/Cargo.toml" rel="noopener" target="_blank">TGI Cargo.toml</a></td>
+</tr>
+<tr id="b9">
+<td class="rowhead">llama.cpp</td>
+<td>0.5.0（CMakeLists；master 滾動發布）</td>
+<td>MIT；ggml-org</td>
+<td>GGUF 引擎，面向 CPU、邊緣與單節點 GPU</td>
+<td class="src"><a href="https://github.com/ggml-org/llama.cpp/blob/master/CMakeLists.txt" rel="noopener" target="_blank">llama.cpp CMakeLists</a>；<a href="https://github.com/ggml-org/llama.cpp/blob/master/README.md" rel="noopener" target="_blank">llama.cpp README</a></td>
+</tr>
+<tr id="b10">
+<td class="rowhead">AMD ATOM</td>
+<td>nightly image 2026-09-29 = ATOM 0.1.7.dev46（ROCm 7.2.4）；InferenceX 設定檔中最後有版號的 image 為 0.1.3</td>
+<td>MIT；AMD</td>
+<td>以 AITER kernel 為基礎的 Instinct 專用引擎；也能作為 vLLM、SGLang 的 plugin</td>
+<td class="src"><a href="https://github.com/ROCm/ATOM/blob/main/README.md" rel="noopener" target="_blank">ATOM README</a>；<a href="https://github.com/SemiAnalysisAI/InferenceX/blob/main/inferencex-e2e/perf-changelog.yaml" rel="noopener" target="_blank">InferenceX perf-changelog</a>；<a href="https://github.com/SemiAnalysisAI/InferenceX/blob/main/inferencex-e2e/configs/amd-master.yaml" rel="noopener" target="_blank">InferenceX AMD configs</a></td>
+</tr>
+<tr id="b11">
+<td class="rowhead">TileRT</td>
+<td class="num">0.1.6（2026-09-24）</td>
+<td>repository 為 MIT，引擎以預先編譯的 binary wheel 發布；tile-ai</td>
+<td>低延遲 decode 引擎，一次只服務 1 條序列；prefill 交給 vLLM</td>
+<td class="src"><a href="https://github.com/tile-ai/TileRT/blob/main/README.md" rel="noopener" target="_blank">TileRT README</a></td>
+</tr>
+<tr id="b12">
+<td class="rowhead">TokenSpeed</td>
+<td class="num">0.1.0（2026-07-24）</td>
+<td>MIT；LightSeek Foundation（非營利）</td>
+<td>C++ 控制平面加 Python 執行平面；Dynamo 自 2026-05-06 起可掛載</td>
+<td class="src"><a href="https://pypi.org/pypi/tokenspeed/json" rel="noopener" target="_blank">PyPI tokenspeed</a>；<a href="https://github.com/lightseekorg/tokenspeed/blob/main/README.md" rel="noopener" target="_blank">TokenSpeed README</a></td>
+</tr>
+<tr id="b13">
+<td class="rowhead">vLLM Neuron plugin</td>
+<td>0.24.0.1.1.0（2026-08-17，對應 vLLM 0.24.0）；首版 0.21.0.1.0.0（2026-07-20）</td>
+<td>PyPI 授權欄為 Proprietary；AWS</td>
+<td>Trainium 的 vLLM 後端，模型程式碼寫在 plugin 內；Beta，只支援 Trn2／Trn3</td>
+<td class="src"><a href="https://github.com/vllm-project/vllm-neuron/blob/release-0.24.0.1.1.0/README.md" rel="noopener" target="_blank">vLLM Neuron README</a>；<a href="https://awsdocs-neuron.readthedocs-hosted.com/en/latest/release-notes/components/vllm-neuron.html" rel="noopener" target="_blank">vLLM Neuron release notes</a>；<a href="https://pypi.org/pypi/vllm-neuron/json" rel="noopener" target="_blank">PyPI vllm-neuron</a></td>
+</tr>
+<tr id="b14">
+<td class="rowhead">NxD Inference</td>
+<td>0.10.18399（凍結在 Neuron 2.31.0 的建置）</td>
+<td>授權查無；AWS</td>
+<td>Inf2／Trn1／Trn2 的舊推論函式庫；公告寫明「No new releases are planned」</td>
+<td class="src"><a href="https://awsdocs-neuron.readthedocs-hosted.com/en/latest/about-neuron/announcements/neuron2.x/announce-nxdi-maintenance-support-2-31.html" rel="noopener" target="_blank">NxDI 維護公告</a>；<a href="https://awsdocs-neuron.readthedocs-hosted.com/en/latest/release-notes/components/nxd-inference.html" rel="noopener" target="_blank">NxDI release notes</a></td>
+</tr>
+<tr id="b15">
+<td class="rowhead">Optimum Neuron</td>
+<td class="num">0.4.5（2026-02-11）</td>
+<td>授權查無；Hugging Face</td>
+<td>Inf2／Trn1 的 Hugging Face 路徑，自帶 vLLM platform plugin</td>
+<td class="src"><a href="https://pypi.org/project/optimum-neuron/" rel="noopener" target="_blank">PyPI optimum-neuron</a>；<a href="https://github.com/huggingface/optimum-neuron/blob/main/docs/source/guides/vllm_plugin.mdx" rel="noopener" target="_blank">Optimum Neuron vLLM plugin guide</a></td>
+</tr>
+<tr id="b16">
+<td class="rowhead">vLLM TPU plugin（<code>tpu-inference</code>）</td>
+<td>0.30.0（2026-09-30）；0.29.0（2026-09-10），版號跟隨 vLLM</td>
+<td>Apache-2.0（PyPI 授權欄）；vllm-project</td>
+<td>TPU 的 vLLM 後端，JAX 與 PyTorch 模型都經 JAX／XLA lowering</td>
+<td class="src"><a href="https://pypi.org/project/vllm-tpu/" rel="noopener" target="_blank">PyPI vllm-tpu</a>；<a href="https://github.com/vllm-project/tpu-inference" rel="noopener" target="_blank">tpu-inference</a></td>
+</tr>
+<tr id="b17">
+<td class="rowhead">SGL-JAX</td>
+<td>PyPI 穩定版 0.0.2，預覽版 0.1.0rc0（2026-08-29）</td>
+<td>Apache（PyPI 授權欄）；sgl-project</td>
+<td>獨立的 JAX 原生 SGLang 引擎，用於 TPU v6e、v7</td>
+<td class="src"><a href="https://pypi.org/pypi/sglang-jax/json" rel="noopener" target="_blank">PyPI sglang-jax</a>；<a href="https://github.com/sgl-project/sglang-jax" rel="noopener" target="_blank">sglang-jax</a></td>
+</tr>
+<tr id="b18">
+<td class="rowhead">Cerebras 推論堆疊</td>
+<td>版本不公開</td>
+<td>專有；Cerebras</td>
+<td>沒有可自行安裝的引擎，經公開 API、Dedicated Inference 或地端採購的系統使用</td>
+<td class="src"><a href="https://inference-docs.cerebras.ai/models/overview" rel="noopener" target="_blank">Cerebras models</a>；<a href="https://inference-docs.cerebras.ai/dedicated/overview" rel="noopener" target="_blank">Cerebras Dedicated</a></td>
+</tr>
+</tbody>
+</table></div></figure>
+</div></div><div class="subpanel" role="tabpanel" id="s1-2" aria-labelledby="tab-s1-2"><div class="prose"><h3>矩陣一：GPU 與 LPX</h3><figure class="tbl" data-cols="5" data-rows="10"><div aria-label="資料表" class="tbl-scroll" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th scope="col">引擎</th>
+<th class="w2" scope="col">NVIDIA GPU</th>
+<th class="w2" scope="col">AMD GPU</th>
+<th scope="col">NVIDIA LPX</th>
+<th class="src" scope="col">來源</th>
+</tr>
+</thead>
+<tbody>
+<tr id="b19">
+<td class="rowhead">vLLM</td>
+<td><span class="chip chip-yes">正式</span>（Hopper、Blackwell）；Vera Rubin 為實驗（Preview，需從原始碼建置）</td>
+<td><span class="chip chip-yes">正式</span><span class="chip-note">ROCm 6.3 以上；MI200／MI300／MI350；預編 wheel 只有 Python 3.12</span></td>
+<td><span class="chip chip-no">不支援</span></td>
+<td class="src"><a href="https://github.com/vllm-project/vllm/blob/main/docs/features/README.md" rel="noopener" target="_blank">vLLM feature matrix</a>；<a href="https://github.com/vllm-project/vllm/blob/main/docs/getting_started/installation/gpu.cuda.inc.md" rel="noopener" target="_blank">vLLM CUDA install</a>；<a href="https://github.com/vllm-project/vllm/blob/main/docs/getting_started/installation/gpu.rocm.inc.md" rel="noopener" target="_blank">vLLM ROCm install</a></td>
+</tr>
+<tr id="b20">
+<td class="rowhead">SGLang</td>
+<td><span class="chip chip-yes">正式</span>（A100 至 GB300）；Vera Rubin 為實驗（CUDA 13.4 nightly image）</td>
+<td><span class="chip chip-yes">正式</span><span class="chip-note">MI300X、MI325X、MI350X、MI355X</span></td>
+<td><span class="chip chip-no">不支援</span></td>
+<td class="src"><a href="https://github.com/sgl-project/sglang/blob/main/README.md" rel="noopener" target="_blank">SGLang README</a>；<a href="https://github.com/sgl-project/sglang/blob/main/.github/workflows/release-docker-cu134-nightly.yml" rel="noopener" target="_blank">SGLang cu134 nightly</a>；<a href="https://github.com/sgl-project/sglang/blob/main/docs/docs/hardware-platforms/amd_gpu.mdx" rel="noopener" target="_blank">SGLang AMD GPUs</a></td>
+</tr>
+<tr id="b21">
+<td class="rowhead">TensorRT-LLM</td>
+<td><span class="chip chip-yes">正式</span>（Ampere 至 Blackwell）；Rubin（sm107）已列入量化矩陣，尚未列入硬體清單</td>
+<td><span class="chip chip-no">不支援</span></td>
+<td><span class="chip chip-no">不支援</span></td>
+<td class="src"><a href="https://github.com/NVIDIA/TensorRT-LLM/blob/main/docs/source/supported-hardware.md" rel="noopener" target="_blank">TRT-LLM supported hardware</a>；<a href="https://github.com/NVIDIA/TensorRT-LLM/blob/main/docs/source/features/quantization.md" rel="noopener" target="_blank">TRT-LLM quantization</a></td>
+</tr>
+<tr id="b22">
+<td class="rowhead">NVIDIA NIM</td>
+<td><span class="chip chip-yes">正式</span><span class="chip-note">以 vLLM profile 發布</span></td>
+<td class="muted"><span class="chip chip-na">查無</span></td>
+<td class="muted"><span class="chip chip-na">查無</span></td>
+<td class="src"><a href="https://docs.nvidia.com/nim/large-language-models/latest/about-nim-llm/release-notes.html" rel="noopener" target="_blank">NIM release notes</a></td>
+</tr>
+<tr id="b23">
+<td class="rowhead">NVIDIA Dynamo</td>
+<td><span class="chip chip-yes">正式</span><span class="chip-note">編排 SGLang、TensorRT-LLM、vLLM</span></td>
+<td class="muted"><span class="chip chip-na">查無</span></td>
+<td><span class="chip chip-exp">實驗</span>（<code>lpx</code> 元件型別，預設關閉）</td>
+<td class="src"><a href="https://github.com/ai-dynamo/dynamo/blob/main/README.md" rel="noopener" target="_blank">Dynamo README</a>；<a href="https://github.com/ai-dynamo/dynamo/blob/main/deploy/operator/api/v1beta1/dynamocomponentdeployment_types.go" rel="noopener" target="_blank">Dynamo component types</a>；<a href="https://github.com/ai-dynamo/dynamo/blob/main/deploy/operator/api/config/v1alpha1/lpx.go" rel="noopener" target="_blank">Dynamo LPX operator config</a></td>
+</tr>
+<tr id="b24">
+<td class="rowhead">Hugging Face TGI</td>
+<td><span class="chip chip-yes">正式</span><span class="chip-note">維護模式</span></td>
+<td><span class="chip chip-yes">正式</span><span class="chip-note">維護模式；ROCm image</span></td>
+<td><span class="chip chip-no">不支援</span></td>
+<td class="src"><a href="https://github.com/huggingface/text-generation-inference/blob/main/README.md" rel="noopener" target="_blank">TGI README</a>；<a href="https://github.com/huggingface/text-generation-inference/blob/main/docs/source/architecture.md" rel="noopener" target="_blank">TGI architecture</a></td>
+</tr>
+<tr id="b25">
+<td class="rowhead">llama.cpp</td>
+<td><span class="chip chip-yes">正式</span><span class="chip-note">CUDA backend</span></td>
+<td><span class="chip chip-yes">正式</span><span class="chip-note">HIP backend</span></td>
+<td><span class="chip chip-no">不支援</span></td>
+<td class="src"><a href="https://github.com/ggml-org/llama.cpp/blob/master/README.md" rel="noopener" target="_blank">llama.cpp README</a></td>
+</tr>
+<tr id="b26">
+<td class="rowhead">AMD ATOM</td>
+<td><span class="chip chip-no">不支援</span></td>
+<td><span class="chip chip-yes">正式</span><span class="chip-note">0.1.x；無版本化的 release notes</span></td>
+<td><span class="chip chip-no">不支援</span></td>
+<td class="src"><a href="https://github.com/ROCm/ATOM/blob/main/README.md" rel="noopener" target="_blank">ATOM README</a></td>
+</tr>
+<tr id="b27">
+<td class="rowhead">TileRT</td>
+<td><span class="chip chip-yes">正式</span><span class="chip-note">8× B200；DeepSeek-V3.2、GLM-5／5.1</span></td>
+<td><span class="chip chip-yes">正式</span><span class="chip-note">8× MI350X／MI355X；GLM-5.2／5.3</span></td>
+<td><span class="chip chip-no">不支援</span></td>
+<td class="src"><a href="https://github.com/tile-ai/TileRT/blob/main/README.md" rel="noopener" target="_blank">TileRT README</a></td>
+</tr>
+<tr id="b28">
+<td class="rowhead">TokenSpeed</td>
+<td><span class="chip chip-yes">正式</span><span class="chip-note">0.1.0；Blackwell、Hopper</span></td>
+<td><span class="chip chip-yes">正式</span><span class="chip-note">gfx950，即 MI350 系列</span></td>
+<td><span class="chip chip-no">不支援</span></td>
+<td class="src"><a href="https://github.com/lightseekorg/tokenspeed/blob/main/README.md" rel="noopener" target="_blank">TokenSpeed README</a>；<a href="https://github.com/lightseekorg/tokenspeed/blob/main/docs/recipes/models.md" rel="noopener" target="_blank">TokenSpeed model recipes</a>；<a href="https://github.com/vllm-project/vllm/blob/main/docs/getting_started/installation/gpu.rocm.inc.md" rel="noopener" target="_blank">vLLM ROCm install</a></td>
+</tr>
+</tbody>
+</table></div></figure>
+</div></div><div class="subpanel" role="tabpanel" id="s1-3" aria-labelledby="tab-s1-3"><div class="prose"><h3>矩陣二：AWS、Google 與 Cerebras</h3><figure class="tbl" data-cols="6" data-rows="6"><div aria-label="資料表" class="tbl-scroll" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th scope="col">引擎</th>
+<th class="w2" scope="col">AWS Trainium</th>
+<th class="w2" scope="col">AWS Inferentia</th>
+<th class="w2" scope="col">Google TPU</th>
+<th scope="col">Cerebras</th>
+<th class="src" scope="col">來源</th>
+</tr>
+</thead>
+<tbody>
+<tr id="b29">
+<td class="rowhead">vLLM</td>
+<td><span class="chip chip-part">Beta</span><span class="chip-note">vLLM Neuron plugin 0.24.0.1.1.0；Trn2／Trn3</span></td>
+<td><span class="chip chip-yes">正式</span><span class="chip-note">維護模式；vLLM 0.16 + NxD Inference plugin 0.5.x；Inf2</span></td>
+<td><span class="chip chip-yes">正式</span><span class="chip-note">vllm-tpu 0.30.0；建議 v7x、v5e、v6e；多主機 TP／EP／DP 未測</span></td>
+<td><span class="chip chip-no">不支援</span></td>
+<td class="src"><a href="https://github.com/vllm-project/vllm-neuron/blob/release-0.24.0.1.1.0/README.md" rel="noopener" target="_blank">vLLM Neuron README</a>；<a href="https://awsdocs-neuron.readthedocs-hosted.com/en/latest/libraries/vllm-neuron/neuron-inference-overview.html" rel="noopener" target="_blank">AI Inference on Neuron</a>；<a href="https://github.com/vllm-project/tpu-inference" rel="noopener" target="_blank">tpu-inference</a>；<a href="https://github.com/vllm-project/tpu-inference/tree/main/support_matrices" rel="noopener" target="_blank">tpu-inference support matrices</a>；<a href="https://pypi.org/project/vllm-tpu/" rel="noopener" target="_blank">PyPI vllm-tpu</a>；<a href="https://inference-docs.cerebras.ai/dedicated/overview" rel="noopener" target="_blank">Cerebras Dedicated</a></td>
+</tr>
+<tr id="b30">
+<td class="rowhead">SGLang</td>
+<td><span class="chip chip-no">不支援</span><span class="chip-note">README 列為整合進行中</span></td>
+<td class="muted"><span class="chip chip-na">查無</span></td>
+<td><span class="chip chip-yes">正式</span><span class="chip-note">SGL-JAX，獨立 repository；v6e、v7</span></td>
+<td><span class="chip chip-no">不支援</span></td>
+<td class="src"><a href="https://github.com/sgl-project/sglang/blob/main/README.md" rel="noopener" target="_blank">SGLang README</a>；<a href="https://github.com/sgl-project/sglang/blob/main/docs/docs/hardware-platforms/tpu.mdx" rel="noopener" target="_blank">SGLang TPU</a>；<a href="https://github.com/sgl-project/sglang-jax" rel="noopener" target="_blank">sglang-jax</a></td>
+</tr>
+<tr id="b31">
+<td class="rowhead">NxD Inference</td>
+<td><span class="chip chip-yes">正式</span><span class="chip-note">維護模式；Trn2；Trn1 見註 1</span></td>
+<td><span class="chip chip-yes">正式</span><span class="chip-note">維護模式；見註 1</span></td>
+<td><span class="chip chip-no">不支援</span></td>
+<td><span class="chip chip-no">不支援</span></td>
+<td class="src"><a href="https://awsdocs-neuron.readthedocs-hosted.com/en/latest/about-neuron/announcements/neuron2.x/announce-nxdi-maintenance-support-2-31.html" rel="noopener" target="_blank">NxDI 維護公告</a>；<a href="https://awsdocs-neuron.readthedocs-hosted.com/en/latest/release-notes/components/nxd-inference.html" rel="noopener" target="_blank">NxDI release notes</a></td>
+</tr>
+<tr id="b32">
+<td class="rowhead">Optimum Neuron</td>
+<td><span class="chip chip-yes">正式</span>（Trn1）；不支援（Trn2）</td>
+<td><span class="chip chip-yes">正式</span><span class="chip-note">0.4.5；Inf2</span></td>
+<td><span class="chip chip-no">不支援</span></td>
+<td><span class="chip chip-no">不支援</span></td>
+<td class="src"><a href="https://pypi.org/project/optimum-neuron/" rel="noopener" target="_blank">PyPI optimum-neuron</a>；<a href="https://github.com/huggingface/optimum-neuron/blob/main/docs/source/guides/vllm_plugin.mdx" rel="noopener" target="_blank">Optimum Neuron vLLM plugin guide</a></td>
+</tr>
+<tr id="b33">
+<td class="rowhead">Hugging Face TGI</td>
+<td><span class="chip chip-no">不支援</span><span class="chip-note">見註 2</span></td>
+<td><span class="chip chip-no">不支援</span><span class="chip-note">見註 2</span></td>
+<td><span class="chip chip-no">不支援</span></td>
+<td><span class="chip chip-no">不支援</span></td>
+<td class="src"><a href="https://github.com/huggingface/optimum-neuron/commits/main" rel="noopener" target="_blank">Optimum Neuron commits</a>；<a href="https://github.com/huggingface/text-generation-inference/blob/main/docs/source/architecture.md" rel="noopener" target="_blank">TGI architecture</a></td>
+</tr>
+<tr id="b34">
+<td class="rowhead">Cerebras 推論堆疊</td>
+<td><span class="chip chip-no">不支援</span></td>
+<td><span class="chip chip-no">不支援</span></td>
+<td><span class="chip chip-no">不支援</span></td>
+<td><span class="chip chip-yes">正式</span><span class="chip-note">唯一堆疊；公開 API 2 個模型</span></td>
+<td class="src"><a href="https://inference-docs.cerebras.ai/models/overview" rel="noopener" target="_blank">Cerebras models</a></td>
+</tr>
+</tbody>
+</table></div></figure>
+<p id="b35">TensorRT-LLM、llama.cpp、ATOM、TileRT、TokenSpeed 在矩陣二的 4 欄都是不支援；NIM 與 Dynamo 為查無。</p>
+<ul>
+<li id="b36">註 1：AWS 文件仍把 Inf2 列在 NxD Inference 的 vLLM 0.16 路徑下，但 NxDI 2.29 的 release notes 寫「only supported on Trn2 and newer hardware」，需要 NKI kernel 的 Inf2／Trn1 使用者要釘在 2.28（<a href="https://awsdocs-neuron.readthedocs-hosted.com/en/latest/release-notes/components/nxd-inference.html" rel="noopener" target="_blank">NxDI release notes</a>；<a href="https://awsdocs-neuron.readthedocs-hosted.com/en/latest/libraries/vllm-neuron/neuron-inference-overview.html" rel="noopener" target="_blank">AI Inference on Neuron</a>）。兩份文件互相矛盾，列入待釐清項目。</li>
+<li id="b37">註 2：Optimum Neuron 在 2025-11-19 至 2026-01-20 間移除 TGI benchmark、image 與文件；TGI repository 的架構文件仍寫 Neuron（Inferentia2）版本「is maintained in the main TGI repository」（<a href="https://github.com/huggingface/optimum-neuron/commits/main" rel="noopener" target="_blank">Optimum Neuron commits</a>；<a href="https://github.com/huggingface/text-generation-inference/blob/main/docs/source/architecture.md" rel="noopener" target="_blank">TGI architecture</a>）。</li>
+<li id="b38">註 3：PyPI 上的 <code>vllm-neuron</code> 套件是 0.1.0（2026-06-19），與 repository 的 0.24.0.1.1.0 編號不一致；本章以 AWS release notes 與 README 為準（<a href="https://pypi.org/pypi/vllm-neuron/json" rel="noopener" target="_blank">PyPI vllm-neuron</a>；<a href="https://awsdocs-neuron.readthedocs-hosted.com/en/latest/release-notes/components/vllm-neuron.html" rel="noopener" target="_blank">vLLM Neuron release notes</a>）。</li>
+<li id="b39">表外硬體：Intel Gaudi 的 <code>vllm-gaudi</code> 0.26.0（2026-08，對應 vLLM 0.26.0）、Huawei Ascend 的 <code>vllm-ascend</code> 0.23.0.post1（2026-09-22）、Apple silicon 的 <code>vllm-metal</code>（社群維護）都是 plugin；Tenstorrent 用自家的 vLLM fork，Llama-3.3-70B 與 Qwen3-32B 在 Wormhole Galaxy 標為 Complete（<a href="https://github.com/vllm-project/vllm-gaudi/blob/main/README.md" rel="noopener" target="_blank">vllm-gaudi README</a>；<a href="https://pypi.org/pypi/vllm-ascend/json" rel="noopener" target="_blank">PyPI vllm-ascend</a>；<a href="https://github.com/vllm-project/vllm-metal/blob/main/README.md" rel="noopener" target="_blank">vllm-metal README</a>；<a href="https://github.com/tenstorrent/tt-inference-server/blob/main/docs/model_support/models_by_hardware.md" rel="noopener" target="_blank">tt-inference-server models</a>）。</li>
+<li id="b40">其他出現在 2026 年大型開放模型 recipe 的引擎：LMDeploy 0.18.0（2026-09-28）的 PyTorch engine 列出 Kimi-K2.6、DeepSeek-V4、GLM-5.2；KTransformers 0.7.0.post4 做 CPU–GPU 混合推論；Modular MAX v26.6（2026-09-17）的產品頁宣稱 DeepSeek V4 Pro 可跑在 NVIDIA 與 AMD GPU <span class="g g-c" title="等級 C：廠商宣稱或規格，未揭露方法">C</span>（<a href="https://github.com/InternLM/lmdeploy/blob/main/docs/en/supported_models/supported_models.md" rel="noopener" target="_blank">LMDeploy supported models</a>；<a href="https://pypi.org/project/lmdeploy/" rel="noopener" target="_blank">PyPI lmdeploy</a>；<a href="https://github.com/kvcache-ai/ktransformers/blob/main/README.md" rel="noopener" target="_blank">KTransformers README</a>；<a href="https://pypi.org/project/ktransformers/" rel="noopener" target="_blank">PyPI ktransformers</a>；<a href="https://max.modular.com/releases/" rel="noopener" target="_blank">MAX releases</a>；<a href="https://www.modular.com/models/deepseek-v4-pro" rel="noopener" target="_blank">Modular DeepSeek V4 Pro</a>）。</li>
+</ul>
+</div></div></div>
+<details class="srcs"><summary>本節來源（62）</summary><ul><li><a href="https://inference-docs.cerebras.ai/dedicated/overview" target="_blank" rel="noopener">Cerebras Dedicated</a></li><li><a href="https://github.com/ai-dynamo/dynamo/blob/main/deploy/operator/api/v1beta1/dynamocomponentdeployment_types.go" target="_blank" rel="noopener">Dynamo component types</a></li><li><a href="https://awsdocs-neuron.readthedocs-hosted.com/en/latest/about-neuron/announcements/neuron2.x/announce-nxdi-maintenance-support-2-31.html" target="_blank" rel="noopener">NxDI 維護公告</a></li><li><a href="https://github.com/vllm-project/vllm-neuron/blob/release-0.24.0.1.1.0/README.md" target="_blank" rel="noopener">vLLM Neuron README</a></li><li><a href="https://github.com/vllm-project/vllm/blob/main/docs/getting_started/installation/README.md" target="_blank" rel="noopener">vLLM installation</a></li><li><a href="https://github.com/sgl-project/sglang/blob/main/README.md" target="_blank" rel="noopener">SGLang README</a></li><li><a href="https://pypi.org/pypi/vllm/json" target="_blank" rel="noopener">PyPI vllm</a></li><li><a href="https://github.com/vllm-project/vllm/blob/main/docs/contributing/release_process.md" target="_blank" rel="noopener">vLLM release process</a></li><li><a href="https://github.com/vllm-project/vllm/blob/main/README.md" target="_blank" rel="noopener">vLLM README</a></li><li><a href="https://pypi.org/pypi/sglang/json" target="_blank" rel="noopener">PyPI sglang</a></li><li><a href="https://pypi.org/pypi/tensorrt-llm/json" target="_blank" rel="noopener">PyPI tensorrt-llm</a></li><li><a href="https://github.com/NVIDIA/TensorRT-LLM/blob/main/docs/source/release-notes.md" target="_blank" rel="noopener">TRT-LLM release notes</a></li><li><a href="https://docs.nvidia.com/nim/large-language-models/latest/about-nim-llm/release-notes.html" target="_blank" rel="noopener">NIM release notes</a></li><li><a href="https://docs.nvidia.com/nim/large-language-models/latest/reference/architecture.html" target="_blank" rel="noopener">NIM architecture</a></li><li><a href="https://docs.nvidia.com/nim/large-language-models/latest/reference/1.x-migration-guide.html" target="_blank" rel="noopener">NIM migration guide</a></li><li><a href="https://pypi.org/pypi/ai-dynamo/json" target="_blank" rel="noopener">PyPI ai-dynamo</a></li><li><a href="https://github.com/ai-dynamo/dynamo/blob/main/docs/fern/components/releases.data.ts" target="_blank" rel="noopener">Dynamo releases data</a></li><li><a href="https://github.com/ai-dynamo/dynamo/blob/main/README.md" target="_blank" rel="noopener">Dynamo README</a></li><li><a href="https://github.com/huggingface/text-generation-inference/blob/main/README.md" target="_blank" rel="noopener">TGI README</a></li><li><a href="https://github.com/huggingface/text-generation-inference/blob/main/Cargo.toml" target="_blank" rel="noopener">TGI Cargo.toml</a></li><li><a href="https://github.com/ggml-org/llama.cpp/blob/master/CMakeLists.txt" target="_blank" rel="noopener">llama.cpp CMakeLists</a></li><li><a href="https://github.com/ggml-org/llama.cpp/blob/master/README.md" target="_blank" rel="noopener">llama.cpp README</a></li><li><a href="https://github.com/ROCm/ATOM/blob/main/README.md" target="_blank" rel="noopener">ATOM README</a></li><li><a href="https://github.com/SemiAnalysisAI/InferenceX/blob/main/inferencex-e2e/perf-changelog.yaml" target="_blank" rel="noopener">InferenceX perf-changelog</a></li><li><a href="https://github.com/SemiAnalysisAI/InferenceX/blob/main/inferencex-e2e/configs/amd-master.yaml" target="_blank" rel="noopener">InferenceX AMD configs</a></li><li><a href="https://github.com/tile-ai/TileRT/blob/main/README.md" target="_blank" rel="noopener">TileRT README</a></li><li><a href="https://pypi.org/pypi/tokenspeed/json" target="_blank" rel="noopener">PyPI tokenspeed</a></li><li><a href="https://github.com/lightseekorg/tokenspeed/blob/main/README.md" target="_blank" rel="noopener">TokenSpeed README</a></li><li><a href="https://awsdocs-neuron.readthedocs-hosted.com/en/latest/release-notes/components/vllm-neuron.html" target="_blank" rel="noopener">vLLM Neuron release notes</a></li><li><a href="https://pypi.org/pypi/vllm-neuron/json" target="_blank" rel="noopener">PyPI vllm-neuron</a></li><li><a href="https://awsdocs-neuron.readthedocs-hosted.com/en/latest/release-notes/components/nxd-inference.html" target="_blank" rel="noopener">NxDI release notes</a></li><li><a href="https://pypi.org/project/optimum-neuron/" target="_blank" rel="noopener">PyPI optimum-neuron</a></li><li><a href="https://github.com/huggingface/optimum-neuron/blob/main/docs/source/guides/vllm_plugin.mdx" target="_blank" rel="noopener">Optimum Neuron vLLM plugin guide</a></li><li><a href="https://pypi.org/project/vllm-tpu/" target="_blank" rel="noopener">PyPI vllm-tpu</a></li><li><a href="https://github.com/vllm-project/tpu-inference" target="_blank" rel="noopener">tpu-inference</a></li><li><a href="https://pypi.org/pypi/sglang-jax/json" target="_blank" rel="noopener">PyPI sglang-jax</a></li><li><a href="https://github.com/sgl-project/sglang-jax" target="_blank" rel="noopener">sglang-jax</a></li><li><a href="https://inference-docs.cerebras.ai/models/overview" target="_blank" rel="noopener">Cerebras models</a></li><li><a href="https://github.com/vllm-project/vllm/blob/main/docs/features/README.md" target="_blank" rel="noopener">vLLM feature matrix</a></li><li><a href="https://github.com/vllm-project/vllm/blob/main/docs/getting_started/installation/gpu.cuda.inc.md" target="_blank" rel="noopener">vLLM CUDA install</a></li><li><a href="https://github.com/vllm-project/vllm/blob/main/docs/getting_started/installation/gpu.rocm.inc.md" target="_blank" rel="noopener">vLLM ROCm install</a></li><li><a href="https://github.com/sgl-project/sglang/blob/main/.github/workflows/release-docker-cu134-nightly.yml" target="_blank" rel="noopener">SGLang cu134 nightly</a></li><li><a href="https://github.com/sgl-project/sglang/blob/main/docs/docs/hardware-platforms/amd_gpu.mdx" target="_blank" rel="noopener">SGLang AMD GPUs</a></li><li><a href="https://github.com/NVIDIA/TensorRT-LLM/blob/main/docs/source/supported-hardware.md" target="_blank" rel="noopener">TRT-LLM supported hardware</a></li><li><a href="https://github.com/NVIDIA/TensorRT-LLM/blob/main/docs/source/features/quantization.md" target="_blank" rel="noopener">TRT-LLM quantization</a></li><li><a href="https://github.com/ai-dynamo/dynamo/blob/main/deploy/operator/api/config/v1alpha1/lpx.go" target="_blank" rel="noopener">Dynamo LPX operator config</a></li><li><a href="https://github.com/huggingface/text-generation-inference/blob/main/docs/source/architecture.md" target="_blank" rel="noopener">TGI architecture</a></li><li><a href="https://github.com/lightseekorg/tokenspeed/blob/main/docs/recipes/models.md" target="_blank" rel="noopener">TokenSpeed model recipes</a></li><li><a href="https://awsdocs-neuron.readthedocs-hosted.com/en/latest/libraries/vllm-neuron/neuron-inference-overview.html" target="_blank" rel="noopener">AI Inference on Neuron</a></li><li><a href="https://github.com/vllm-project/tpu-inference/tree/main/support_matrices" target="_blank" rel="noopener">tpu-inference support matrices</a></li><li><a href="https://github.com/sgl-project/sglang/blob/main/docs/docs/hardware-platforms/tpu.mdx" target="_blank" rel="noopener">SGLang TPU</a></li><li><a href="https://github.com/huggingface/optimum-neuron/commits/main" target="_blank" rel="noopener">Optimum Neuron commits</a></li><li><a href="https://github.com/vllm-project/vllm-gaudi/blob/main/README.md" target="_blank" rel="noopener">vllm-gaudi README</a></li><li><a href="https://pypi.org/pypi/vllm-ascend/json" target="_blank" rel="noopener">PyPI vllm-ascend</a></li><li><a href="https://github.com/vllm-project/vllm-metal/blob/main/README.md" target="_blank" rel="noopener">vllm-metal README</a></li><li><a href="https://github.com/tenstorrent/tt-inference-server/blob/main/docs/model_support/models_by_hardware.md" target="_blank" rel="noopener">tt-inference-server models</a></li><li><a href="https://github.com/InternLM/lmdeploy/blob/main/docs/en/supported_models/supported_models.md" target="_blank" rel="noopener">LMDeploy supported models</a></li><li><a href="https://pypi.org/project/lmdeploy/" target="_blank" rel="noopener">PyPI lmdeploy</a></li><li><a href="https://github.com/kvcache-ai/ktransformers/blob/main/README.md" target="_blank" rel="noopener">KTransformers README</a></li><li><a href="https://pypi.org/project/ktransformers/" target="_blank" rel="noopener">PyPI ktransformers</a></li><li><a href="https://max.modular.com/releases/" target="_blank" rel="noopener">MAX releases</a></li><li><a href="https://www.modular.com/models/deepseek-v4-pro" target="_blank" rel="noopener">Modular DeepSeek V4 Pro</a></li></ul></details></section>
+<section class="panel" role="tabpanel" id="s2" aria-labelledby="tab-s2"><div class="panel-head"><h2>各晶片搭配不同引擎的優缺點</h2><div class="sec-lead prose"><p id="b41">InferenceX 在 2026-10-04 的 AgentX 快照涵蓋 6 個模型，沒有任何 1 個引擎在所有模型與硬體上領先；同一顆 B300 上 vLLM 與 SGLang 的每 GPU 吞吐量在 DeepSeek-V4.1-Flash 相差 3.3×（406,374 ÷ 122,186 = 3.33）[<span class="g g-d" title="等級 D：本文推算，附算式">D</span>，原始數字為 A]（<a href="https://inferencex.semianalysis.com/api/v1/benchmarks?model=DeepSeek-V4.1-Flash" rel="noopener" target="_blank">InferenceX API, DeepSeek-V4.1-Flash</a>）。GPU 以外的晶片沒有同條件的引擎對照量測：Trainium 是 Beta 對維護模式，Inferentia2 是維護模式的 NxD Inference 加 Optimum Neuron，TPU 有 2 個引擎，Cerebras 只有 1 條路。</p>
+</div></div>
+<div class="subtabs"><div class="subtablist" role="tablist" aria-label="各晶片搭配不同引擎的優缺點"><button type="button" class="subtab" role="tab" id="tab-s2-1" aria-controls="s2-1" aria-selected="true">GPU（NVIDIA 與 AMD）</button><button type="button" class="subtab" role="tab" id="tab-s2-2" aria-controls="s2-2" aria-selected="false">AWS Trainium</button><button type="button" class="subtab" role="tab" id="tab-s2-3" aria-controls="s2-3" aria-selected="false">AWS Inferentia</button><button type="button" class="subtab" role="tab" id="tab-s2-4" aria-controls="s2-4" aria-selected="false">Google TPU</button><button type="button" class="subtab" role="tab" id="tab-s2-5" aria-controls="s2-5" aria-selected="false">Cerebras</button><button type="button" class="subtab" role="tab" id="tab-s2-6" aria-controls="s2-6" aria-selected="false">已停用或降級的堆疊</button></div><div class="subpanel on" role="tabpanel" id="s2-1" aria-labelledby="tab-s2-1"><div class="prose"><h3>GPU（NVIDIA 與 AMD）</h3><figure class="tbl" data-cols="4" data-rows="8"><div aria-label="資料表" class="tbl-scroll" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th class="w1" scope="col">配對</th>
+<th class="w3" scope="col">優點</th>
+<th class="w3" scope="col">缺點或限制</th>
+<th class="src" scope="col">來源</th>
+</tr>
+</thead>
+<tbody>
+<tr id="b42">
+<td class="rowhead">vLLM × NVIDIA</td>
+<td>每 2 週 1 版；DeepSeek-V4.1-Flash 上線當天 6 款 NVIDIA SKU（H100、H200、B200、B300、GB200、GB300）都能執行 <span class="g g-a" title="等級 A：獨立第三方量測">A</span>；InferenceX 指定為 Kimi K3、MiniMax M3 的主要引擎；NIM 的底層</td>
+<td>disaggregated prefill 文件標題仍是 experimental；speculative decoding 不能與 LoRA 併用；GGUF 移到 out-of-tree plugin 且標 highly experimental</td>
+<td class="src"><a href="https://inferencex.semianalysis.com/blog/engrams-embedding-entendre-codesign" rel="noopener" target="_blank">InferenceX blog, 2026-09-18</a>；<a href="https://github.com/SemiAnalysisAI/InferenceX/blob/main/inferencex-e2e/docs/MODELS.md" rel="noopener" target="_blank">InferenceX MODELS.md</a>；<a href="https://github.com/vllm-project/vllm/blob/main/docs/features/disagg_prefill.md" rel="noopener" target="_blank">vLLM disaggregated prefill</a>；<a href="https://github.com/vllm-project/vllm/blob/main/docs/features/README.md" rel="noopener" target="_blank">vLLM feature matrix</a>；<a href="https://github.com/vllm-project/vllm/blob/main/docs/features/quantization/gguf.md" rel="noopener" target="_blank">vLLM GGUF</a></td>
+</tr>
+<tr id="b43">
+<td class="rowhead">SGLang × NVIDIA</td>
+<td>InferenceX 指定為 GLM-5.2、Qwen3.5-397B、Qwen3.8-Flash-Next 的主要引擎；NVIDIA 設定檔 145 個中 SGLang 系占 86 個（59%）[<span class="g g-d" title="等級 D：本文推算，附算式">D</span>：86 ÷ 145]；HiCache 加 Mooncake 共享池在 Dynamo 矩陣列為支援</td>
+<td>FP4 KV cache 標 experimental；DeepSeek-V4.1-Flash 的每 GPU 吞吐量落後 vLLM 2.4–4.3×（GB200 84,824 ÷ 35,491 = 2.39；H200 35,315 ÷ 8,224 = 4.29）<span class="g g-d" title="等級 D：本文推算，附算式">D</span></td>
+<td class="src"><a href="https://github.com/SemiAnalysisAI/InferenceX/blob/main/inferencex-e2e/docs/MODELS.md" rel="noopener" target="_blank">InferenceX MODELS.md</a>；<a href="https://github.com/SemiAnalysisAI/InferenceX/blob/main/inferencex-e2e/configs/nvidia-master.yaml" rel="noopener" target="_blank">InferenceX NVIDIA configs</a>；<a href="https://github.com/ai-dynamo/dynamo/blob/main/docs/fern/pages/developer-guide/knowledge-base/modular-components/router/offloading-support-matrix.md" rel="noopener" target="_blank">Dynamo offloading matrix</a>；<a href="https://github.com/sgl-project/sglang/blob/main/docs/docs/advanced_features/quantized_kv_cache.mdx" rel="noopener" target="_blank">SGLang quantized KV cache</a>；<a href="https://inferencex.semianalysis.com/api/v1/benchmarks?model=DeepSeek-V4.1-Flash" rel="noopener" target="_blank">InferenceX API, DeepSeek-V4.1-Flash</a></td>
+</tr>
+<tr id="b44">
+<td class="rowhead">TensorRT-LLM（常搭配 Dynamo）× NVIDIA</td>
+<td>Vera Rubin NVL72 的首次量測用 pre-release TensorRT-LLM（2026-09-10）<span class="g g-a" title="等級 A：獨立第三方量測">A</span>；InferenceX 稱「B300 TRT-LLM TP2 owns the M3 crown」<span class="g g-a" title="等級 A：獨立第三方量測">A</span>；有文件的 Helix context parallelism（MLA、Blackwell）、Wide-EP 與 NVFP4 KV cache</td>
+<td>穩定版停在 1.2.1（2026-04-20），距基準日 5.5 個月 <span class="g g-d" title="等級 D：本文推算，附算式">D</span>；InferenceX 指出專有或硬體專用引擎「do not always provide every feature」；NVIDIA 的 SGLang 送測在 P90 TTFT 上明顯低於 TensorRT-LLM <span class="g g-a" title="等級 A：獨立第三方量測">A</span></td>
+<td class="src"><a href="https://inferencex.semianalysis.com/blog/vera-rubin-nvl72-agentic-inference" rel="noopener" target="_blank">InferenceX Vera Rubin post</a>；<a href="https://inferencex.semianalysis.com/blog/agentx-inferencexv3-does-cuda-moat" rel="noopener" target="_blank">InferenceX AgentX blog</a>；<a href="https://github.com/NVIDIA/TensorRT-LLM/blob/main/docs/source/features/helix.md" rel="noopener" target="_blank">TRT-LLM Helix</a>；<a href="https://pypi.org/pypi/tensorrt-llm/json" rel="noopener" target="_blank">PyPI tensorrt-llm</a>；<a href="https://github.com/SemiAnalysisAI/InferenceX/blob/main/inferencex-e2e/docs/MODELS.md" rel="noopener" target="_blank">InferenceX MODELS.md</a></td>
+</tr>
+<tr id="b45">
+<td class="rowhead">NIM × NVIDIA</td>
+<td>經 NVIDIA 驗證的容器與 profile（profile 名稱形如 <code>vllm-fp8-tp4-pp1-lora</code>：引擎、精度、TP、PP、是否含 LoRA）</td>
+<td>內含 vLLM 0.28.0，落後上游 2 個小版本 [<span class="g g-d" title="等級 D：本文推算，附算式">D</span>：0.30 − 0.28]</td>
+<td class="src"><a href="https://docs.nvidia.com/nim/large-language-models/latest/about-nim-llm/release-notes.html" rel="noopener" target="_blank">NIM release notes</a>；<a href="https://pypi.org/pypi/vllm/json" rel="noopener" target="_blank">PyPI vllm</a></td>
+</tr>
+<tr id="b46">
+<td class="rowhead">vLLM、SGLang × AMD</td>
+<td>都在主幹支援 ROCm；MI355X 上 vLLM 在 DeepSeek-V4.1-Flash 領先 ATOM 與 SGLang（128,237 對 102,389 對 12,319 total tok/s per GPU）<span class="g g-a" title="等級 A：獨立第三方量測">A</span></td>
+<td>Marlin INT4、ModelOpt NVFP4、FP4 KV cache 在 AMD 不支援，SGLang 的 GGUF 也不支援；CPU KV offload 在 ROCm 7.14 之前效率差；DeepSeek V4 上線第 1 週長上下文 workload 無法使用 <span class="g g-a" title="等級 A：獨立第三方量測">A</span></td>
+<td class="src"><a href="https://inferencex.semianalysis.com/api/v1/benchmarks?model=DeepSeek-V4.1-Flash" rel="noopener" target="_blank">InferenceX API, DeepSeek-V4.1-Flash</a>；<a href="https://github.com/vllm-project/vllm/blob/main/docs/features/quantization/README.md" rel="noopener" target="_blank">vLLM quantization</a>；<a href="https://github.com/sgl-project/sglang/blob/main/docs/docs/advanced_features/quantization.mdx" rel="noopener" target="_blank">SGLang quantization</a>；<a href="https://github.com/sgl-project/sglang/blob/main/docs/docs/advanced_features/attention_backend.mdx" rel="noopener" target="_blank">SGLang attention backends</a>；<a href="https://inferencex.semianalysis.com/blog/agentx-inferencexv3-does-cuda-moat" rel="noopener" target="_blank">InferenceX AgentX blog</a></td>
+</tr>
+<tr id="b47">
+<td class="rowhead">ATOM × AMD</td>
+<td>Kimi K3 每 GPU 吞吐量 14,526，高於同硬體 vLLM 的 13,230（+10%）[<span class="g g-d" title="等級 D：本文推算，附算式">D</span>，原始數字為 A]；GLM-5.2／5.3 達 34,195 <span class="g g-a" title="等級 A：獨立第三方量測">A</span></td>
+<td>InferenceX：多數 AI lab 不願在正式環境使用，原因是「tons of missing features」[<span class="g g-a" title="等級 A：獨立第三方量測">A</span>，量測方評論]；文件查無 structured output 與 multi-LoRA；FP4 與機櫃級分散式推論列在 MI400 世代 roadmap [<span class="g g-c" title="等級 C：廠商宣稱或規格，未揭露方法">C</span>，草稿文件]</td>
+<td class="src"><a href="https://inferencex.semianalysis.com/api/v1/benchmarks?model=Kimi-K3" rel="noopener" target="_blank">InferenceX API, Kimi-K3</a>；<a href="https://inferencex.semianalysis.com/api/v1/benchmarks?model=GLM-5.2" rel="noopener" target="_blank">InferenceX API, GLM-5.2</a>；<a href="https://inferencex.semianalysis.com/blog/agentx-inferencexv3-does-cuda-moat" rel="noopener" target="_blank">InferenceX AgentX blog</a>；<a href="https://rocm.blogs.amd.com/software-tools-optimization/atom-inference-engine/README.html" rel="noopener" target="_blank">AMD ATOM blog</a>；<a href="https://github.com/ROCm/ATOM/blob/main/atom_overview_draft.md" rel="noopener" target="_blank">ATOM overview draft</a></td>
+</tr>
+<tr id="b48">
+<td class="rowhead">TileRT × B200／MI355X</td>
+<td>單使用者最快：GLM-5.3 FP8 在 MI355X 上中位數 485、P90 469 tok/s per user（concurrency 1，2026-09-24）<span class="g g-a" title="等級 A：獨立第三方量測">A</span></td>
+<td>一次只服務 1 條序列；該量測用 16 顆 GPU（prefill TP8 + decode TP8），total 只有 1,301 tok/s per GPU；只有 5 個模型的 backend</td>
+<td class="src"><a href="https://inferencex.semianalysis.com/api/v1/benchmarks?model=GLM-5.2" rel="noopener" target="_blank">InferenceX API, GLM-5.2</a>；<a href="https://github.com/tile-ai/TileRT/blob/main/README.md" rel="noopener" target="_blank">TileRT README</a></td>
+</tr>
+<tr id="b49">
+<td class="rowhead">TGI、llama.cpp</td>
+<td>TGI：既有部署可續用；llama.cpp：裝置後端最多，CPU 與單機 GPU 都能跑</td>
+<td>TGI 自 2026-03-21 後無 commit；llama.cpp 的跨主機 RPC backend 自述為 proof of concept、「fragile and insecure」</td>
+<td class="src"><a href="https://github.com/huggingface/text-generation-inference/blob/main/README.md" rel="noopener" target="_blank">TGI README</a>；<a href="https://github.com/ggml-org/llama.cpp/blob/master/tools/rpc/README.md" rel="noopener" target="_blank">llama.cpp RPC README</a></td>
+</tr>
+</tbody>
+</table></div></figure>
+<p id="b50">InferenceX AgentX 領先者（2026-10-04 快照，等級 <span class="g g-a" title="等級 A：獨立第三方量測">A</span>）。條件：agentic trace 重播；「每使用者」為最低 concurrency 時的中位數 tok/s per user；「每 GPU」為中位數 TTFT 低於 5 秒的最佳點的 total tok/s per GPU，含 cache 命中的輸入 token；speculative decoding 採固定的 acceptance length，因此是引擎排序而非容量數字。AMD 欄的「a／b」依序是每使用者與每 GPU 的數字。</p>
+<figure class="tbl" data-cols="5" data-rows="6"><div aria-label="資料表" class="tbl-scroll" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th class="w1" scope="col">模型</th>
+<th class="w2" scope="col">NVIDIA：每使用者最快</th>
+<th class="w2" scope="col">NVIDIA：每 GPU 吞吐量最高</th>
+<th class="w2" scope="col">AMD MI355X</th>
+<th class="src" scope="col">來源</th>
+</tr>
+</thead>
+<tbody>
+<tr id="b51">
+<td><span class="rh">Kimi K3</span><span class="rh-sub"><span class="vh">（</span>MXFP4<span class="vh">）</span></span></td>
+<td>Dynamo-vLLM，GB300：259</td>
+<td>Dynamo-vLLM，GB300：19,303</td>
+<td>vLLM 172／13,230；ATOM 159／14,526</td>
+<td class="src"><a href="https://inferencex.semianalysis.com/api/v1/benchmarks?model=Kimi-K3" rel="noopener" target="_blank">InferenceX API, Kimi-K3</a></td>
+</tr>
+<tr id="b52">
+<td class="rowhead">GLM-5.2／5.3</td>
+<td>Dynamo-SGLang，GB300：350</td>
+<td>Dynamo-SGLang P/D，GB300：18,557</td>
+<td>TileRT 485（僅 concurrency 1）；ATOM 34,195；SGLang 291／18,689</td>
+<td class="src"><a href="https://inferencex.semianalysis.com/api/v1/benchmarks?model=GLM-5.2" rel="noopener" target="_blank">InferenceX API, GLM-5.2</a></td>
+</tr>
+<tr id="b53">
+<td class="rowhead">DeepSeek-V4-Pro</td>
+<td>Dynamo-SGLang，GB200／GB300：312</td>
+<td>TensorRT-LLM，VR200：148,886；SGLang，B300：97,619；B200 上 vLLM 54,815 對 SGLang 49,101</td>
+<td>MoRI-SGLang P/D 61,963（2026-10-04 重跑）；SGLang 41,699；vLLM 26,110；ATOM 11,160</td>
+<td class="src"><a href="https://inferencex.semianalysis.com/api/v1/benchmarks?model=DeepSeek-V4-Pro" rel="noopener" target="_blank">InferenceX API, DeepSeek-V4-Pro</a></td>
+</tr>
+<tr id="b54">
+<td class="rowhead">DeepSeek-V4.1-Flash</td>
+<td>vLLM，GB300：621（SGLang 435）</td>
+<td>vLLM，GB300：415,091（SGLang 154,403）</td>
+<td>vLLM 380／128,237；ATOM 357／102,389；SGLang 300／12,319</td>
+<td class="src"><a href="https://inferencex.semianalysis.com/api/v1/benchmarks?model=DeepSeek-V4.1-Flash" rel="noopener" target="_blank">InferenceX API, DeepSeek-V4.1-Flash</a></td>
+</tr>
+<tr id="b55">
+<td class="rowhead">Qwen3.5-397B</td>
+<td>Dynamo-SGLang，GB200：575</td>
+<td>Dynamo-SGLang P/D，GB300：131,368</td>
+<td>只有 SGLang：446／79,526</td>
+<td class="src"><a href="https://inferencex.semianalysis.com/api/v1/benchmarks?model=Qwen-3.5-397B-A17B" rel="noopener" target="_blank">InferenceX API, Qwen3.5-397B</a></td>
+</tr>
+<tr id="b56">
+<td class="rowhead">Qwen3.8-Flash-Next</td>
+<td>只有 SGLang（B200 292）</td>
+<td>SGLang，B300：81,505</td>
+<td class="muted">無資料列</td>
+<td class="src"><a href="https://inferencex.semianalysis.com/api/v1/benchmarks?model=Qwen3.8-Flash-Next" rel="noopener" target="_blank">InferenceX API, Qwen3.8-Flash-Next</a></td>
+</tr>
+</tbody>
+</table></div></figure>
+<ul>
+<li id="b57">4 個只指定 1 個主要引擎的模型（Kimi K3 → vLLM；GLM-5.2、Qwen3.5、Qwen3.8-Flash-Next → SGLang），NVIDIA 上的領先者就是被指定的引擎 <span class="g g-d" title="等級 D：本文推算，附算式">D</span>；引擎排名反映的是誰先為該模型調校，而不是硬體（<a href="https://github.com/SemiAnalysisAI/InferenceX/blob/main/inferencex-e2e/docs/MODELS.md" rel="noopener" target="_blank">InferenceX MODELS.md</a>）。</li>
+<li id="b58">InferenceX 規定供應商要先送 vLLM 或 SGLang，才能送 ATOM、TensorRT-LLM、TokenSpeed；全新的硬體 SKU 可先用硬體專用引擎（<a href="https://github.com/SemiAnalysisAI/InferenceX/blob/main/inferencex-e2e/docs/MODELS.md" rel="noopener" target="_blank">InferenceX MODELS.md</a>）。</li>
+<li id="b59">InferenceX 記錄 2026-08-21 之後 B200 的 performance per dollar 超過 MI355X，並歸因於 Inferact 與 NVIDIA 對 vLLM 的最佳化 <span class="g g-a" title="等級 A：獨立第三方量測">A</span>（<a href="https://inferencex.semianalysis.com/blog/agentx-inferencexv3-does-cuda-moat" rel="noopener" target="_blank">InferenceX AgentX blog</a>）。</li>
+</ul>
+</div></div><div class="subpanel" role="tabpanel" id="s2-2" aria-labelledby="tab-s2-2"><div class="prose"><h3>AWS Trainium</h3><figure class="tbl" data-cols="5" data-rows="2"><div aria-label="資料表" class="tbl-scroll" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th class="w2" scope="col">引擎</th>
+<th class="w2" scope="col">狀態</th>
+<th class="w4" scope="col">優點</th>
+<th class="w3" scope="col">缺點或限制</th>
+<th class="src" scope="col">來源</th>
+</tr>
+</thead>
+<tbody>
+<tr id="b60">
+<td class="rowhead">vLLM Neuron plugin 0.24.0.1.1.0</td>
+<td>Beta；Trn2／Trn3；AWS 稱為 Trainium 上建議的 LLM serving 方案</td>
+<td>新功能都落在這裡：paged KV cache、預設開啟的 prefix caching、segmented prefill、EAGLE3、經 NIXL／EFA 的 PD disaggregation、expert 與 context parallelism、structured output</td>
+<td>內含 vLLM 0.24.0，落後上游 6 個小版本 [<span class="g g-d" title="等級 D：本文推算，附算式">D</span>：0.30 − 0.24]；只驗證 4 個模型家族（Llama 3、gpt-oss、Qwen3-VL、Qwen3-Embedding）；不支援 LoRA、KV offload、MTP、draft model、pipeline parallelism、MLA 模型</td>
+<td class="src"><a href="https://github.com/vllm-project/vllm-neuron/blob/release-0.24.0.1.1.0/README.md" rel="noopener" target="_blank">vLLM Neuron README</a>；<a href="https://awsdocs-neuron.readthedocs-hosted.com/en/latest/vllm-neuron/docs/guides/features-guide.html" rel="noopener" target="_blank">vLLM Neuron features guide</a>；<a href="https://github.com/vllm-project/vllm-neuron/blob/release-0.24.0.1.1.0/vllm_neuron/model/registry.py" rel="noopener" target="_blank">vLLM Neuron registry</a></td>
+</tr>
+<tr id="b61">
+<td class="rowhead">NxD Inference 0.10.x + vLLM 0.16</td>
+<td>維護模式（2026-05-20 公告）；Neuron 2.32 起不再隨 DLAMI／DLC 發布</td>
+<td>有 plugin 還沒有的功能：multi-LoRA、INT8、Medusa、draft model（batch size 1）；模型較多（Llama 4、Mixtral、DBRX、Qwen2.5、Qwen3 dense、Qwen3-235B-A22B）</td>
+<td>KV cache 是連續配置而非 paged；不支援 chunked prefill；PD disaggregation 只在已停止支援的 vLLM V0 fork</td>
+<td class="src"><a href="https://awsdocs-neuron.readthedocs-hosted.com/en/latest/about-neuron/announcements/neuron2.x/announce-nxdi-maintenance-support-2-31.html" rel="noopener" target="_blank">NxDI 維護公告</a>；<a href="https://awsdocs-neuron.readthedocs-hosted.com/en/latest/about-neuron/whats-new.html" rel="noopener" target="_blank">What's New</a>；<a href="https://awsdocs-neuron.readthedocs-hosted.com/en/latest/libraries/nxd-inference/developer_guides/feature-guide.html" rel="noopener" target="_blank">NxDI feature guide</a>；<a href="https://awsdocs-neuron.readthedocs-hosted.com/en/latest/libraries/nxd-inference/developer_guides/vllm-user-guide-v1.html" rel="noopener" target="_blank">vLLM guide for NxDI</a>；<a href="https://awsdocs-neuron.readthedocs-hosted.com/en/latest/libraries/nxd-inference/developer_guides/model-reference.html" rel="noopener" target="_blank">NxDI model reference</a></td>
+</tr>
+</tbody>
+</table></div></figure>
+<ul>
+<li id="b62">兩個堆疊互不為超集：改用 plugin 會得到 paged KV、PD disaggregation 與 structured output，但失去 LoRA 與 INT8；Trainium 上目前沒有「標為 GA 且仍在開發」的 LLM serving 堆疊 <span class="g g-d" title="等級 D：本文推算，附算式">D</span>（<a href="https://awsdocs-neuron.readthedocs-hosted.com/en/latest/vllm-neuron/docs/getting-started/migration-nxdi-to-vllm-neuron.html" rel="noopener" target="_blank">vLLM Neuron migration guide</a>）。</li>
+<li id="b63">沒有 day-0：每個新架構都要手寫模型程式碼，AWS 文件寫「there is no direct port of NxDI modeling classes」；DeepSeek-V3 與 GLM-5.2 只有 NxDI 上的社群 contrib port，GLM-5.2 在 trn2.48xlarge（TP=64、batch 1）為 2.96 tok/s [<span class="g g-b" title="等級 B：廠商或夥伴公布，且揭露方法">B</span>，社群]；Kimi 查無任何 port（<a href="https://awsdocs-neuron.readthedocs-hosted.com/en/latest/vllm-neuron/docs/getting-started/migration-nxdi-to-vllm-neuron.html" rel="noopener" target="_blank">vLLM Neuron migration guide</a>；<a href="https://awsdocs-neuron.readthedocs-hosted.com/en/latest/vllm-neuron/docs/model-dev/onboarding-models.html" rel="noopener" target="_blank">vLLM Neuron onboarding</a>；<a href="https://github.com/aws-neuron/neuronx-distributed-inference/tree/main/contrib/models" rel="noopener" target="_blank">NxDI contrib models</a>；<a href="https://github.com/aws-neuron/neuronx-distributed-inference/blob/main/contrib/models/GLM-5.2/README.md" rel="noopener" target="_blank">GLM-5.2 contrib</a>）。</li>
+<li id="b64">廠商數字：gpt-oss-120b（BF16、TP16、trn2.48xlarge、1 個併發請求、512 in／128 out）開 EAGLE3 後 112.1 → 134.5 tok/s（1.20×）<span class="g g-b" title="等級 B：廠商或夥伴公布，且揭露方法">B</span>；2.32 宣稱 gpt-oss 吞吐量「up to 50%」提升 <span class="g g-c" title="等級 C：廠商宣稱或規格，未揭露方法">C</span>（<a href="https://awsdocs-neuron.readthedocs-hosted.com/en/latest/vllm-neuron/docs/tutorials/tutorial-eagle3-speculative-decoding-gpt-oss.html" rel="noopener" target="_blank">EAGLE3 gpt-oss tutorial</a>；<a href="https://awsdocs-neuron.readthedocs-hosted.com/en/latest/about-neuron/whats-new.html" rel="noopener" target="_blank">What's New</a>）。</li>
+</ul>
+</div></div><div class="subpanel" role="tabpanel" id="s2-3" aria-labelledby="tab-s2-3"><div class="prose"><h3>AWS Inferentia</h3><p id="b65">Inferentia2 只剩 1 條 AWS 支援的路：NxD Inference 加 vLLM 0.16（plugin 0.5.x），釘在 Neuron 2.31 以前的版本；vLLM Neuron plugin 不支援 Inf2（<a href="https://awsdocs-neuron.readthedocs-hosted.com/en/latest/libraries/vllm-neuron/neuron-inference-overview.html" rel="noopener" target="_blank">AI Inference on Neuron</a>）。</p>
+<figure class="tbl" data-cols="5" data-rows="3"><div aria-label="資料表" class="tbl-scroll" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th class="w2" scope="col">路徑</th>
+<th class="w2" scope="col">狀態與日期</th>
+<th class="w3" scope="col">優點</th>
+<th class="w2" scope="col">缺點或限制</th>
+<th class="src" scope="col">來源</th>
+</tr>
+</thead>
+<tbody>
+<tr id="b66">
+<td class="rowhead">NxD Inference + vLLM 0.16</td>
+<td>維護模式；2.32（2026-08-17）起不再發布對應的 DLAMI 與容器</td>
+<td>AWS 官方路徑；multi-LoRA、INT8 可用</td>
+<td>軟體凍結；需要 NKI kernel 時要釘在 2.28；非 paged KV、無 chunked prefill</td>
+<td class="src"><a href="https://awsdocs-neuron.readthedocs-hosted.com/en/latest/about-neuron/whats-new.html" rel="noopener" target="_blank">What's New</a>；<a href="https://awsdocs-neuron.readthedocs-hosted.com/en/latest/release-notes/components/nxd-inference.html" rel="noopener" target="_blank">NxDI release notes</a>；<a href="https://awsdocs-neuron.readthedocs-hosted.com/en/latest/libraries/nxd-inference/developer_guides/vllm-user-guide-v1.html" rel="noopener" target="_blank">vLLM guide for NxDI</a></td>
+</tr>
+<tr id="b67">
+<td><span class="rh">Optimum Neuron 0.4.5</span><span class="rh-sub"><span class="vh">（</span>2026-02-11<span class="vh">）</span></span></td>
+<td>仍有 commit（至 2026-09-23）；<code>main</code> 追到 SDK 2.31.0</td>
+<td>有公開 benchmark：Llama 3.1 8B 在 12 個 Neuron 裝置上（即 inf2.48xlarge，D；3 個 replica × TP=8、sequence length 4,096、batch 32；<code>main</code> 的 vLLM 依賴為 0.16.0）為 1,226.8 output tok/s（2026-08-27）<span class="g g-b" title="等級 B：廠商或夥伴公布，且揭露方法">B</span></td>
+<td>自帶的 vLLM platform 不支援 prefix caching、LoRA、speculative decoding、MLA</td>
+<td class="src"><a href="https://pypi.org/project/optimum-neuron/" rel="noopener" target="_blank">PyPI optimum-neuron</a>；<a href="https://github.com/huggingface/optimum-neuron/commits/main" rel="noopener" target="_blank">Optimum Neuron commits</a>；<a href="https://github.com/huggingface/optimum-neuron/blob/main/benchmark/vllm/data-parallel/llama3.1-8b/docker-compose-dp3.yaml" rel="noopener" target="_blank">Optimum Neuron benchmark</a>；<a href="https://github.com/huggingface/optimum-neuron/blob/main/benchmark/vllm/data-parallel/llama3.1-8b/.env" rel="noopener" target="_blank">Optimum Neuron benchmark .env</a>；<a href="https://github.com/huggingface/optimum-neuron/blob/main/benchmark/vllm/data-parallel/llama3.1-8b/vllm-results-dp3.csv" rel="noopener" target="_blank">Optimum Neuron result CSV</a>；<a href="https://github.com/huggingface/optimum-neuron/blob/main/pyproject.toml" rel="noopener" target="_blank">Optimum Neuron pyproject</a>；<a href="https://github.com/huggingface/optimum-neuron/blob/main/optimum/neuron/vllm/ARCHITECTURE_VLLM_SERVING.md" rel="noopener" target="_blank">Optimum Neuron vLLM architecture</a></td>
+</tr>
+<tr id="b68">
+<td class="rowhead">TGI on Neuron、SageMaker LMI</td>
+<td>已移除（TGI image 2026-01-19；LMI 的 Neuron 程式碼 2025-11-03）</td>
+<td class="muted">—</td>
+<td>不再是選項</td>
+<td class="src"><a href="https://github.com/huggingface/optimum-neuron/commits/main" rel="noopener" target="_blank">Optimum Neuron commits</a>；<a href="https://github.com/deepjavalibrary/djl-serving/pull/2939" rel="noopener" target="_blank">DJL PR #2939</a></td>
+</tr>
+</tbody>
+</table></div></figure>
+<p id="b69">產業媒體報導 AWS 在 Trainium2 之後「stopped making Inferentia chips」；新的 vLLM Neuron plugin 也只支援 Trn2／Trn3（<a href="https://www.nextplatform.com/2025/12/03/with-trainium4-aws-will-crank-up-everything-but-the-clocks/" rel="noopener" target="_blank">The Next Platform, 2025-12-03</a>；<a href="https://github.com/vllm-project/vllm-neuron/blob/release-0.24.0.1.1.0/README.md" rel="noopener" target="_blank">vLLM Neuron README</a>）。</p>
+</div></div><div class="subpanel" role="tabpanel" id="s2-4" aria-labelledby="tab-s2-4"><div class="prose"><h3>Google TPU</h3><figure class="tbl" data-cols="5" data-rows="4"><div aria-label="資料表" class="tbl-scroll" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th class="w1" scope="col">引擎</th>
+<th class="w2" scope="col">狀態與日期</th>
+<th class="w3" scope="col">優點</th>
+<th class="w3" scope="col">缺點或限制</th>
+<th class="src" scope="col">來源</th>
+</tr>
+</thead>
+<tbody>
+<tr id="b70">
+<td><span class="rh">vLLM TPU 0.30.0</span><span class="rh-sub"><span class="vh">（</span>2026-09-30<span class="vh">）</span></span></td>
+<td>Google 文件對單主機 serving 只列這個選項</td>
+<td>版號與上游 vLLM 相同（上游 0.30.0 為 2026-09-22）；沒有 TPU 原生 JAX 模型時退回上游 PyTorch 模型程式碼（經 Torchax）；chunked prefill、prefix caching、LoRA、KV offload 在 v6e 與 v7x 為 Passing</td>
+<td>多主機只有 pipeline parallelism 為 Passing，TP／DP／EP 多主機 Untested；量化、MoE、MLA 的 kernel 列全部 Untested；LLM recipe 的 <code>--max-model-len</code> 多為 9,216，Qwen3-Coder-480B 為 10,240（另有 Gemma 4 的 1,524 與 Qwen3-Embedding-8B 的 16,384）</td>
+<td class="src"><a href="https://docs.cloud.google.com/tpu/docs/tpu-inference" rel="noopener" target="_blank">Run inference on Cloud TPU</a>；<a href="https://pypi.org/project/vllm-tpu/" rel="noopener" target="_blank">PyPI vllm-tpu</a>；<a href="https://vllm.ai/blog/2025-10-16-vllm-tpu" rel="noopener" target="_blank">vLLM blog, 2025-10-16</a>；<a href="https://github.com/vllm-project/tpu-inference/tree/main/support_matrices" rel="noopener" target="_blank">tpu-inference support matrices</a>；<a href="https://github.com/AI-Hypercomputer/tpu-recipes/tree/main/inference/ironwood/vLLM" rel="noopener" target="_blank">tpu-recipes</a></td>
+</tr>
+<tr id="b71">
+<td class="rowhead">SGL-JAX</td>
+<td>開源發布中；recipe 以 sglang-jax 0.1.0 驗證</td>
+<td>有多主機驗證：DeepSeek-V3 在 v6e-64（16 節點）、GLM-4.5-Air 在 v6e-32</td>
+<td>與 SGLang 主幹是不同程式庫；Qwen3.8-27B 的 262,144-token context「has not been exercised end to end」</td>
+<td class="src"><a href="https://github.com/sgl-project/sglang-jax" rel="noopener" target="_blank">sglang-jax</a>；<a href="https://github.com/sgl-project/sglang-jax/tree/main/docs/cookbook/autoregressive" rel="noopener" target="_blank">sglang-jax cookbook</a></td>
+</tr>
+<tr id="b72">
+<td class="rowhead">JetStream、Hex-LLM</td>
+<td>JetStream 於 2026-02-01 封存；Hex-LLM 標為 deprecated（文件更新 2026-10-01）</td>
+<td class="muted">—</td>
+<td>GKE 教學仍建議多主機用 JetStream，與封存狀態矛盾</td>
+<td class="src"><a href="https://github.com/AI-Hypercomputer/JetStream" rel="noopener" target="_blank">JetStream</a>；<a href="https://docs.cloud.google.com/gemini-enterprise-agent-platform/models/open-models/use-hex-llm" rel="noopener" target="_blank">Hex-LLM</a>；<a href="https://docs.cloud.google.com/kubernetes-engine/docs/tutorials/serve-vllm-tpu" rel="noopener" target="_blank">GKE vLLM TPU tutorial</a></td>
+</tr>
+<tr id="b73">
+<td class="rowhead">TorchTPU</td>
+<td>private beta；預計 2026 年 10 月中開源</td>
+<td>原生 PyTorch 裝置，將成為 vLLM 與 SGLang 在 TPU 上的後端</td>
+<td>尚未公開；Torchax「will soon be deprecated」</td>
+<td class="src"><a href="https://developers.googleblog.com/torchtpu-running-pytorch-natively-on-tpus-at-google-scale/" rel="noopener" target="_blank">TorchTPU blog</a>；<a href="https://inferencex.semianalysis.com/blog/tpu-inferencex-full-steam" rel="noopener" target="_blank">InferenceX TPU post</a></td>
+</tr>
+</tbody>
+</table></div></figure>
+<ul>
+<li id="b74">唯一的獨立量測（InferenceX Official Preview，2026-09-07；Qwen3.5-397B、FP8、8K in／1K out、aggregated、pre-release TorchTPU vLLM）：20 tok/s per user 時 Ironwood 9,364、B200 8,903、B300 8,925 total tok/s per chip；concurrency 256 的平均 TTFT 為 5.41 秒、3.75 秒、2.40 秒 <span class="g g-a" title="等級 A：獨立第三方量測">A</span>（<a href="https://inferencex.semianalysis.com/blog/tpu-inferencex-full-steam" rel="noopener" target="_blank">InferenceX TPU post</a>）。</li>
+<li id="b75">day-0 落後：InferenceX 寫「vLLM and SGLang concentrate their day-0 support on NVIDIA」，Kimi K3 與 GLM 5.3 的 TPU 支援仍在計畫中（<a href="https://inferencex.semianalysis.com/blog/tpu-inferencex-full-steam" rel="noopener" target="_blank">InferenceX TPU post</a>）。</li>
+<li id="b76">18 個月內換了 3 代引擎（PyTorch/XLA 原型 → Torchax／JAX 的 <code>tpu-inference</code> → TorchTPU）<span class="g g-d" title="等級 D：本文推算，附算式">D</span>，recipe 與調校參數在 TorchTPU 開源後還會再變。</li>
+</ul>
+</div></div><div class="subpanel" role="tabpanel" id="s2-5" aria-labelledby="tab-s2-5"><div class="prose"><h3>Cerebras</h3><p id="b77">Cerebras 沒有引擎可選：公開 API 只有 2 個模型（<code>gpt-oss-120b</code>、<code>qwen-3.8-27b</code>），context 上限 131K（<a href="https://inference-docs.cerebras.ai/models/overview" rel="noopener" target="_blank">Cerebras models</a>）。</p>
+<figure class="tbl" data-cols="4" data-rows="3"><div aria-label="資料表" class="tbl-scroll" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th scope="col">面向</th>
+<th class="w2" scope="col">公開 API（Shared Inference）</th>
+<th class="w1" scope="col">Dedicated Inference</th>
+<th class="src" scope="col">來源</th>
+</tr>
+</thead>
+<tbody>
+<tr id="b78">
+<td class="rowhead">模型</td>
+<td>2 個；無 Kimi K3、DeepSeek V4、Qwen3.8 旗艦</td>
+<td>可部署 fine-tuned 權重；另有其他模型家族</td>
+<td class="src"><a href="https://inference-docs.cerebras.ai/models/overview" rel="noopener" target="_blank">Cerebras models</a>；<a href="https://inference-docs.cerebras.ai/dedicated/overview" rel="noopener" target="_blank">Cerebras Dedicated</a></td>
+</tr>
+<tr id="b79">
+<td class="rowhead">量化</td>
+<td>由 Cerebras 決定並揭露：只量化權重，16／8／4-bit 混合；activation、attention、KV cache 不量化</td>
+<td>可調整</td>
+<td class="src"><a href="https://inference-docs.cerebras.ai/models/overview" rel="noopener" target="_blank">Cerebras models</a>；<a href="https://inference-docs.cerebras.ai/dedicated/overview" rel="noopener" target="_blank">Cerebras Dedicated</a></td>
+</tr>
+<tr id="b80">
+<td class="rowhead">speculative decoding</td>
+<td>由供應商在後端使用，不是使用者參數</td>
+<td>可調整 draft model</td>
+<td class="src"><a href="https://www.cerebras.ai/blog/cerebras-kimi-k2-Enterprise" rel="noopener" target="_blank">Cerebras Kimi K2 blog</a>；<a href="https://inference-docs.cerebras.ai/dedicated/overview" rel="noopener" target="_blank">Cerebras Dedicated</a></td>
+</tr>
+</tbody>
+</table></div></figure>
+<ul>
+<li id="b81">優點是功能以服務形式提供（prompt caching、strict structured outputs、tool calling、reasoning 控制），使用者不必維運引擎（<a href="https://inference-docs.cerebras.ai/capabilities/prompt-caching" rel="noopener" target="_blank">Cerebras prompt caching</a>；<a href="https://inference-docs.cerebras.ai/support/change-log" rel="noopener" target="_blank">Cerebras change log</a>）。</li>
+<li id="b82">缺點是無法自行上新模型或調引擎參數；1 個 trillion-parameter 模型（Kimi K2.6）約用 20 台 CS-3（單一來源）<span class="g g-c" title="等級 C：廠商宣稱或規格，未揭露方法">C</span>（<a href="https://venturebeat.com/technology/cerebras-says-its-chips-run-a-trillion-parameter-ai-model-nearly-7-times-faster-than-gpu-clouds" rel="noopener" target="_blank">VentureBeat</a>）。</li>
+</ul>
+</div></div><div class="subpanel" role="tabpanel" id="s2-6" aria-labelledby="tab-s2-6"><div class="prose"><h3>已停用或降級的堆疊</h3><figure class="tbl" data-cols="3" data-rows="7"><div aria-label="資料表" class="tbl-scroll" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th class="w2" scope="col">項目</th>
+<th class="w2" scope="col">狀態與日期</th>
+<th class="src" scope="col">來源</th>
+</tr>
+</thead>
+<tbody>
+<tr id="b83">
+<td>TensorRT-LLM 的 TensorRT backend（<code>trtllm-build</code>）</td>
+<td>已移除（1.2，2026-03-12）</td>
+<td class="src"><a href="https://github.com/NVIDIA/TensorRT-LLM/blob/main/docs/source/release-notes.md" rel="noopener" target="_blank">TRT-LLM release notes</a></td>
+</tr>
+<tr id="b84">
+<td>TensorRT-LLM 的 two-model speculative decoding</td>
+<td>已移除（1.2）</td>
+<td class="src"><a href="https://github.com/NVIDIA/TensorRT-LLM/blob/main/docs/source/release-notes.md" rel="noopener" target="_blank">TRT-LLM release notes</a></td>
+</tr>
+<tr id="b85">
+<td class="rowhead">NIM 1.x 的多後端架構</td>
+<td class="num">2.0 起只剩 vLLM</td>
+<td class="src"><a href="https://docs.nvidia.com/nim/large-language-models/latest/reference/1.x-migration-guide.html" rel="noopener" target="_blank">NIM migration guide</a></td>
+</tr>
+<tr id="b86">
+<td><span class="rh">Dynamo KV Block Manager</span><span class="rh-sub"><span class="vh">（</span>KVBM<span class="vh">）</span></span></td>
+<td>v1.5.0（2026-09-18）起 deprecated，預定 v1.6.0 移除，改用各引擎原生的 KV offload</td>
+<td class="src"><a href="https://github.com/ai-dynamo/dynamo/blob/main/docs/fern/pages/reference/general/releases/deprecations.mdx" rel="noopener" target="_blank">Dynamo deprecations</a></td>
+</tr>
+<tr id="b87">
+<td class="rowhead">Hugging Face TGI</td>
+<td>維護模式；最後 commit 2026-03-21</td>
+<td class="src"><a href="https://github.com/huggingface/text-generation-inference/blob/main/README.md" rel="noopener" target="_blank">TGI README</a></td>
+</tr>
+<tr id="b88">
+<td class="rowhead">NxD Inference</td>
+<td>維護模式（2026-05-20 公告）</td>
+<td class="src"><a href="https://awsdocs-neuron.readthedocs-hosted.com/en/latest/about-neuron/announcements/neuron2.x/announce-nxdi-maintenance-support-2-31.html" rel="noopener" target="_blank">NxDI 維護公告</a></td>
+</tr>
+<tr id="b89">
+<td class="rowhead">JetStream</td>
+<td class="num">2026-02-01 封存</td>
+<td class="src"><a href="https://github.com/AI-Hypercomputer/JetStream" rel="noopener" target="_blank">JetStream</a></td>
+</tr>
+</tbody>
+</table></div></figure>
+</div></div></div>
+<details class="srcs"><summary>本節來源（73）</summary><ul><li><a href="https://inferencex.semianalysis.com/api/v1/benchmarks?model=DeepSeek-V4.1-Flash" target="_blank" rel="noopener">InferenceX API, DeepSeek-V4.1-Flash</a></li><li><a href="https://inferencex.semianalysis.com/blog/engrams-embedding-entendre-codesign" target="_blank" rel="noopener">InferenceX blog, 2026-09-18</a></li><li><a href="https://github.com/SemiAnalysisAI/InferenceX/blob/main/inferencex-e2e/docs/MODELS.md" target="_blank" rel="noopener">InferenceX MODELS.md</a></li><li><a href="https://github.com/vllm-project/vllm/blob/main/docs/features/disagg_prefill.md" target="_blank" rel="noopener">vLLM disaggregated prefill</a></li><li><a href="https://github.com/vllm-project/vllm/blob/main/docs/features/README.md" target="_blank" rel="noopener">vLLM feature matrix</a></li><li><a href="https://github.com/vllm-project/vllm/blob/main/docs/features/quantization/gguf.md" target="_blank" rel="noopener">vLLM GGUF</a></li><li><a href="https://github.com/SemiAnalysisAI/InferenceX/blob/main/inferencex-e2e/configs/nvidia-master.yaml" target="_blank" rel="noopener">InferenceX NVIDIA configs</a></li><li><a href="https://github.com/ai-dynamo/dynamo/blob/main/docs/fern/pages/developer-guide/knowledge-base/modular-components/router/offloading-support-matrix.md" target="_blank" rel="noopener">Dynamo offloading matrix</a></li><li><a href="https://github.com/sgl-project/sglang/blob/main/docs/docs/advanced_features/quantized_kv_cache.mdx" target="_blank" rel="noopener">SGLang quantized KV cache</a></li><li><a href="https://inferencex.semianalysis.com/blog/vera-rubin-nvl72-agentic-inference" target="_blank" rel="noopener">InferenceX Vera Rubin post</a></li><li><a href="https://inferencex.semianalysis.com/blog/agentx-inferencexv3-does-cuda-moat" target="_blank" rel="noopener">InferenceX AgentX blog</a></li><li><a href="https://github.com/NVIDIA/TensorRT-LLM/blob/main/docs/source/features/helix.md" target="_blank" rel="noopener">TRT-LLM Helix</a></li><li><a href="https://pypi.org/pypi/tensorrt-llm/json" target="_blank" rel="noopener">PyPI tensorrt-llm</a></li><li><a href="https://docs.nvidia.com/nim/large-language-models/latest/about-nim-llm/release-notes.html" target="_blank" rel="noopener">NIM release notes</a></li><li><a href="https://pypi.org/pypi/vllm/json" target="_blank" rel="noopener">PyPI vllm</a></li><li><a href="https://github.com/vllm-project/vllm/blob/main/docs/features/quantization/README.md" target="_blank" rel="noopener">vLLM quantization</a></li><li><a href="https://github.com/sgl-project/sglang/blob/main/docs/docs/advanced_features/quantization.mdx" target="_blank" rel="noopener">SGLang quantization</a></li><li><a href="https://github.com/sgl-project/sglang/blob/main/docs/docs/advanced_features/attention_backend.mdx" target="_blank" rel="noopener">SGLang attention backends</a></li><li><a href="https://inferencex.semianalysis.com/api/v1/benchmarks?model=Kimi-K3" target="_blank" rel="noopener">InferenceX API, Kimi-K3</a></li><li><a href="https://inferencex.semianalysis.com/api/v1/benchmarks?model=GLM-5.2" target="_blank" rel="noopener">InferenceX API, GLM-5.2</a></li><li><a href="https://rocm.blogs.amd.com/software-tools-optimization/atom-inference-engine/README.html" target="_blank" rel="noopener">AMD ATOM blog</a></li><li><a href="https://github.com/ROCm/ATOM/blob/main/atom_overview_draft.md" target="_blank" rel="noopener">ATOM overview draft</a></li><li><a href="https://github.com/tile-ai/TileRT/blob/main/README.md" target="_blank" rel="noopener">TileRT README</a></li><li><a href="https://github.com/huggingface/text-generation-inference/blob/main/README.md" target="_blank" rel="noopener">TGI README</a></li><li><a href="https://github.com/ggml-org/llama.cpp/blob/master/tools/rpc/README.md" target="_blank" rel="noopener">llama.cpp RPC README</a></li><li><a href="https://inferencex.semianalysis.com/api/v1/benchmarks?model=DeepSeek-V4-Pro" target="_blank" rel="noopener">InferenceX API, DeepSeek-V4-Pro</a></li><li><a href="https://inferencex.semianalysis.com/api/v1/benchmarks?model=Qwen-3.5-397B-A17B" target="_blank" rel="noopener">InferenceX API, Qwen3.5-397B</a></li><li><a href="https://inferencex.semianalysis.com/api/v1/benchmarks?model=Qwen3.8-Flash-Next" target="_blank" rel="noopener">InferenceX API, Qwen3.8-Flash-Next</a></li><li><a href="https://github.com/vllm-project/vllm-neuron/blob/release-0.24.0.1.1.0/README.md" target="_blank" rel="noopener">vLLM Neuron README</a></li><li><a href="https://awsdocs-neuron.readthedocs-hosted.com/en/latest/vllm-neuron/docs/guides/features-guide.html" target="_blank" rel="noopener">vLLM Neuron features guide</a></li><li><a href="https://github.com/vllm-project/vllm-neuron/blob/release-0.24.0.1.1.0/vllm_neuron/model/registry.py" target="_blank" rel="noopener">vLLM Neuron registry</a></li><li><a href="https://awsdocs-neuron.readthedocs-hosted.com/en/latest/about-neuron/announcements/neuron2.x/announce-nxdi-maintenance-support-2-31.html" target="_blank" rel="noopener">NxDI 維護公告</a></li><li><a href="https://awsdocs-neuron.readthedocs-hosted.com/en/latest/about-neuron/whats-new.html" target="_blank" rel="noopener">What&#x27;s New</a></li><li><a href="https://awsdocs-neuron.readthedocs-hosted.com/en/latest/libraries/nxd-inference/developer_guides/feature-guide.html" target="_blank" rel="noopener">NxDI feature guide</a></li><li><a href="https://awsdocs-neuron.readthedocs-hosted.com/en/latest/libraries/nxd-inference/developer_guides/vllm-user-guide-v1.html" target="_blank" rel="noopener">vLLM guide for NxDI</a></li><li><a href="https://awsdocs-neuron.readthedocs-hosted.com/en/latest/libraries/nxd-inference/developer_guides/model-reference.html" target="_blank" rel="noopener">NxDI model reference</a></li><li><a href="https://awsdocs-neuron.readthedocs-hosted.com/en/latest/vllm-neuron/docs/getting-started/migration-nxdi-to-vllm-neuron.html" target="_blank" rel="noopener">vLLM Neuron migration guide</a></li><li><a href="https://awsdocs-neuron.readthedocs-hosted.com/en/latest/vllm-neuron/docs/model-dev/onboarding-models.html" target="_blank" rel="noopener">vLLM Neuron onboarding</a></li><li><a href="https://github.com/aws-neuron/neuronx-distributed-inference/tree/main/contrib/models" target="_blank" rel="noopener">NxDI contrib models</a></li><li><a href="https://github.com/aws-neuron/neuronx-distributed-inference/blob/main/contrib/models/GLM-5.2/README.md" target="_blank" rel="noopener">GLM-5.2 contrib</a></li><li><a href="https://awsdocs-neuron.readthedocs-hosted.com/en/latest/vllm-neuron/docs/tutorials/tutorial-eagle3-speculative-decoding-gpt-oss.html" target="_blank" rel="noopener">EAGLE3 gpt-oss tutorial</a></li><li><a href="https://awsdocs-neuron.readthedocs-hosted.com/en/latest/libraries/vllm-neuron/neuron-inference-overview.html" target="_blank" rel="noopener">AI Inference on Neuron</a></li><li><a href="https://awsdocs-neuron.readthedocs-hosted.com/en/latest/release-notes/components/nxd-inference.html" target="_blank" rel="noopener">NxDI release notes</a></li><li><a href="https://pypi.org/project/optimum-neuron/" target="_blank" rel="noopener">PyPI optimum-neuron</a></li><li><a href="https://github.com/huggingface/optimum-neuron/commits/main" target="_blank" rel="noopener">Optimum Neuron commits</a></li><li><a href="https://github.com/huggingface/optimum-neuron/blob/main/benchmark/vllm/data-parallel/llama3.1-8b/docker-compose-dp3.yaml" target="_blank" rel="noopener">Optimum Neuron benchmark</a></li><li><a href="https://github.com/huggingface/optimum-neuron/blob/main/benchmark/vllm/data-parallel/llama3.1-8b/.env" target="_blank" rel="noopener">Optimum Neuron benchmark .env</a></li><li><a href="https://github.com/huggingface/optimum-neuron/blob/main/benchmark/vllm/data-parallel/llama3.1-8b/vllm-results-dp3.csv" target="_blank" rel="noopener">Optimum Neuron result CSV</a></li><li><a href="https://github.com/huggingface/optimum-neuron/blob/main/pyproject.toml" target="_blank" rel="noopener">Optimum Neuron pyproject</a></li><li><a href="https://github.com/huggingface/optimum-neuron/blob/main/optimum/neuron/vllm/ARCHITECTURE_VLLM_SERVING.md" target="_blank" rel="noopener">Optimum Neuron vLLM architecture</a></li><li><a href="https://github.com/deepjavalibrary/djl-serving/pull/2939" target="_blank" rel="noopener">DJL PR #2939</a></li><li><a href="https://www.nextplatform.com/2025/12/03/with-trainium4-aws-will-crank-up-everything-but-the-clocks/" target="_blank" rel="noopener">The Next Platform, 2025-12-03</a></li><li><a href="https://docs.cloud.google.com/tpu/docs/tpu-inference" target="_blank" rel="noopener">Run inference on Cloud TPU</a></li><li><a href="https://pypi.org/project/vllm-tpu/" target="_blank" rel="noopener">PyPI vllm-tpu</a></li><li><a href="https://vllm.ai/blog/2025-10-16-vllm-tpu" target="_blank" rel="noopener">vLLM blog, 2025-10-16</a></li><li><a href="https://github.com/vllm-project/tpu-inference/tree/main/support_matrices" target="_blank" rel="noopener">tpu-inference support matrices</a></li><li><a href="https://github.com/AI-Hypercomputer/tpu-recipes/tree/main/inference/ironwood/vLLM" target="_blank" rel="noopener">tpu-recipes</a></li><li><a href="https://github.com/sgl-project/sglang-jax" target="_blank" rel="noopener">sglang-jax</a></li><li><a href="https://github.com/sgl-project/sglang-jax/tree/main/docs/cookbook/autoregressive" target="_blank" rel="noopener">sglang-jax cookbook</a></li><li><a href="https://github.com/AI-Hypercomputer/JetStream" target="_blank" rel="noopener">JetStream</a></li><li><a href="https://docs.cloud.google.com/gemini-enterprise-agent-platform/models/open-models/use-hex-llm" target="_blank" rel="noopener">Hex-LLM</a></li><li><a href="https://docs.cloud.google.com/kubernetes-engine/docs/tutorials/serve-vllm-tpu" target="_blank" rel="noopener">GKE vLLM TPU tutorial</a></li><li><a href="https://developers.googleblog.com/torchtpu-running-pytorch-natively-on-tpus-at-google-scale/" target="_blank" rel="noopener">TorchTPU blog</a></li><li><a href="https://inferencex.semianalysis.com/blog/tpu-inferencex-full-steam" target="_blank" rel="noopener">InferenceX TPU post</a></li><li><a href="https://inference-docs.cerebras.ai/models/overview" target="_blank" rel="noopener">Cerebras models</a></li><li><a href="https://inference-docs.cerebras.ai/dedicated/overview" target="_blank" rel="noopener">Cerebras Dedicated</a></li><li><a href="https://www.cerebras.ai/blog/cerebras-kimi-k2-Enterprise" target="_blank" rel="noopener">Cerebras Kimi K2 blog</a></li><li><a href="https://inference-docs.cerebras.ai/capabilities/prompt-caching" target="_blank" rel="noopener">Cerebras prompt caching</a></li><li><a href="https://inference-docs.cerebras.ai/support/change-log" target="_blank" rel="noopener">Cerebras change log</a></li><li><a href="https://venturebeat.com/technology/cerebras-says-its-chips-run-a-trillion-parameter-ai-model-nearly-7-times-faster-than-gpu-clouds" target="_blank" rel="noopener">VentureBeat</a></li><li><a href="https://github.com/NVIDIA/TensorRT-LLM/blob/main/docs/source/release-notes.md" target="_blank" rel="noopener">TRT-LLM release notes</a></li><li><a href="https://docs.nvidia.com/nim/large-language-models/latest/reference/1.x-migration-guide.html" target="_blank" rel="noopener">NIM migration guide</a></li><li><a href="https://github.com/ai-dynamo/dynamo/blob/main/docs/fern/pages/reference/general/releases/deprecations.mdx" target="_blank" rel="noopener">Dynamo deprecations</a></li></ul></details></section>
+<section class="panel" role="tabpanel" id="s3" aria-labelledby="tab-s3"><div class="panel-head"><h2>編譯式與動態執行的差異</h2><div class="sec-lead prose"><p id="b90">本章涵蓋的 5 類現行堆疊中有 4 類在服務啟動前就固定 shape 或配置（AWS Neuron 的 NEFF、TPU 的 XLA 程式、NVIDIA LPX 的 LPU build、Cerebras 的晶圓配置），只有 GPU 上的 vLLM、SGLang 與 1.2 之後的 TensorRT-LLM 在 PyTorch 上動態執行。已公開的 Neuron 編譯時間從 11.8 分鐘（DeepSeek-V3 的 NEFF，trn2.48xlarge、TP=64、seq_len 512）[<span class="g g-b" title="等級 B：廠商或夥伴公布，且揭露方法">B</span>，社群] 到 4 小時（Llama-3.2-11B-Vision，inf2.24xlarge、TP=2、32K context，4 小時後編譯失敗）<span class="g g-a" title="等級 A：獨立第三方量測">A</span>（<a href="https://github.com/NVIDIA/TensorRT-LLM/blob/main/docs/source/release-notes.md" rel="noopener" target="_blank">TRT-LLM release notes</a>；<a href="https://github.com/aws-neuron/neuronx-distributed-inference/blob/main/contrib/models/DeepSeek-V3/README.md" rel="noopener" target="_blank">DeepSeek-V3 contrib</a>；<a href="https://zenn.dev/exwzd/articles/20250930-inferentia-llama" rel="noopener" target="_blank">Exawizards, 2025-09-30</a>）。</p>
+</div></div>
+<div class="subtabs"><div class="subtablist" role="tablist" aria-label="編譯式與動態執行的差異"><button type="button" class="subtab" role="tab" id="tab-s3-1" aria-controls="s3-1" aria-selected="true">什麼變成編譯期決定</button><button type="button" class="subtab" role="tab" id="tab-s3-2" aria-controls="s3-2" aria-selected="false">編譯、暖機與載入時間</button><button type="button" class="subtab" role="tab" id="tab-s3-3" aria-controls="s3-3" aria-selected="false">對營運的影響</button></div><div class="subpanel on" role="tabpanel" id="s3-1" aria-labelledby="tab-s3-1"><div class="prose"><h3>什麼變成編譯期決定</h3><figure class="tbl" data-cols="5" data-rows="7"><div aria-label="資料表" class="tbl-scroll" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th class="w2" scope="col">堆疊</th>
+<th class="w3" scope="col">編譯產物與時機</th>
+<th class="w3" scope="col">編譯期就固定的項目</th>
+<th class="w2" scope="col">遇到未編譯的 shape</th>
+<th class="src" scope="col">來源</th>
+</tr>
+</thead>
+<tbody>
+<tr id="b91">
+<td><span class="rh">AWS Neuron</span><span class="rh-sub"><span class="vh">（</span>vLLM Neuron plugin<span class="vh">）</span></span></td>
+<td>伺服器暖機時經 <code>torch.compile</code> → XLA／HLO → Neuron compiler，每個 bucket（sequence length × batch size）1 個 NEFF</td>
+<td>prefill token bucket（預設從 128 起的 2 的次方）、decode batch bucket、decode context bucket；KV cache 大小（預設上限為記憶體預算的 30%）；structured output 可在編譯時拿掉</td>
+<td>暖機後啟用 <code>fail_on_recompile</code>，新 shape 直接報錯，不會 JIT 重編</td>
+<td class="src"><a href="https://awsdocs-neuron.readthedocs-hosted.com/en/latest/vllm-neuron/docs/guides/features-guide.html" rel="noopener" target="_blank">vLLM Neuron features guide</a>；<a href="https://awsdocs-neuron.readthedocs-hosted.com/en/latest/vllm-neuron/docs/model-dev/onboarding-models.html" rel="noopener" target="_blank">vLLM Neuron onboarding</a>；<a href="https://awsdocs-neuron.readthedocs-hosted.com/en/latest/vllm-neuron/docs/design/vllm/structured-outputs-and-tool-calling.html" rel="noopener" target="_blank">vLLM Neuron structured output design</a></td>
+</tr>
+<tr id="b92">
+<td><span class="rh">AWS Neuron</span><span class="rh-sub"><span class="vh">（</span>NxD Inference<span class="vh">）</span></span></td>
+<td><code>compile()</code> 以範例 tensor trace 成 HLO，再由 <code>neuronx-cc</code> 產生 NEFF</td>
+<td>最大 context（bucket 階梯）、batch size（<code>generate()</code> 的 prompt 數必須等於 <code>batch_size</code>）、KV block 數（<code>num_gpu_blocks_override</code> 必填）；開 prefix caching 會讓 bucket 數再乘一個維度</td>
+<td>補齊（padding）到最近的 bucket；啟動參數與編譯時不一致會觸發重新編譯</td>
+<td class="src"><a href="https://awsdocs-neuron.readthedocs-hosted.com/en/latest/libraries/nxd-inference/developer_guides/feature-guide.html" rel="noopener" target="_blank">NxDI feature guide</a>；<a href="https://awsdocs-neuron.readthedocs-hosted.com/en/latest/libraries/nxd-inference/developer_guides/vllm-user-guide-v1.html" rel="noopener" target="_blank">vLLM guide for NxDI</a>；<a href="https://zenn.dev/exwzd/articles/20250827_inferentia_compile" rel="noopener" target="_blank">Exawizards, 2025-08-28</a></td>
+</tr>
+<tr id="b93">
+<td><span class="rh">Google TPU</span><span class="rh-sub"><span class="vh">（</span>vLLM TPU，JAX／XLA<span class="vh">）</span></span></td>
+<td>啟動時依 bucket 預編譯（<code>SKIP_JAX_PRECOMPILE</code>、<code>NUM_PRECOMPILE_WORKERS</code>、<code>MIN_TOKEN_BUCKET</code> 預設 16）</td>
+<td><code>--max-model-len</code> 與 <code>compilation_sizes</code>；recipe 對不同 workload shape 的做法是改參數後重啟伺服器</td>
+<td>以 bucket 補齊；低 concurrency 時 bucket 過大，padding token 會觸發無用的 expert 計算 <span class="g g-a" title="等級 A：獨立第三方量測">A</span></td>
+<td class="src"><a href="https://github.com/vllm-project/tpu-inference/blob/main/tpu_inference/envs.py" rel="noopener" target="_blank">tpu-inference envs.py</a>；<a href="https://github.com/AI-Hypercomputer/tpu-recipes/tree/main/inference/ironwood/vLLM/Qwen3-32B" rel="noopener" target="_blank">tpu-recipes Qwen3-32B</a>；<a href="https://inferencex.semianalysis.com/blog/tpu-inferencex-full-steam" rel="noopener" target="_blank">InferenceX TPU post</a></td>
+</tr>
+<tr id="b94">
+<td class="rowhead">NVIDIA LPX</td>
+<td>編譯器產生不可變的 LPU build，以 <code>buildId</code> 登錄在 LPU model registry；operator 依 build 推導 placement 與 replica 數</td>
+<td>執行模式（<code>lpuOnly</code> 或 GPU 混合的 <code>lpx</code>）、LPU 目標家族、實體分割（partition）</td>
+<td><span class="chip chip-na">查無公開資料</span> ；晶片為完全決定性、指令排程由軟體完成</td>
+<td class="src"><a href="https://github.com/ai-dynamo/dynamo/blob/main/deploy/operator/api/v1beta1/lpx_types.go" rel="noopener" target="_blank">Dynamo LPX types</a>；<a href="https://github.com/ai-dynamo/dynamo/blob/main/deploy/operator/internal/dynamo/lpx/build.go" rel="noopener" target="_blank">Dynamo LPX build</a>；<a href="https://www.servethehome.com/nvidias-groq-3-lpu-accelerators-for-heterogeneous-ai-compute-at-hot-chips-2026/" rel="noopener" target="_blank">ServeTheHome, Hot Chips 2026</a></td>
+</tr>
+<tr id="b95">
+<td class="rowhead">Cerebras</td>
+<td>權重放在晶圓上的 SRAM；超過 1 片晶圓的模型在 layer 邊界切開，跨多台 CS-3 以 pipeline 執行</td>
+<td>KV cache 與權重共用每片 44 GB 的 SRAM；N 個 pipeline stage 至少要 N 個 in-flight microbatch 才能填滿（分析師說法）</td>
+<td><span class="chip chip-na">查無公開資料</span><span class="chip-note">編譯工具鏈與時間未公開</span></td>
+<td class="src"><a href="https://www.cerebras.ai/blog/how-cerebras-serves-gpt-5-6-sol-at-up-to-750-tokens-per-second" rel="noopener" target="_blank">Cerebras GPT-5.6 Sol blog</a>；<a href="https://newsletter.semianalysis.com/p/cerebras-faster-tokens-please" rel="noopener" target="_blank">SemiAnalysis, Cerebras</a></td>
+</tr>
+<tr id="b96">
+<td><span class="rh">TensorRT engine</span><span class="rh-sub"><span class="vh">（</span>TensorRT-LLM 1.1 以前<span class="vh">）</span></span></td>
+<td><code>trtllm-build</code> 預先建置 engine</td>
+<td><span class="chip chip-na">查無</span><span class="chip-note">筆記未收錄舊流程的參數</span></td>
+<td class="muted">—</td>
+<td class="src"><a href="https://github.com/NVIDIA/TensorRT-LLM/blob/main/docs/source/release-notes.md" rel="noopener" target="_blank">TRT-LLM release notes</a></td>
+</tr>
+<tr id="b97">
+<td><span class="rh">GPU 動態執行</span><span class="rh-sub"><span class="vh">（</span>vLLM、SGLang、TensorRT-LLM 1.2 以後<span class="vh">）</span></span></td>
+<td>無預先編譯的模型產物；PyTorch 模型程式碼加 CUDA／HIP graph 與 <code>torch.compile</code></td>
+<td>無；最大 context、batch 上限、KV dtype、量化是啟動參數或由 checkpoint 決定，NVFP4 的 GEMM kernel 在載入時選定</td>
+<td>任何不超過上限的長度與 batch 都直接執行</td>
+<td class="src"><a href="https://github.com/vllm-project/vllm/blob/main/README.md" rel="noopener" target="_blank">vLLM README</a>；<a href="https://github.com/vllm-project/vllm/blob/main/docs/features/quantization/modelopt.md" rel="noopener" target="_blank">vLLM ModelOpt</a>；<a href="https://github.com/NVIDIA/TensorRT-LLM/blob/main/docs/source/release-notes.md" rel="noopener" target="_blank">TRT-LLM release notes</a></td>
+</tr>
+</tbody>
+</table></div></figure>
+</div></div><div class="subpanel" role="tabpanel" id="s3-2" aria-labelledby="tab-s3-2"><div class="prose"><h3>編譯、暖機與載入時間</h3><figure class="tbl" data-cols="6" data-rows="9"><div aria-label="資料表" class="tbl-scroll" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th class="w2" scope="col">案例</th>
+<th class="w2" scope="col">數字</th>
+<th class="w2" scope="col">條件</th>
+<th scope="col">日期</th>
+<th scope="col">等級</th>
+<th class="src" scope="col">來源</th>
+</tr>
+</thead>
+<tbody>
+<tr id="b98">
+<td class="rowhead">Neuron 通則</td>
+<td class="num">約 15 分鐘</td>
+<td>「a small-ish model of 15GB」；NxD Inference 經 vLLM</td>
+<td>現行文件</td>
+<td><span class="g g-c" title="等級 C：廠商宣稱或規格，未揭露方法">C</span></td>
+<td class="src"><a href="https://awsdocs-neuron.readthedocs-hosted.com/en/latest/libraries/nxd-inference/developer_guides/vllm-user-guide-v1.html" rel="noopener" target="_blank">vLLM guide for NxDI</a></td>
+</tr>
+<tr id="b99">
+<td class="rowhead">Llama 3.1 405B，Trn2</td>
+<td>編譯加載入 40 分鐘 → 12 分鐘</td>
+<td>Neuron 2.23 起預設 shard-on-load</td>
+<td class="num">2025-05</td>
+<td><span class="g g-c" title="等級 C：廠商宣稱或規格，未揭露方法">C</span></td>
+<td class="src"><a href="https://awsdocs-neuron.readthedocs-hosted.com/en/latest/release-notes/components/nxd-inference.html" rel="noopener" target="_blank">NxDI release notes</a></td>
+</tr>
+<tr id="b100">
+<td class="rowhead">DeepSeek-V3 671B，trn2.48xlarge TP=64</td>
+<td>NEFF 編譯 11.8 分鐘（快取命中約 1 秒）；FP8→BF16 權重 sharding 3.5 小時；載入已 shard 的權重 7.8 分鐘</td>
+<td>SDK 2.28、seq_len 512</td>
+<td class="num">2026-04</td>
+<td><span class="g g-b" title="等級 B：廠商或夥伴公布，且揭露方法">B</span>（社群）</td>
+<td class="src"><a href="https://github.com/aws-neuron/neuronx-distributed-inference/blob/main/contrib/models/DeepSeek-V3/README.md" rel="noopener" target="_blank">DeepSeek-V3 contrib</a></td>
+</tr>
+<tr id="b101">
+<td class="rowhead">GLM-5.2 FP8，trn2.48xlarge TP=64</td>
+<td>編譯加 pre-shard 約 1.5 小時；載入 139 秒；暖機 16 秒</td>
+<td>seq_len 2,048</td>
+<td class="num">2026-06-17</td>
+<td><span class="g g-b" title="等級 B：廠商或夥伴公布，且揭露方法">B</span>（社群）</td>
+<td class="src"><a href="https://github.com/aws-neuron/neuronx-distributed-inference/blob/main/contrib/models/GLM-5.2/README.md" rel="noopener" target="_blank">GLM-5.2 contrib</a></td>
+</tr>
+<tr id="b102">
+<td class="rowhead">Llama-3.2-11B-Vision，inf2.24xlarge TP=8</td>
+<td>12 分鐘（2K context）、16 分鐘（8K）、38 分鐘（32K）</td>
+<td>由 vLLM 觸發編譯</td>
+<td class="num">2025-09-30</td>
+<td><span class="g g-a" title="等級 A：獨立第三方量測">A</span></td>
+<td class="src"><a href="https://zenn.dev/exwzd/articles/20250930-inferentia-llama" rel="noopener" target="_blank">Exawizards, 2025-09-30</a></td>
+</tr>
+<tr id="b103">
+<td class="rowhead">同模型，TP=2</td>
+<td>8K 編譯 2 小時成功但無法服務；32K 跑 4 小時仍編譯失敗</td>
+<td>inf2.24xlarge</td>
+<td class="num">2025-09-30</td>
+<td><span class="g g-a" title="等級 A：獨立第三方量測">A</span></td>
+<td class="src"><a href="https://zenn.dev/exwzd/articles/20250930-inferentia-llama" rel="noopener" target="_blank">Exawizards, 2025-09-30</a></td>
+</tr>
+<tr id="b104">
+<td class="rowhead">gpt-oss，vLLM Neuron</td>
+<td>compile timeout 設 1,200–2,400 秒；engine-ready timeout 設 5,400 秒</td>
+<td>AWS recipe，Trn2／Trn3</td>
+<td class="num">2026-07</td>
+<td><span class="g g-c" title="等級 C：廠商宣稱或規格，未揭露方法">C</span></td>
+<td class="src"><a href="https://awsdocs-neuron.readthedocs-hosted.com/en/latest/vllm-neuron/docs/tutorials/tutorial-gpt-oss.html" rel="noopener" target="_blank">gpt-oss tutorial</a></td>
+</tr>
+<tr id="b105">
+<td><span class="rh">Qwen3.8 2.4T，TPU7x</span><span class="rh-sub"><span class="vh">（</span>Google CI<span class="vh">）</span></span></td>
+<td>engine-ready timeout 設 10,800 秒</td>
+<td>多主機、TP=32 的每日 benchmark</td>
+<td class="num">2026-10 讀取</td>
+<td><span class="g g-b" title="等級 B：廠商或夥伴公布，且揭露方法">B</span></td>
+<td class="src"><a href="https://github.com/vllm-project/tpu-inference/blob/main/.buildkite/benchmark/cases/daily/daily_qwen3_8_2p4t_fp8_tpu7x_32.json" rel="noopener" target="_blank">tpu-inference CI case</a></td>
+</tr>
+<tr id="b106">
+<td><span class="rh">對照：Llama 3.1 405B，8× H200</span><span class="rh-sub"><span class="vh">（</span>vLLM<span class="vh">）</span></span></td>
+<td>標準 BF16 載入約 18 分鐘；GPUDirect Storage 加預先 shard 的 BF16（812 GB）10.4 秒、FP8（408 GB）6.4 秒</td>
+<td>p5en.48xlarge、FSx for Lustre；只有權重載入，無編譯</td>
+<td class="num">2026-06-01</td>
+<td><span class="g g-b" title="等級 B：廠商或夥伴公布，且揭露方法">B</span></td>
+<td class="src"><a href="https://aws.amazon.com/blogs/machine-learning/accelerate-llm-model-loading-and-increase-context-windows-with-gpudirect-on-amazon-fsx-for-lustre-and-turboquant/" rel="noopener" target="_blank">AWS ML blog, 2026-06-01</a></td>
+</tr>
+</tbody>
+</table></div></figure>
+</div></div><div class="subpanel" role="tabpanel" id="s3-3" aria-labelledby="tab-s3-3"><div class="prose"><h3>對營運的影響</h3><figure class="tbl" data-cols="4" data-rows="5"><div aria-label="資料表" class="tbl-scroll" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th scope="col">面向</th>
+<th class="w3" scope="col">編譯式、靜態 shape（Neuron、TPU、LPX、Cerebras）</th>
+<th class="w3" scope="col">動態執行（GPU 上的 vLLM、SGLang）</th>
+<th class="src" scope="col">來源</th>
+</tr>
+</thead>
+<tbody>
+<tr id="b107">
+<td class="rowhead">自動擴展</td>
+<td>新 replica 要先編譯或命中快取；vLLM Neuron 可在 CPU 執行個體預先編譯，再經本機加 NFS／FSx 的兩層快取共用，也能設成只允許快取命中。LPX 元件不支援 scalingAdapter</td>
+<td>Dynamo Planner 依 TTFT 與 ITL SLA 分別調整 prefill 與 decode 的 replica 數</td>
+<td class="src"><a href="https://awsdocs-neuron.readthedocs-hosted.com/en/latest/vllm-neuron/docs/design/compilation/cpu_compilation.html" rel="noopener" target="_blank">vLLM Neuron CPU compilation</a>；<a href="https://awsdocs-neuron.readthedocs-hosted.com/en/latest/vllm-neuron/docs/design/compilation/compilation_cache.html" rel="noopener" target="_blank">vLLM Neuron compilation cache</a>；<a href="https://github.com/ai-dynamo/dynamo/blob/main/deploy/operator/api/v1beta1/dynamocomponentdeployment_types.go" rel="noopener" target="_blank">Dynamo component types</a>；<a href="https://github.com/ai-dynamo/dynamo/blob/main/docs/fern/pages/developer-guide/knowledge-base/modular-components/planner/overview.md" rel="noopener" target="_blank">Dynamo Planner overview</a></td>
+</tr>
+<tr id="b108">
+<td class="rowhead">冷啟動</td>
+<td>bucket 越多，啟動越慢、占用的裝置記憶體越多；逾時設定以小時計（5,400 秒、10,800 秒）</td>
+<td>時間花在權重載入：405B 模型 18 分鐘，GPUDirect Storage 可降到 10.4 秒 <span class="g g-b" title="等級 B：廠商或夥伴公布，且揭露方法">B</span>；vLLM 另有 experimental 的 engine snapshot（CRIU）</td>
+<td class="src"><a href="https://awsdocs-neuron.readthedocs-hosted.com/en/latest/vllm-neuron/docs/guides/features-guide.html" rel="noopener" target="_blank">vLLM Neuron features guide</a>；<a href="https://awsdocs-neuron.readthedocs-hosted.com/en/latest/vllm-neuron/docs/tutorials/tutorial-gpt-oss.html" rel="noopener" target="_blank">gpt-oss tutorial</a>；<a href="https://github.com/vllm-project/tpu-inference/blob/main/.buildkite/benchmark/cases/daily/daily_qwen3_8_2p4t_fp8_tpu7x_32.json" rel="noopener" target="_blank">tpu-inference CI case</a>；<a href="https://aws.amazon.com/blogs/machine-learning/accelerate-llm-model-loading-and-increase-context-windows-with-gpudirect-on-amazon-fsx-for-lustre-and-turboquant/" rel="noopener" target="_blank">AWS ML blog, 2026-06-01</a>；<a href="https://github.com/vllm-project/vllm/blob/main/docs/features/initialized_snapshots.md" rel="noopener" target="_blank">vLLM initialized snapshots</a></td>
+</tr>
+<tr id="b109">
+<td class="rowhead">新模型支援</td>
+<td>Neuron 要為每個架構手寫模型套件並驗證；TPU 可退回 PyTorch 模型程式碼，但旗艦模型的 day-0 集中在 NVIDIA；LPX 要有編譯好的 build；Cerebras 由供應商決定</td>
+<td>DeepSeek-V4.1-Flash 上線當天，6 款 NVIDIA SKU 都能以 vLLM 執行 <span class="g g-a" title="等級 A：獨立第三方量測">A</span></td>
+<td class="src"><a href="https://awsdocs-neuron.readthedocs-hosted.com/en/latest/vllm-neuron/docs/model-dev/onboarding-models.html" rel="noopener" target="_blank">vLLM Neuron onboarding</a>；<a href="https://vllm.ai/blog/2025-10-16-vllm-tpu" rel="noopener" target="_blank">vLLM blog, 2025-10-16</a>；<a href="https://inferencex.semianalysis.com/blog/tpu-inferencex-full-steam" rel="noopener" target="_blank">InferenceX TPU post</a>；<a href="https://inferencex.semianalysis.com/blog/engrams-embedding-entendre-codesign" rel="noopener" target="_blank">InferenceX blog, 2026-09-18</a></td>
+</tr>
+<tr id="b110">
+<td class="rowhead">長上下文</td>
+<td>最大 context 是編譯期參數，且每多一個長度 bucket 就多一份編譯與記憶體。已記載的上限：vLLM Neuron 的 segmented prefill 測到 128K；TPU repo 內最大值 98,304（多模態 benchmark script）、LLM recipe 約 9K–10K；Cerebras 公開 API 131K</td>
+<td>1M token 有 recipe：vLLM <code>--max-model-len 1010000</code>（Qwen3.8-2.4T）、TensorRT-LLM <code>--max_seq_len 1048576</code>（GLM-5.3-Flash，4× B200）</td>
+<td class="src"><a href="https://awsdocs-neuron.readthedocs-hosted.com/en/latest/about-neuron/whats-new.html" rel="noopener" target="_blank">What's New</a>；<a href="https://github.com/vllm-project/tpu-inference/blob/main/tests/e2e/benchmarking/mm_bench.sh" rel="noopener" target="_blank">tpu-inference mm_bench.sh</a>；<a href="https://github.com/AI-Hypercomputer/tpu-recipes/tree/main/inference/ironwood/vLLM" rel="noopener" target="_blank">tpu-recipes</a>；<a href="https://inference-docs.cerebras.ai/models/overview" rel="noopener" target="_blank">Cerebras models</a>；<a href="https://github.com/vllm-project/recipes/blob/main/models/Qwen/Qwen3.8-2.4T-A95B.yaml" rel="noopener" target="_blank">vLLM Qwen3.8-2.4T recipe</a>；<a href="https://github.com/NVIDIA/TensorRT-LLM/blob/main/docs/source/deployment-guide/deployment-guide-for-glm-5.3-flash-on-trtllm.md" rel="noopener" target="_blank">TRT-LLM GLM-5.3-Flash guide</a></td>
+</tr>
+<tr id="b111">
+<td class="rowhead">改量化或 KV 預算</td>
+<td>等於重新產生一組 NEFF；Neuron 會拒絕 AWQ／GPTQ 類的 checkpoint，MXFP4 只在 Trn3 執行，Trn2 載入時解回 BF16</td>
+<td>換 checkpoint 或啟動參數後重啟即可</td>
+<td class="src"><a href="https://awsdocs-neuron.readthedocs-hosted.com/en/latest/vllm-neuron/docs/guides/features-guide.html" rel="noopener" target="_blank">vLLM Neuron features guide</a>；<a href="https://awsdocs-neuron.readthedocs-hosted.com/en/latest/vllm-neuron/docs/model-recipes/gpt-oss.html" rel="noopener" target="_blank">gpt-oss recipe</a>；<a href="https://github.com/vllm-project/vllm/blob/main/README.md" rel="noopener" target="_blank">vLLM README</a></td>
+</tr>
+</tbody>
+</table></div></figure>
+<ul>
+<li id="b112">兩個 ASIC 堆疊都在往動態執行靠攏，但都還沒進到 serving：Neuron 的原生 PyTorch（TorchNeuron）在 plugin README 標為不支援，TorchTPU 的 roadmap 寫要讓 <code>torch.compile</code> 直接支援 dynamic shape（<a href="https://github.com/vllm-project/vllm-neuron/blob/release-0.24.0.1.1.0/README.md" rel="noopener" target="_blank">vLLM Neuron README</a>；<a href="https://developers.googleblog.com/torchtpu-running-pytorch-natively-on-tpus-at-google-scale/" rel="noopener" target="_blank">TorchTPU blog</a>）。</li>
+<li id="b113">實務做法（獨立實測者的觀察）：編譯吃的是主機記憶體而非加速器記憶體，所以在大執行個體編譯、在小執行個體服務；啟動參數必須與編譯時一致，否則會重編（<a href="https://zenn.dev/exwzd/articles/20250827_inferentia_compile" rel="noopener" target="_blank">Exawizards, 2025-08-28</a>）。</li>
+</ul>
+</div></div></div>
+<details class="srcs"><summary>本節來源（40）</summary><ul><li><a href="https://github.com/NVIDIA/TensorRT-LLM/blob/main/docs/source/release-notes.md" target="_blank" rel="noopener">TRT-LLM release notes</a></li><li><a href="https://github.com/aws-neuron/neuronx-distributed-inference/blob/main/contrib/models/DeepSeek-V3/README.md" target="_blank" rel="noopener">DeepSeek-V3 contrib</a></li><li><a href="https://zenn.dev/exwzd/articles/20250930-inferentia-llama" target="_blank" rel="noopener">Exawizards, 2025-09-30</a></li><li><a href="https://awsdocs-neuron.readthedocs-hosted.com/en/latest/vllm-neuron/docs/guides/features-guide.html" target="_blank" rel="noopener">vLLM Neuron features guide</a></li><li><a href="https://awsdocs-neuron.readthedocs-hosted.com/en/latest/vllm-neuron/docs/model-dev/onboarding-models.html" target="_blank" rel="noopener">vLLM Neuron onboarding</a></li><li><a href="https://awsdocs-neuron.readthedocs-hosted.com/en/latest/vllm-neuron/docs/design/vllm/structured-outputs-and-tool-calling.html" target="_blank" rel="noopener">vLLM Neuron structured output design</a></li><li><a href="https://awsdocs-neuron.readthedocs-hosted.com/en/latest/libraries/nxd-inference/developer_guides/feature-guide.html" target="_blank" rel="noopener">NxDI feature guide</a></li><li><a href="https://awsdocs-neuron.readthedocs-hosted.com/en/latest/libraries/nxd-inference/developer_guides/vllm-user-guide-v1.html" target="_blank" rel="noopener">vLLM guide for NxDI</a></li><li><a href="https://zenn.dev/exwzd/articles/20250827_inferentia_compile" target="_blank" rel="noopener">Exawizards, 2025-08-28</a></li><li><a href="https://github.com/vllm-project/tpu-inference/blob/main/tpu_inference/envs.py" target="_blank" rel="noopener">tpu-inference envs.py</a></li><li><a href="https://github.com/AI-Hypercomputer/tpu-recipes/tree/main/inference/ironwood/vLLM/Qwen3-32B" target="_blank" rel="noopener">tpu-recipes Qwen3-32B</a></li><li><a href="https://inferencex.semianalysis.com/blog/tpu-inferencex-full-steam" target="_blank" rel="noopener">InferenceX TPU post</a></li><li><a href="https://github.com/ai-dynamo/dynamo/blob/main/deploy/operator/api/v1beta1/lpx_types.go" target="_blank" rel="noopener">Dynamo LPX types</a></li><li><a href="https://github.com/ai-dynamo/dynamo/blob/main/deploy/operator/internal/dynamo/lpx/build.go" target="_blank" rel="noopener">Dynamo LPX build</a></li><li><a href="https://www.servethehome.com/nvidias-groq-3-lpu-accelerators-for-heterogeneous-ai-compute-at-hot-chips-2026/" target="_blank" rel="noopener">ServeTheHome, Hot Chips 2026</a></li><li><a href="https://www.cerebras.ai/blog/how-cerebras-serves-gpt-5-6-sol-at-up-to-750-tokens-per-second" target="_blank" rel="noopener">Cerebras GPT-5.6 Sol blog</a></li><li><a href="https://newsletter.semianalysis.com/p/cerebras-faster-tokens-please" target="_blank" rel="noopener">SemiAnalysis, Cerebras</a></li><li><a href="https://github.com/vllm-project/vllm/blob/main/README.md" target="_blank" rel="noopener">vLLM README</a></li><li><a href="https://github.com/vllm-project/vllm/blob/main/docs/features/quantization/modelopt.md" target="_blank" rel="noopener">vLLM ModelOpt</a></li><li><a href="https://awsdocs-neuron.readthedocs-hosted.com/en/latest/release-notes/components/nxd-inference.html" target="_blank" rel="noopener">NxDI release notes</a></li><li><a href="https://github.com/aws-neuron/neuronx-distributed-inference/blob/main/contrib/models/GLM-5.2/README.md" target="_blank" rel="noopener">GLM-5.2 contrib</a></li><li><a href="https://awsdocs-neuron.readthedocs-hosted.com/en/latest/vllm-neuron/docs/tutorials/tutorial-gpt-oss.html" target="_blank" rel="noopener">gpt-oss tutorial</a></li><li><a href="https://github.com/vllm-project/tpu-inference/blob/main/.buildkite/benchmark/cases/daily/daily_qwen3_8_2p4t_fp8_tpu7x_32.json" target="_blank" rel="noopener">tpu-inference CI case</a></li><li><a href="https://aws.amazon.com/blogs/machine-learning/accelerate-llm-model-loading-and-increase-context-windows-with-gpudirect-on-amazon-fsx-for-lustre-and-turboquant/" target="_blank" rel="noopener">AWS ML blog, 2026-06-01</a></li><li><a href="https://awsdocs-neuron.readthedocs-hosted.com/en/latest/vllm-neuron/docs/design/compilation/cpu_compilation.html" target="_blank" rel="noopener">vLLM Neuron CPU compilation</a></li><li><a href="https://awsdocs-neuron.readthedocs-hosted.com/en/latest/vllm-neuron/docs/design/compilation/compilation_cache.html" target="_blank" rel="noopener">vLLM Neuron compilation cache</a></li><li><a href="https://github.com/ai-dynamo/dynamo/blob/main/deploy/operator/api/v1beta1/dynamocomponentdeployment_types.go" target="_blank" rel="noopener">Dynamo component types</a></li><li><a href="https://github.com/ai-dynamo/dynamo/blob/main/docs/fern/pages/developer-guide/knowledge-base/modular-components/planner/overview.md" target="_blank" rel="noopener">Dynamo Planner overview</a></li><li><a href="https://github.com/vllm-project/vllm/blob/main/docs/features/initialized_snapshots.md" target="_blank" rel="noopener">vLLM initialized snapshots</a></li><li><a href="https://vllm.ai/blog/2025-10-16-vllm-tpu" target="_blank" rel="noopener">vLLM blog, 2025-10-16</a></li><li><a href="https://inferencex.semianalysis.com/blog/engrams-embedding-entendre-codesign" target="_blank" rel="noopener">InferenceX blog, 2026-09-18</a></li><li><a href="https://awsdocs-neuron.readthedocs-hosted.com/en/latest/about-neuron/whats-new.html" target="_blank" rel="noopener">What&#x27;s New</a></li><li><a href="https://github.com/vllm-project/tpu-inference/blob/main/tests/e2e/benchmarking/mm_bench.sh" target="_blank" rel="noopener">tpu-inference mm_bench.sh</a></li><li><a href="https://github.com/AI-Hypercomputer/tpu-recipes/tree/main/inference/ironwood/vLLM" target="_blank" rel="noopener">tpu-recipes</a></li><li><a href="https://inference-docs.cerebras.ai/models/overview" target="_blank" rel="noopener">Cerebras models</a></li><li><a href="https://github.com/vllm-project/recipes/blob/main/models/Qwen/Qwen3.8-2.4T-A95B.yaml" target="_blank" rel="noopener">vLLM Qwen3.8-2.4T recipe</a></li><li><a href="https://github.com/NVIDIA/TensorRT-LLM/blob/main/docs/source/deployment-guide/deployment-guide-for-glm-5.3-flash-on-trtllm.md" target="_blank" rel="noopener">TRT-LLM GLM-5.3-Flash guide</a></li><li><a href="https://awsdocs-neuron.readthedocs-hosted.com/en/latest/vllm-neuron/docs/model-recipes/gpt-oss.html" target="_blank" rel="noopener">gpt-oss recipe</a></li><li><a href="https://github.com/vllm-project/vllm-neuron/blob/release-0.24.0.1.1.0/README.md" target="_blank" rel="noopener">vLLM Neuron README</a></li><li><a href="https://developers.googleblog.com/torchtpu-running-pytorch-natively-on-tpus-at-google-scale/" target="_blank" rel="noopener">TorchTPU blog</a></li></ul></details></section></div>
+<nav class="pager" aria-label="上一張與下一張"><a href="01-silicon.html"><span>← 01</span>晶片與系統規格</a><a class="nx" href="03-architectures.html"><span>03 →</span>模型架構支援</a></nav>
+<footer class="foot"><span>資料截至 2026-10-04；逐項查核於 2026-10-05 完成。模型與價格每週在變，引用前請對照來源。</span><span class="code">IA-02 · REV 2026-10-05</span></footer>
+</main>
+</div>
+<script src="assets/site.js" defer></script>
+</body>
+</html>

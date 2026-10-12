@@ -1,0 +1,996 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>部署模式 · Inference ASIC Atlas</title>
+<meta name="description" content="五個家族中只有 GPU 在 6 類部署模式都買得到。Bedrock serverless 在四個開源家族中只提供 1 個當代旗艦（Kimi K3）；在 AWS 上要為開放權重旗艦取得容量確定性，只剩自管 GPU。">
+<meta name="color-scheme" content="light dark">
+<link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&amp;display=swap">
+<link rel="stylesheet" href="assets/site.css">
+<link rel="stylesheet" href="assets/katex/katex.min.css">
+<script>(function(){var d=document.documentElement;d.classList.add('js');try{var t=localStorage.getItem('ia-theme');if(t==='light'||t==='dark')d.setAttribute('data-theme',t)}catch(e){}})();</script>
+</head>
+<body><a class="skip" href="#sheet">跳到內容</a><header class="hdr"><div class="hdr-in"><a class="brand" href="index.html"><svg width="32" height="32" viewBox="0 0 32 32" aria-hidden="true"><rect class="k" x="7" y="7" width="18" height="18"></rect><circle cx="11" cy="11" r="1.6" fill="#F2B544"></circle><path class="p" d="M11 2v5M16 2v5M21 2v5M11 25v5M16 25v5M21 25v5M2 11h5M2 16h5M2 21h5M25 11h5M25 16h5M25 21h5" stroke-width="2" fill="none"></path></svg><span class="brand-t"><span class="brand-en">INFERENCE ASIC ATLAS</span><span class="brand-zh">推論晶片圖鑑</span></span></a><button type="button" class="hbtn menu-btn" id="menu-btn" aria-expanded="false" aria-controls="idx"><svg width="18" height="18" viewBox="0 0 18 18" aria-hidden="true"><path d="M2 4.5h14M2 9h14M2 13.5h14" stroke="currentColor" stroke-width="1.8" fill="none"></path></svg><span>章節</span></button><div class="hdr-tools"><span class="rev">REV 2026-10-05 · 12 SHEETS · 777 SOURCES</span><form id="hsearch" class="hsearch" action="search.html" method="get" role="search"><input name="q" type="search" placeholder="搜尋全站" aria-label="搜尋全站"><button type="submit" aria-label="搜尋"><svg width="18" height="18" viewBox="0 0 18 18" aria-hidden="true"><circle cx="7.5" cy="7.5" r="5" fill="none" stroke="currentColor" stroke-width="1.8"></circle><path d="M11.5 11.5L16 16" stroke="currentColor" stroke-width="1.8"></path></svg></button></form><button type="button" class="hbtn" id="theme-btn" aria-label="切換深色模式"><svg width="18" height="18" viewBox="0 0 18 18" aria-hidden="true"><circle cx="9" cy="9" r="7" fill="none" stroke="currentColor" stroke-width="1.6"></circle><path d="M9 2a7 7 0 0 1 0 14z" fill="currentColor"></path></svg></button></div></div></header>
+<div class="wrap">
+<nav class="idx" id="idx" aria-label="章節"><a href="index.html"><span class="n">00</span><span>總覽</span></a><div class="grp"><span class="grp-t">硬體 HARDWARE</span><a href="01-silicon.html"><span class="n">01</span><span>晶片與系統規格</span></a></div><div class="grp"><span class="grp-t">軟體 SOFTWARE</span><a href="02-engines.html"><span class="n">02</span><span>推論引擎</span></a><a href="06-technique-matrix.html"><span class="n">06</span><span>技術支援矩陣</span></a></div><div class="grp"><span class="grp-t">模型 MODELS</span><a href="03-architectures.html"><span class="n">03</span><span>模型架構支援</span></a><a href="04-open-models.html"><span class="n">04</span><span>開源模型效能</span></a><a href="05-proprietary-models.html"><span class="n">05</span><span>私有模型效能</span></a></div><div class="grp"><span class="grp-t">情境 SCENARIOS</span><a href="07-long-context.html"><span class="n">07</span><span>長上下文 200K / 1M</span></a><a href="08-metrics.html"><span class="n">08</span><span>效能與成本</span></a><a href="09-deployment.html" aria-current="page"><span class="n">09</span><span>部署模式</span></a></div><div class="grp"><span class="grp-t">規劃 PLANNING</span><a href="10-capacity.html"><span class="n">10</span><span>容量計算器</span></a><a href="11-evidence.html"><span class="n">11</span><span>估算依據</span></a><a href="12-sources.html"><span class="n">12</span><span>來源</span></a></div><div class="grp"><span class="grp-t">附錄 APPENDIX</span><a href="factcheck.html"><span class="n">A</span><span>查核紀錄</span></a></div></nav>
+<main id="sheet">
+<section class="sheet-head"><span class="sheet-code">SHEET 09 / 12 · DEPLOYMENT</span><h1>部署模式</h1><p class="lead">五個家族中只有 GPU 在 6 類部署模式都買得到。Bedrock serverless 在四個開源家族中只提供 1 個當代旗艦（Kimi K3）；在 AWS 上要為開放權重旗艦取得容量確定性，只剩自管 GPU。</p><div class="conv prose"><p>資料基準日：2026-10-04。表中未另標日期的配額、限制、價格與狀態，都是該日讀取的廠商現行文件值。等級：<span class="g g-a" title="等級 A：獨立第三方量測">A</span>  = 獨立第三方量測；<span class="g g-b" title="等級 B：廠商或夥伴公布，且揭露方法">B</span>  = 廠商／夥伴公布且揭露方法；<span class="g g-c" title="等級 C：廠商宣稱或規格，未揭露方法">C</span>  = 廠商宣稱或規格、未揭露方法；<span class="g g-d" title="等級 D：本文推算，附算式">D</span>  = 本文推算（附算式）；「分析師」「財報文件」沿用研究筆記對第三方估計與申報文件的標示。</p>
+</div></section>
+<div class="tabs"><div class="tablist" role="tablist" aria-label="本章的小節"><button type="button" class="tab" role="tab" id="tab-s1" aria-controls="s1" aria-selected="true"><span class="n">9.1</span><span>部署選項</span></button><button type="button" class="tab" role="tab" id="tab-s2" aria-controls="s2" aria-selected="false"><span class="n">9.2</span><span>各晶片的模式</span></button><button type="button" class="tab" role="tab" id="tab-s3" aria-controls="s3" aria-selected="false"><span class="n">9.3</span><span>決策樹</span></button></div>
+<section class="panel on" role="tabpanel" id="s1" aria-labelledby="tab-s1"><div class="panel-head"><h2>部署選項</h2><div class="sec-lead prose"><p id="b1">部署選項可歸為 6 類，控制權越多，自備的容量與維運也越多。對本調查的旗艦開放權重模型，受管途徑很窄：Amazon Bedrock serverless 在 Kimi、GLM、DeepSeek、Qwen 四個家族中只提供 1 個當代旗艦（Kimi K3，2026-09-18 GA），Bedrock Custom Model Import 的上限（文字模型 &lt; 200 GB、context &lt; 128K）則排除所有 744B 以上的模型（<a href="https://docs.aws.amazon.com/bedrock/latest/userguide/model-cards.html" rel="noopener" target="_blank">Bedrock model cards</a>；<a href="https://aws.amazon.com/about-aws/whats-new/2026/09/moonshot-ai-kimi-k3-on-amazon-bedrock/" rel="noopener" target="_blank">AWS What's New, 18 Sep 2026</a>；<a href="https://docs.aws.amazon.com/bedrock/latest/userguide/model-customization-import-model.html" rel="noopener" target="_blank">Bedrock Custom Model Import docs</a>）。</p>
+</div></div>
+<div class="prose"><figure class="tbl" data-cols="6" data-rows="16"><div aria-label="資料表" class="tbl-scroll" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th class="w2" scope="col">模式</th>
+<th class="w2" scope="col">你控制什麼</th>
+<th class="w2" scope="col">適合的模型</th>
+<th class="w3" scope="col">主要限制</th>
+<th class="w2" scope="col">計費單位</th>
+<th class="src" scope="col">來源</th>
+</tr>
+</thead>
+<tbody>
+<tr id="b2">
+<td><strong>1 第一方模型 API</strong>（Anthropic、OpenAI、Gemini API；Moonshot、Z.ai、DeepSeek、Alibaba Cloud）</td>
+<td>模型版本、請求參數、prompt caching；配額隨消費層級</td>
+<td>私有模型與開放權重模型的原廠端點</td>
+<td>Anthropic Scale 層每個模型類別 10,000 RPM、10M ITPM、2M OTPM <span class="g g-b" title="等級 B：廠商或夥伴公布，且揭露方法">B</span>，再高需 Custom；Anthropic Priority Tier 的容量承諾已停售；開放權重的原廠端點可能慢於第三方：Kimi K3 原廠 40 t/s，Bedrock 182 t/s（Artificial Analysis，10K 輸入，2026-10-04）<span class="g g-a" title="等級 A：獨立第三方量測">A</span></td>
+<td>每 1M token（輸入、輸出、cache 分開計價）</td>
+<td class="src"><a href="https://platform.claude.com/docs/en/api/rate-limits" rel="noopener" target="_blank">Anthropic rate limits</a>；<a href="https://platform.claude.com/docs/en/api/service-tiers" rel="noopener" target="_blank">Anthropic service tiers</a>；<a href="https://artificialanalysis.ai/models/kimi-k3/providers" rel="noopener" target="_blank">Artificial Analysis, Kimi K3 providers</a></td>
+</tr>
+<tr id="b3">
+<td><strong>2a Amazon Bedrock on-demand</strong>（Standard / Priority / Flex）</td>
+<td>模型 ID、service tier、端點（bedrock-runtime 或 bedrock-mantle）、prompt caching；硬體由 AWS 決定且不揭露</td>
+<td>Claude、Nova、GPT；開放權重有 Kimi K3、Kimi K2.5、GLM 5、DeepSeek V3.2、Qwen3、gpt-oss</td>
+<td>配額由同一帳號、同一 Region 的所有應用共用；Claude 的輸出 token 以 5×、10× 或 15× 扣配額 <span class="g g-b" title="等級 B：廠商或夥伴公布，且揭露方法">B</span>；目錄沒有 DeepSeek V4、GLM 5.1–5.3、Qwen3.5–3.8</td>
+<td>每 1M token；Kimi K3 模型卡載明 Priority = 1.75× Standard、Flex = 0.5× Standard</td>
+<td class="src"><a href="https://docs.aws.amazon.com/bedrock/latest/userguide/service-tiers-inference.html" rel="noopener" target="_blank">Bedrock service tiers</a>；<a href="https://docs.aws.amazon.com/bedrock/latest/userguide/quotas-token-burndown.html" rel="noopener" target="_blank">How tokens are counted in Amazon Bedrock</a>；<a href="https://aws.amazon.com/blogs/machine-learning/optimize-your-applications-for-scale-and-reliability-on-amazon-bedrock/" rel="noopener" target="_blank">AWS ML blog, 11 Feb 2026</a>；<a href="https://docs.aws.amazon.com/general/latest/gr/bedrock.html" rel="noopener" target="_blank">Amazon Bedrock endpoints and quotas</a>；<a href="https://docs.aws.amazon.com/bedrock/latest/userguide/model-cards.html" rel="noopener" target="_blank">Bedrock model cards</a>；<a href="https://docs.aws.amazon.com/bedrock/latest/userguide/model-card-moonshot-ai-kimi-k3.html" rel="noopener" target="_blank">Bedrock Kimi K3 model card</a></td>
+</tr>
+<tr id="b4">
+<td><strong>2b Bedrock cross-Region inference</strong>（geographic / global profile）</td>
+<td>選 profile：US、EU、APAC 地理區，或 global；不能指定實際處理的 Region</td>
+<td>沒有 In-Region 選項或需要較高配額的模型；Kimi K3 只有 US 與 global profile</td>
+<td>global profile「routes to any supported commercial AWS Region worldwide」，沒有駐留保證；inference profile 不支援 Provisioned Throughput</td>
+<td>以來源 Region 的價格計、無額外路由費；global 約便宜 10%</td>
+<td class="src"><a href="https://docs.aws.amazon.com/bedrock/latest/userguide/cross-region-inference.html" rel="noopener" target="_blank">Bedrock cross-Region inference</a>；<a href="https://docs.aws.amazon.com/bedrock/latest/userguide/model-card-moonshot-ai-kimi-k3.html" rel="noopener" target="_blank">Bedrock Kimi K3 model card</a></td>
+</tr>
+<tr id="b5">
+<td><strong>2c Google Vertex AI MaaS</strong>（文件現稱 Gemini Enterprise Agent Platform）</td>
+<td>模型 ID；Standard 或 Priority PayGo</td>
+<td>Gemini、Claude；開放權重在 2026-10-21 之後只剩 GLM 5.2（Preview）、gpt-oss-120b、Gemma 4、Llama 4</td>
+<td>多數開放模型端點已於 2026-07-21 deprecated、2026-10-21 停用；GLM 5.2 只有 PayGo，保證可用至少到 2026-10-31；Google 的替代方案是從 Model Garden 自行部署</td>
+<td>每 1M token；PayGo 以組織層級的 TPM 基線限流，沒有 RPM 上限</td>
+<td class="src"><a href="https://docs.cloud.google.com/gemini-enterprise-agent-platform/models/deprecations/open-models" rel="noopener" target="_blank">Vertex open model deprecations</a>；<a href="https://docs.cloud.google.com/gemini-enterprise-agent-platform/models/maas/zaiorg/glm-52" rel="noopener" target="_blank">Vertex GLM 5.2 page</a>；<a href="https://docs.cloud.google.com/gemini-enterprise-agent-platform/models/standard-paygo" rel="noopener" target="_blank">Standard PayGo</a>；<a href="https://docs.cloud.google.com/gemini-enterprise-agent-platform/models/provisioned-throughput/supported-models" rel="noopener" target="_blank">Provisioned Throughput supported models, updated 1 Oct 2026</a></td>
+</tr>
+<tr id="b6">
+<td><strong>2d Azure AI Foundry</strong>（Global Standard / Data Zone Standard）</td>
+<td>部署類型與部署 Region；TPM 配額分配到各 deployment</td>
+<td>GPT 系列；DeepSeek V4 Pro / Flash、Kimi K2.5–K2.7 Code（Preview）、gpt-oss-120b（Preview）</td>
+<td>沒有 Kimi K3；「sold by Azure」清單沒有 GLM 與 Qwen chat 模型；Data Zone Standard 配額是 Global Standard 的三分之一；Global Standard 可從 5 個亞太 Region 部署，但依名稱屬全球路由（筆記推論，未經 Microsoft 定義頁驗證）</td>
+<td>每 1M token；RPM / TPM 依訂閱層級（Tier 1–6）</td>
+<td class="src"><a href="https://learn.microsoft.com/en-us/azure/foundry/foundry-models/concepts/models-sold-directly-by-azure" rel="noopener" target="_blank">Foundry Models sold by Azure</a>；<a href="https://learn.microsoft.com/en-us/azure/foundry/foundry-models/concepts/models-sold-directly-by-azure-region-availability" rel="noopener" target="_blank">Azure region availability, 4 Sep 2026</a>；<a href="https://learn.microsoft.com/en-us/azure/foundry/openai/quotas-limits" rel="noopener" target="_blank">Azure OpenAI quotas and limits</a></td>
+</tr>
+<tr id="b7">
+<td class="rowhead"><strong>3a Bedrock Reserved tier</strong></td>
+<td>分別保留輸入 TPM 與輸出 TPM；期限 1 或 3 個月</td>
+<td>需要容量確定性的 Bedrock 模型；筆記所列開放權重模型卡（含 Kimi K3）的 Reserved 欄都是 No</td>
+<td>最低 100,000 輸入 TPM + 10,000 輸出 TPM <span class="g g-b" title="等級 B：廠商或夥伴公布，且揭露方法">B</span>；經 account team 申請；目標 uptime 99.5%；超出部分溢流到 Standard；支援的模型與價格筆記未取得</td>
+<td>每 1K TPM 固定價</td>
+<td class="src"><a href="https://docs.aws.amazon.com/bedrock/latest/userguide/service-tiers-inference.html" rel="noopener" target="_blank">Bedrock service tiers</a>；<a href="https://docs.aws.amazon.com/bedrock/latest/userguide/model-card-moonshot-ai-kimi-k3.html" rel="noopener" target="_blank">Bedrock Kimi K3 model card</a></td>
+</tr>
+<tr id="b8">
+<td class="rowhead"><strong>3b Bedrock Provisioned Throughput</strong></td>
+<td>購買 model unit（MU）；no-commitment、1 個月或 6 個月</td>
+<td>需要專屬吞吐量的 Bedrock 模型（適用模型清單筆記未取得）</td>
+<td>每 MU 的吞吐量與價格不公開（「contact your AWS account manager」）；不能搭配 inference profile，也就不能搭配 cross-Region inference</td>
+<td>MU（以輸入、輸出 TPM 定義）；另有「by Tokens」模式</td>
+<td class="src"><a href="https://docs.aws.amazon.com/bedrock/latest/userguide/prov-throughput.html" rel="noopener" target="_blank">Bedrock Provisioned Throughput</a>；<a href="https://docs.aws.amazon.com/bedrock/latest/userguide/prov-thru-purchase.html" rel="noopener" target="_blank">Purchase Provisioned Throughput</a>；<a href="https://docs.aws.amazon.com/bedrock/latest/userguide/cross-region-inference.html" rel="noopener" target="_blank">Bedrock cross-Region inference</a></td>
+</tr>
+<tr id="b9">
+<td class="num rowhead"><strong>3c Azure PTU</strong></td>
+<td>PTU 數量與部署類型（global、data zone、regional）</td>
+<td>GPT 系列；DeepSeek V4 Pro（每 PTU 100 輸入 TPM）、DeepSeek V3.2、gpt-oss-120b</td>
+<td>最低 15 PTU、級距 5（regional 為 50）；DeepSeek V4 Pro 與 GLM 5.2 最低 800 PTU <span class="g g-b" title="等級 B：廠商或夥伴公布，且揭露方法">B</span>；1 個月或 1 年 reservation「don't guarantee capacity」；用滿 100% 即回 429 或 spillover 到 standard</td>
+<td>PTU-小時，或 1 個月 / 1 年 reservation</td>
+<td class="src"><a href="https://learn.microsoft.com/en-us/azure/foundry/openai/how-to/provisioned-throughput-sizing" rel="noopener" target="_blank">PTU sizing</a>；<a href="https://learn.microsoft.com/en-us/azure/foundry/openai/concepts/provisioned-throughput-billing" rel="noopener" target="_blank">PTU billing, updated 22 May 2026</a>；<a href="https://learn.microsoft.com/en-us/azure/foundry/openai/how-to/spillover-traffic-management" rel="noopener" target="_blank">Azure spillover</a></td>
+</tr>
+<tr id="b10">
+<td class="rowhead"><strong>3d Google Provisioned Throughput</strong></td>
+<td>GSU 數量；綁定 project × region × model × version</td>
+<td>Gemini、Claude；清單內的開放模型端點多數將於 2026-10-21 停用</td>
+<td>最低 1 GSU（數個 Claude 模型為 25–35 GSU）<span class="g g-b" title="等級 B：廠商或夥伴公布，且揭露方法">B</span>；GLM 5.2 不支援；「Throughput doesn't accumulate」</td>
+<td>GSU（tokens/s，輸出與 cache 以 burndown 折算）；期限 1 週、1 個月、3 個月、1 年；超出部分預設溢流到 PayGo</td>
+<td class="src"><a href="https://docs.cloud.google.com/gemini-enterprise-agent-platform/models/provisioned-throughput/supported-models" rel="noopener" target="_blank">Provisioned Throughput supported models, updated 1 Oct 2026</a>；<a href="https://docs.cloud.google.com/gemini-enterprise-agent-platform/models/provisioned-throughput/measure-provisioned-throughput" rel="noopener" target="_blank">Calculate Provisioned Throughput requirements</a>；<a href="https://docs.cloud.google.com/gemini-enterprise-agent-platform/models/maas/zaiorg/glm-52" rel="noopener" target="_blank">Vertex GLM 5.2 page</a></td>
+</tr>
+<tr id="b11">
+<td><strong>2e / 3e Cerebras Inference</strong>（Shared / Dedicated）</td>
+<td>Shared：模型與參數；Dedicated：保留容量、微調權重、draft model 與量化設定</td>
+<td>Shared 只有 gpt-oss-120b 與 qwen-3.8-27b；Dedicated 另列 GLM 4.X / 5.X、Kimi K2.X、DeepSeek V3.X 等家族</td>
+<td>公開 API 的 context 上限 131K；Developer 層 gpt-oss-120b 為 1,000 RPM、1M uncached TPM、3M total TPM <span class="g g-b" title="等級 B：廠商或夥伴公布，且揭露方法">B</span>；Dedicated 的 context、價格、SLA 未公開</td>
+<td>每 1M token（cache 命中不打折）；Dedicated 洽業務</td>
+<td class="src"><a href="https://inference-docs.cerebras.ai/models/overview" rel="noopener" target="_blank">Cerebras model catalog</a>；<a href="https://inference-docs.cerebras.ai/support/rate-limits" rel="noopener" target="_blank">Cerebras rate limits</a>；<a href="https://inference-docs.cerebras.ai/dedicated/overview" rel="noopener" target="_blank">Cerebras Dedicated Inference</a>；<a href="https://inference-docs.cerebras.ai/capabilities/prompt-caching" rel="noopener" target="_blank">Cerebras prompt caching</a></td>
+</tr>
+<tr id="b12">
+<td class="rowhead"><strong>4a Bedrock Custom Model Import</strong></td>
+<td>自有權重；不管理執行個體，走 Bedrock API</td>
+<td>&lt; 200 GB 的自訂文字模型：Mistral、Mixtral、Llama 2–3.3、Qwen2 / 2.5 / 3、GPT-OSS 等架構</td>
+<td>文字模型 &lt; 200 GB、多模態 &lt; 100 GB、context &lt; 128K；DeepSeek 架構不在清單；只在 us-east-1、us-east-2、us-west-2、eu-central-1（GPT-OSS 只在 us-east-1）；無 batch、無 embedding；cold start 行為查無公開資料</td>
+<td>指定筆記未記錄</td>
+<td class="src"><a href="https://docs.aws.amazon.com/bedrock/latest/userguide/model-customization-import-model.html" rel="noopener" target="_blank">Bedrock Custom Model Import docs</a></td>
+</tr>
+<tr id="b13">
+<td class="rowhead"><strong>4b SageMaker endpoints</strong></td>
+<td>容器（vLLM、SGLang、TensorRT-LLM、Hugging Face、LMI）、執行個體類型、自動擴展；OpenAI 相容路徑（2026-05，14 個 Region）</td>
+<td>單一執行個體放得下的開放或自訂權重模型</td>
+<td>以端點的執行個體為單位；兆級參數模型所需的跨節點單一 replica 未見於來源；LMI 已於 2025-11 移除 Neuron，只剩 GPU 後端</td>
+<td>端點的執行個體</td>
+<td class="src"><a href="https://aws.amazon.com/blogs/machine-learning/amazon-sagemaker-inference-2026-year-to-date-launches-in-review/" rel="noopener" target="_blank">AWS ML blog, 18 Sep 2026</a>；<a href="https://github.com/deepjavalibrary/djl-serving/pull/2939" rel="noopener" target="_blank">DJL PR #2939</a></td>
+</tr>
+<tr id="b14">
+<td class="rowhead"><strong>4c SageMaker HyperPod Inference</strong></td>
+<td>EKS 叢集加上 AWS 受管 operator；PD（EFA，2026-07）、受管 tiered KV cache、intelligent routing、model caching（2026-09）</td>
+<td>需要 PD 與 KV tiering 的大型開放權重模型（GPU）</td>
+<td>仍須自行維運叢集與容量</td>
+<td>叢集的執行個體</td>
+<td class="src"><a href="https://aws.amazon.com/blogs/machine-learning/amazon-sagemaker-inference-2026-year-to-date-launches-in-review/" rel="noopener" target="_blank">AWS ML blog, 18 Sep 2026</a>；<a href="https://blog.lmcache.ai/en/2026/09/15/lmcache-on-amazon-sagemaker-hyperpod-disaggregated-prefill-and-decode/" rel="noopener" target="_blank">LMCache blog, 15 Sep 2026</a></td>
+</tr>
+<tr id="b15">
+<td><strong>5 自管 Kubernetes 或執行個體</strong>（EKS、GKE、EC2）</td>
+<td>引擎、量化、parallelism、路由、KV tier、擴展策略</td>
+<td>受管目錄沒有的旗艦開放權重模型（GLM-5.2、DeepSeek V4 等）與 1M context</td>
+<td>自備容量（Capacity Blocks、reservation）；PD 需要 RDMA；控制面仍在變動：llm-d 未到 1.0、KServe <code>LLMInferenceService</code> 為 v1alpha2、Dynamo v1.5.0 列 12 個 known issues</td>
+<td>GPU 或晶片-小時</td>
+<td class="src"><a href="https://github.com/llm-d/llm-d/releases" rel="noopener" target="_blank">llm-d releases</a>；<a href="https://docs.nvidia.com/dynamo/dev/reference/releases/v1-5-0" rel="noopener" target="_blank">Dynamo v1.5.0 notes</a>；<a href="https://kserve.github.io/website/blog/kserve-0.18-release" rel="noopener" target="_blank">KServe v0.18 blog</a>；<a href="https://repost.aws/articles/AR7P2P1LpBTQuAqWJPjN-odg/deploying-glm-5-2-on-amazon-eks-using-vllm-deep-learning-containers-dlcs-and-fsx-for-lustre" rel="noopener" target="_blank">AWS re:Post</a></td>
+</tr>
+<tr id="b16">
+<td class="rowhead"><strong>6a 地端：Cerebras CS-3 / CS-4</strong></td>
+<td>整套系統與其上的模型</td>
+<td>以 per-user 速度為價值、且放得進少數晶圓的模型（每晶圓 44 GB SRAM）</td>
+<td>CS-3 每引擎約 25 kW、客製液冷（分析師）；CS-4 每機櫃 120–140 kW、價格未公開；1T 參數模型約需 20 套 CS-3（單一來源，2026-05-20）</td>
+<td>硬體採購；CS-3 每機櫃 BoM 約 $450k（分析師，2026-05-13）</td>
+<td class="src"><a href="https://www.sec.gov/Archives/edgar/data/2021728/000162828026056186/cbrsannouncesfinancialresu.htm" rel="noopener" target="_blank">Cerebras Q2 2026 results, SEC</a>；<a href="https://newsletter.semianalysis.com/p/cerebras-faster-tokens-please" rel="noopener" target="_blank">SemiAnalysis, 13 May 2026</a>；<a href="https://futurumgroup.com/insights/cerebras-cs-4-makes-the-rack-the-new-chip-by-doubling-power-and-tripling-wafers/" rel="noopener" target="_blank">Futurum Group, Aug 2026</a>；<a href="https://venturebeat.com/technology/cerebras-says-its-chips-run-a-trillion-parameter-ai-model-nearly-7-times-faster-than-gpu-clouds" rel="noopener" target="_blank">VentureBeat, 20 May 2026</a></td>
+</tr>
+<tr id="b17">
+<td class="rowhead"><strong>6b 地端：GPU 機櫃與節點</strong></td>
+<td>從硬體到引擎全部</td>
+<td>必須留在自有機房的開放權重模型</td>
+<td>以尖峰容量採購（NVIDIA：「Pricing model: per peak capacity」）；Vera Rubin NVL72 全液冷、45 °C 進水、約 4,000 lb；NVL72 級機櫃功率查無原廠數字</td>
+<td>硬體採購；Vera Rubin 每機櫃約 $3.5–4.0M、Helios 約 $5.0–5.5M（分析師，2026-07-21）</td>
+<td class="src"><a href="https://developer-blogs.nvidia.com/wp-content/uploads/2024/08/S62797-LLM-Inference-Sizing_-Benchmarking-End-to-End-Inference-Systems.pdf" rel="noopener" target="_blank">NVIDIA S62797 slides</a>；<a href="https://www.nvidia.com/en-us/data-center/vera-rubin-nvl72/" rel="noopener" target="_blank">NVIDIA Vera Rubin NVL72 page</a>；<a href="https://www.trendforce.com/news/2026/07/21/news-amds-first-rack-scale-ai-system-helios-challenges-nvidia-with-hbm4-memory-edge-but-reportedly-comes-at-a-higher-price/" rel="noopener" target="_blank">TrendForce, 21 Jul 2026</a></td>
+</tr>
+</tbody>
+</table></div></figure>
+<ul>
+<li id="b18"><strong>兩個端點、一個引擎</strong>：bedrock-runtime 與 bedrock-mantle 的配額分開計算；開放權重 serverless 模型由 Project Mantle 推論引擎提供（2026-02-10 公告），AWS 沒有說明各模型用哪種加速器（<a href="https://docs.aws.amazon.com/bedrock/latest/userguide/quotas.html" rel="noopener" target="_blank">Quotas for Amazon Bedrock</a>；<a href="https://aws.amazon.com/about-aws/whats-new/2026/02/amazon-bedrock-adds-support-six-open-weights-models/" rel="noopener" target="_blank">AWS What's New, 10 Feb 2026</a>）。</li>
+<li id="b19"><strong>台灣與亞太的 Region 現況</strong>：Kimi K3 可從 ap-east-2（Taipei）呼叫，但只能走 global profile；較舊的開放權重模型是 In-Region，亞太在 Tokyo、Mumbai、Sydney、Jakarta、Melbourne，沒有 Taipei、Singapore、Seoul、Hong Kong（<a href="https://docs.aws.amazon.com/bedrock/latest/userguide/model-card-moonshot-ai-kimi-k3.html" rel="noopener" target="_blank">Bedrock Kimi K3 model card</a>；<a href="https://docs.aws.amazon.com/bedrock/latest/userguide/model-card-moonshot-ai-kimi-k2-5.html" rel="noopener" target="_blank">Bedrock Kimi K2.5 model card</a>）。</li>
+<li id="b20"><strong>Custom Model Import 出局的算式</strong> <span class="g g-d" title="等級 D：本文推算，附算式">D</span>：744B × 8 bit ÷ 8 = 744 GB，1.6T × 4 bit ÷ 8 = 800 GB，都超過 200 GB；1M context 的模型也超過 128K 上限。</li>
+</ul>
+<div class="formula"><span class="katex-display"><span class="katex"><span class="katex-mathml"><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>W</mi><mrow><mi mathvariant="normal">G</mi><mi mathvariant="normal">B</mi></mrow></msub><mo>=</mo><msub><mi>P</mi><mi mathvariant="normal">B</mi></msub><mo>×</mo><mfrac><mi>b</mi><mn>8</mn></mfrac></mrow><annotation encoding="application/x-tex">W_{\mathrm{GB}} = P_{\mathrm{B}} \times \frac{b}{8}</annotation></semantics></math></span><span aria-hidden="true" class="katex-html"><span class="katex-base"><span class="katex-strut" style="height:0.8333em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.1389em;">W</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3283em;"><span style="top:-2.55em;margin-left:-0.1389em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight"><span class="mord mathrm mtight">GB</span></span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.8333em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.1389em;">P</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3283em;"><span style="top:-2.55em;margin-left:-0.1389em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathrm mtight">B</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:2.0574em;vertical-align:-0.686em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.3714em;"><span style="top:-2.314em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord">8</span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.677em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord mathnormal">b</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.686em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span></span></span></span></span></div>
+<ul>
+<li id="b21"><strong>自管堆疊是分層而非互斥</strong>：Gateway API Inference Extension（GA）定義路由 API；llm-d（v0.9.0，2026-08-17，未到 1.0）或 NVIDIA Dynamo（v1.5.0，2026-09-18，GA）的 endpoint picker 負責排程；LeaderWorkerSet 或 Grove 把跨節點的一個模型 replica 當成一個單位，引擎是 vLLM、SGLang 或 TensorRT-LLM。KServe v0.18（2026-04-29）以 <code>LLMInferenceService</code>（API v1alpha2）包裝 llm-d v0.6（<a href="https://github.com/kubernetes-sigs/gateway-api-inference-extension" rel="noopener" target="_blank">kubernetes-sigs/gateway-api-inference-extension</a>；<a href="https://github.com/llm-d/llm-d/releases" rel="noopener" target="_blank">llm-d releases</a>；<a href="https://docs.nvidia.com/dynamo/dev/reference/releases/v1-5-0" rel="noopener" target="_blank">Dynamo v1.5.0 notes</a>；<a href="https://kserve.github.io/website/blog/kserve-0.18-release" rel="noopener" target="_blank">KServe v0.18 blog</a>）。</li>
+<li id="b22"><strong>已宣布但不能拿來設計的項目</strong>：Bedrock 上的 Cerebras（2026-03-13 宣布，Cerebras 2026-08-12 財報稱預期 2027 Q1）；Bedrock latency-optimized inference 自 2024-12 至今仍是 Preview，只涵蓋 Claude 3.5 Haiku、Llama 3.1、Nova Pro，Region 為 Ohio 與 Oregon（<a href="https://www.aboutamazon.com/news/aws/aws-cerebras-ai-inference" rel="noopener" target="_blank">About Amazon, 13 Mar 2026</a>；<a href="https://www.sec.gov/Archives/edgar/data/2021728/000162828026056186/cbrsannouncesfinancialresu.htm" rel="noopener" target="_blank">Cerebras Q2 2026 results, SEC</a>；<a href="https://docs.aws.amazon.com/bedrock/latest/userguide/latency-optimized-inference.html" rel="noopener" target="_blank">Bedrock User Guide, latency-optimized inference</a>）。</li>
+<li id="b23"><strong>AWS 地端與一處來源不一致</strong>：Trainium 只透過 EC2 提供，Amazon 表示未來「a real chance」對外供應（2026-07-30）；AWS Outposts、AWS AI Factories 等地端方案在指定筆記中沒有資料。Azure 的 PTU sizing 頁列有 GLM 5.x 與 Qwen 3.x 的 PTU 費率，「Foundry Models sold by Azure」清單卻沒有這兩個家族（<a href="https://www.aboutamazon.com/news/company-news/amazon-ceo-andy-jassy-2025-letter-to-shareholders" rel="noopener" target="_blank">Amazon shareholder letter, 9 Apr 2026</a>；<a href="https://stockanalysis.com/stocks/amzn/transcripts/657334-q2-2026/" rel="noopener" target="_blank">Amazon Q2 2026 call transcript, stockanalysis.com</a>；<a href="https://learn.microsoft.com/en-us/azure/foundry/openai/how-to/provisioned-throughput-sizing" rel="noopener" target="_blank">PTU sizing</a>；<a href="https://learn.microsoft.com/en-us/azure/foundry/foundry-models/concepts/models-sold-directly-by-azure" rel="noopener" target="_blank">Foundry Models sold by Azure</a>）。</li>
+</ul>
+</div>
+<details class="srcs"><summary>本節來源（51）</summary><ul><li><a href="https://docs.aws.amazon.com/bedrock/latest/userguide/model-cards.html" target="_blank" rel="noopener">Bedrock model cards</a></li><li><a href="https://aws.amazon.com/about-aws/whats-new/2026/09/moonshot-ai-kimi-k3-on-amazon-bedrock/" target="_blank" rel="noopener">AWS What&#x27;s New, 18 Sep 2026</a></li><li><a href="https://docs.aws.amazon.com/bedrock/latest/userguide/model-customization-import-model.html" target="_blank" rel="noopener">Bedrock Custom Model Import docs</a></li><li><a href="https://platform.claude.com/docs/en/api/rate-limits" target="_blank" rel="noopener">Anthropic rate limits</a></li><li><a href="https://platform.claude.com/docs/en/api/service-tiers" target="_blank" rel="noopener">Anthropic service tiers</a></li><li><a href="https://artificialanalysis.ai/models/kimi-k3/providers" target="_blank" rel="noopener">Artificial Analysis, Kimi K3 providers</a></li><li><a href="https://docs.aws.amazon.com/bedrock/latest/userguide/service-tiers-inference.html" target="_blank" rel="noopener">Bedrock service tiers</a></li><li><a href="https://docs.aws.amazon.com/bedrock/latest/userguide/quotas-token-burndown.html" target="_blank" rel="noopener">How tokens are counted in Amazon Bedrock</a></li><li><a href="https://aws.amazon.com/blogs/machine-learning/optimize-your-applications-for-scale-and-reliability-on-amazon-bedrock/" target="_blank" rel="noopener">AWS ML blog, 11 Feb 2026</a></li><li><a href="https://docs.aws.amazon.com/general/latest/gr/bedrock.html" target="_blank" rel="noopener">Amazon Bedrock endpoints and quotas</a></li><li><a href="https://docs.aws.amazon.com/bedrock/latest/userguide/model-card-moonshot-ai-kimi-k3.html" target="_blank" rel="noopener">Bedrock Kimi K3 model card</a></li><li><a href="https://docs.aws.amazon.com/bedrock/latest/userguide/cross-region-inference.html" target="_blank" rel="noopener">Bedrock cross-Region inference</a></li><li><a href="https://docs.cloud.google.com/gemini-enterprise-agent-platform/models/deprecations/open-models" target="_blank" rel="noopener">Vertex open model deprecations</a></li><li><a href="https://docs.cloud.google.com/gemini-enterprise-agent-platform/models/maas/zaiorg/glm-52" target="_blank" rel="noopener">Vertex GLM 5.2 page</a></li><li><a href="https://docs.cloud.google.com/gemini-enterprise-agent-platform/models/standard-paygo" target="_blank" rel="noopener">Standard PayGo</a></li><li><a href="https://docs.cloud.google.com/gemini-enterprise-agent-platform/models/provisioned-throughput/supported-models" target="_blank" rel="noopener">Provisioned Throughput supported models, updated 1 Oct 2026</a></li><li><a href="https://learn.microsoft.com/en-us/azure/foundry/foundry-models/concepts/models-sold-directly-by-azure" target="_blank" rel="noopener">Foundry Models sold by Azure</a></li><li><a href="https://learn.microsoft.com/en-us/azure/foundry/foundry-models/concepts/models-sold-directly-by-azure-region-availability" target="_blank" rel="noopener">Azure region availability, 4 Sep 2026</a></li><li><a href="https://learn.microsoft.com/en-us/azure/foundry/openai/quotas-limits" target="_blank" rel="noopener">Azure OpenAI quotas and limits</a></li><li><a href="https://docs.aws.amazon.com/bedrock/latest/userguide/prov-throughput.html" target="_blank" rel="noopener">Bedrock Provisioned Throughput</a></li><li><a href="https://docs.aws.amazon.com/bedrock/latest/userguide/prov-thru-purchase.html" target="_blank" rel="noopener">Purchase Provisioned Throughput</a></li><li><a href="https://learn.microsoft.com/en-us/azure/foundry/openai/how-to/provisioned-throughput-sizing" target="_blank" rel="noopener">PTU sizing</a></li><li><a href="https://learn.microsoft.com/en-us/azure/foundry/openai/concepts/provisioned-throughput-billing" target="_blank" rel="noopener">PTU billing, updated 22 May 2026</a></li><li><a href="https://learn.microsoft.com/en-us/azure/foundry/openai/how-to/spillover-traffic-management" target="_blank" rel="noopener">Azure spillover</a></li><li><a href="https://docs.cloud.google.com/gemini-enterprise-agent-platform/models/provisioned-throughput/measure-provisioned-throughput" target="_blank" rel="noopener">Calculate Provisioned Throughput requirements</a></li><li><a href="https://inference-docs.cerebras.ai/models/overview" target="_blank" rel="noopener">Cerebras model catalog</a></li><li><a href="https://inference-docs.cerebras.ai/support/rate-limits" target="_blank" rel="noopener">Cerebras rate limits</a></li><li><a href="https://inference-docs.cerebras.ai/dedicated/overview" target="_blank" rel="noopener">Cerebras Dedicated Inference</a></li><li><a href="https://inference-docs.cerebras.ai/capabilities/prompt-caching" target="_blank" rel="noopener">Cerebras prompt caching</a></li><li><a href="https://aws.amazon.com/blogs/machine-learning/amazon-sagemaker-inference-2026-year-to-date-launches-in-review/" target="_blank" rel="noopener">AWS ML blog, 18 Sep 2026</a></li><li><a href="https://github.com/deepjavalibrary/djl-serving/pull/2939" target="_blank" rel="noopener">DJL PR #2939</a></li><li><a href="https://blog.lmcache.ai/en/2026/09/15/lmcache-on-amazon-sagemaker-hyperpod-disaggregated-prefill-and-decode/" target="_blank" rel="noopener">LMCache blog, 15 Sep 2026</a></li><li><a href="https://github.com/llm-d/llm-d/releases" target="_blank" rel="noopener">llm-d releases</a></li><li><a href="https://docs.nvidia.com/dynamo/dev/reference/releases/v1-5-0" target="_blank" rel="noopener">Dynamo v1.5.0 notes</a></li><li><a href="https://kserve.github.io/website/blog/kserve-0.18-release" target="_blank" rel="noopener">KServe v0.18 blog</a></li><li><a href="https://repost.aws/articles/AR7P2P1LpBTQuAqWJPjN-odg/deploying-glm-5-2-on-amazon-eks-using-vllm-deep-learning-containers-dlcs-and-fsx-for-lustre" target="_blank" rel="noopener">AWS re:Post</a></li><li><a href="https://www.sec.gov/Archives/edgar/data/2021728/000162828026056186/cbrsannouncesfinancialresu.htm" target="_blank" rel="noopener">Cerebras Q2 2026 results, SEC</a></li><li><a href="https://newsletter.semianalysis.com/p/cerebras-faster-tokens-please" target="_blank" rel="noopener">SemiAnalysis, 13 May 2026</a></li><li><a href="https://futurumgroup.com/insights/cerebras-cs-4-makes-the-rack-the-new-chip-by-doubling-power-and-tripling-wafers/" target="_blank" rel="noopener">Futurum Group, Aug 2026</a></li><li><a href="https://venturebeat.com/technology/cerebras-says-its-chips-run-a-trillion-parameter-ai-model-nearly-7-times-faster-than-gpu-clouds" target="_blank" rel="noopener">VentureBeat, 20 May 2026</a></li><li><a href="https://developer-blogs.nvidia.com/wp-content/uploads/2024/08/S62797-LLM-Inference-Sizing_-Benchmarking-End-to-End-Inference-Systems.pdf" target="_blank" rel="noopener">NVIDIA S62797 slides</a></li><li><a href="https://www.nvidia.com/en-us/data-center/vera-rubin-nvl72/" target="_blank" rel="noopener">NVIDIA Vera Rubin NVL72 page</a></li><li><a href="https://www.trendforce.com/news/2026/07/21/news-amds-first-rack-scale-ai-system-helios-challenges-nvidia-with-hbm4-memory-edge-but-reportedly-comes-at-a-higher-price/" target="_blank" rel="noopener">TrendForce, 21 Jul 2026</a></li><li><a href="https://docs.aws.amazon.com/bedrock/latest/userguide/quotas.html" target="_blank" rel="noopener">Quotas for Amazon Bedrock</a></li><li><a href="https://aws.amazon.com/about-aws/whats-new/2026/02/amazon-bedrock-adds-support-six-open-weights-models/" target="_blank" rel="noopener">AWS What&#x27;s New, 10 Feb 2026</a></li><li><a href="https://docs.aws.amazon.com/bedrock/latest/userguide/model-card-moonshot-ai-kimi-k2-5.html" target="_blank" rel="noopener">Bedrock Kimi K2.5 model card</a></li><li><a href="https://github.com/kubernetes-sigs/gateway-api-inference-extension" target="_blank" rel="noopener">kubernetes-sigs/gateway-api-inference-extension</a></li><li><a href="https://www.aboutamazon.com/news/aws/aws-cerebras-ai-inference" target="_blank" rel="noopener">About Amazon, 13 Mar 2026</a></li><li><a href="https://docs.aws.amazon.com/bedrock/latest/userguide/latency-optimized-inference.html" target="_blank" rel="noopener">Bedrock User Guide, latency-optimized inference</a></li><li><a href="https://www.aboutamazon.com/news/company-news/amazon-ceo-andy-jassy-2025-letter-to-shareholders" target="_blank" rel="noopener">Amazon shareholder letter, 9 Apr 2026</a></li><li><a href="https://stockanalysis.com/stocks/amzn/transcripts/657334-q2-2026/" target="_blank" rel="noopener">Amazon Q2 2026 call transcript, stockanalysis.com</a></li></ul></details></section>
+<section class="panel" role="tabpanel" id="s2" aria-labelledby="tab-s2"><div class="panel-head"><h2>各晶片可用的部署模式與優缺點</h2><div class="sec-lead prose"><p id="b24">五個家族中只有 GPU 在 6 類部署模式都買得到；Trainium2 的自助取得只有 4 個 Region 的 Capacity Blocks，Trainium3 在宣布 GA（2025-12-02）10 個月後仍無公開價格與 Region 清單。叢集層技術裡，有量測支持的最大槓桿是 prefix-aware routing（P90 TTFT 31.083 s → 0.542 s <span class="g g-b" title="等級 B：廠商或夥伴公布，且揭露方法">B</span>）與共享 KV tier（每 GPU-hour 輸出 token 3.7 倍 <span class="g g-b" title="等級 B：廠商或夥伴公布，且揭露方法">B</span>）；PD disaggregation 改善的是尾端 ITL，TTFT 通常變差，而且沒有 RDMA 就不成立。</p>
+</div></div>
+<div class="subtabs"><div class="subtablist" role="tablist" aria-label="各晶片可用的部署模式與優缺點"><button type="button" class="subtab" role="tab" id="tab-s2-1" aria-controls="s2-1" aria-selected="true">可用性矩陣</button><button type="button" class="subtab" role="tab" id="tab-s2-2" aria-controls="s2-2" aria-selected="false">叢集層技術的證據</button><button type="button" class="subtab" role="tab" id="tab-s2-3" aria-controls="s2-3" aria-selected="false">叢集層技術在各家族的狀態</button><button type="button" class="subtab" role="tab" id="tab-s2-4" aria-controls="s2-4" aria-selected="false">各家族的部署優缺點</button></div><div class="subpanel on" role="tabpanel" id="s2-1" aria-labelledby="tab-s2-1"><div class="prose"><h3>可用性矩陣</h3><figure class="tbl" data-cols="7" data-rows="10"><div aria-label="資料表" class="tbl-scroll" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th class="w2" scope="col">加速器</th>
+<th class="w3" scope="col">受管 API（serverless）</th>
+<th class="w2" scope="col">保留 / 專屬容量</th>
+<th class="w2" scope="col">受管自訂權重</th>
+<th class="w3" scope="col">自管（執行個體 / Kubernetes）</th>
+<th class="w2" scope="col">地端 / 買斷</th>
+<th class="src" scope="col">來源</th>
+</tr>
+</thead>
+<tbody>
+<tr id="b25">
+<td class="rowhead"><strong>Trainium1</strong>（Trn1、Trn1n）</td>
+<td>未見對外服務的證據</td>
+<td>Capacity Blocks：trn1.32xlarge，價目頁列 7 個 Region（含 Mumbai、Melbourne、Sydney、Stockholm）</td>
+<td>SageMaker 的 Hugging Face 容器（Neuron SDK 2.26.x）；SageMaker LMI 的 Neuron 支援已停用（2025-11）</td>
+<td>on-demand 只在 N. Virginia、Ohio、Oregon；引擎為維護模式（NxDI + vLLM 0.16）</td>
+<td class="muted">否</td>
+<td class="src"><a href="https://aws.amazon.com/ec2/capacityblocks/pricing/" rel="noopener" target="_blank">AWS Capacity Blocks pricing</a>；<a href="https://b0.p.awsstatic.com/pricing/2.0/meteredUnitMaps/ec2/USD/current/ec2-ondemand-without-sec-sel/US%20East%20%28Ohio%29/Linux/index.json" rel="noopener" target="_blank">AWS price list, Ohio</a>；<a href="https://github.com/huggingface/optimum-neuron/blob/main/docs/source/containers.mdx" rel="noopener" target="_blank">Optimum Neuron containers doc</a>；<a href="https://github.com/deepjavalibrary/djl-serving/pull/2939" rel="noopener" target="_blank">DJL PR #2939</a>；<a href="https://awsdocs-neuron.readthedocs-hosted.com/en/latest/about-neuron/announcements/neuron2.x/announce-nxdi-maintenance-support-2-31.html" rel="noopener" target="_blank">NxDI maintenance announcement</a></td>
+</tr>
+<tr id="b26">
+<td class="rowhead"><strong>Trainium2</strong>（Trn2）</td>
+<td>Bedrock latency-optimized inference：Preview（自 2024-12；Ohio、Oregon）；Claude 跑在超過 100 萬顆 Trainium2 上（2026-07-31）<span class="g g-c" title="等級 C：廠商宣稱或規格，未揭露方法">C</span>；個別模型用哪種硬體不揭露</td>
+<td>Capacity Blocks 是唯一自助途徑：trn2.48xlarge 在 Ohio、Hyderabad；trn2.3xlarge 在 Hyderabad、Melbourne、São Paulo</td>
+<td class="muted"><span class="chip chip-na">查無公開資料</span></td>
+<td>無 on-demand 價格；引擎為 vLLM Neuron（Beta，0.24.0.1.1.0，2026-08-17）；Trn2 UltraServer 仍標示 Preview</td>
+<td>否：Amazon 稱晶片只透過 EC2 變現（2026-04-09）</td>
+<td class="src"><a href="https://docs.aws.amazon.com/bedrock/latest/userguide/latency-optimized-inference.html" rel="noopener" target="_blank">Bedrock User Guide, latency-optimized inference</a>；<a href="https://www.aboutamazon.com/news/aws/amazon-ai-chips-business-history" rel="noopener" target="_blank">About Amazon, 31 Jul 2026</a>；<a href="https://aws.amazon.com/ec2/capacityblocks/pricing/" rel="noopener" target="_blank">AWS Capacity Blocks pricing</a>；<a href="https://docs.aws.amazon.com/ec2/latest/instancetypes/ec2-instance-regions.html" rel="noopener" target="_blank">AWS EC2, instance types by Region</a>；<a href="https://github.com/vllm-project/vllm-neuron/blob/release-0.24.0.1.1.0/README.md" rel="noopener" target="_blank">vLLM Neuron README</a>；<a href="https://aws.amazon.com/ec2/instance-types/trn2/" rel="noopener" target="_blank">AWS EC2 Trn2 page</a>；<a href="https://www.aboutamazon.com/news/company-news/amazon-ceo-andy-jassy-2025-letter-to-shareholders" rel="noopener" target="_blank">Amazon shareholder letter, 9 Apr 2026</a></td>
+</tr>
+<tr id="b27">
+<td class="rowhead"><strong>Trainium3</strong>（Trn3 UltraServer）</td>
+<td>Bedrock「already serving production workloads on Trainium3」（2025-12-02）<span class="g g-c" title="等級 C：廠商宣稱或規格，未揭露方法">C</span>，模型未揭露；Trainium3 prefill + Cerebras decode：已宣布未出貨（預期 2027 Q1）</td>
+<td>Capacity Blocks 價目頁沒有 Trn3</td>
+<td class="muted"><span class="chip chip-na">查無公開資料</span></td>
+<td>2025-12-02 宣布 GA；至 2026-10-04 無公開價格、無 Region 清單；2025-12 的教學須洽 AWS 取得 private Beta AMI；EKS 文件稱執行個體家族為 Trn3pds</td>
+<td class="muted">否</td>
+<td class="src"><a href="https://www.aboutamazon.com/news/aws/trainium-3-ultraserver-faster-ai-training-lower-cost" rel="noopener" target="_blank">About Amazon, 2 Dec 2025</a>；<a href="https://aws.amazon.com/ec2/instance-types/trn3/" rel="noopener" target="_blank">AWS EC2 Trn3 page</a>；<a href="https://aws.amazon.com/ec2/capacityblocks/pricing/" rel="noopener" target="_blank">AWS Capacity Blocks pricing</a>；<a href="https://docs.aws.amazon.com/ec2/latest/instancetypes/ec2-instance-regions.html" rel="noopener" target="_blank">AWS EC2, instance types by Region</a>；<a href="https://awsdocs-neuron.readthedocs-hosted.com/en/latest/libraries/nxd-inference/tutorials/trn3-gpt-oss-120b-tutorial.html" rel="noopener" target="_blank">NxDI Trn3 gpt-oss-120b tutorial</a>；<a href="https://awsdocs-neuron.readthedocs-hosted.com/en/latest/deploy/eks/ultraserver-operator.html" rel="noopener" target="_blank">Neuron docs, UltraServer operator</a>；<a href="https://www.sec.gov/Archives/edgar/data/2021728/000162828026056186/cbrsannouncesfinancialresu.htm" rel="noopener" target="_blank">Cerebras Q2 2026 results, SEC</a></td>
+</tr>
+<tr id="b28">
+<td class="rowhead"><strong>Inferentia2</strong>（Inf2）</td>
+<td><span class="chip chip-na">查無公開資料</span><span class="chip-note">Bedrock 是否使用 Inferentia</span></td>
+<td>reserved 價格筆記未取得</td>
+<td>SageMaker 的 Hugging Face 容器；Hugging Face Inference Endpoints 有「INF2」選項</td>
+<td>on-demand，14 個 Region：含 Tokyo、Singapore、Sydney、Mumbai，Seoul 只有 xlarge；沒有 Taipei、Hong Kong、Osaka；軟體為維護模式</td>
+<td class="muted">否</td>
+<td class="src"><a href="https://b0.p.awsstatic.com/pricing/2.0/meteredUnitMaps/ec2/USD/current/ec2-ondemand-without-sec-sel/US%20East%20%28N.%20Virginia%29/Linux/index.json" rel="noopener" target="_blank">AWS price list (us-east-1)</a>；<a href="https://github.com/huggingface/optimum-neuron/blob/main/docs/source/containers.mdx" rel="noopener" target="_blank">Optimum Neuron containers doc</a>；<a href="https://github.com/huggingface/optimum-neuron/blob/main/docs/source/guides/vllm_on_ie.mdx" rel="noopener" target="_blank">Optimum Neuron Inference Endpoints guide</a>；<a href="https://awsdocs-neuron.readthedocs-hosted.com/en/latest/about-neuron/announcements/neuron2.x/announce-maintenance-pytorch-xla-inference.html" rel="noopener" target="_blank">XLA inference maintenance announcement</a></td>
+</tr>
+<tr id="b29">
+<td class="rowhead"><strong>TPU v5e / v6e</strong></td>
+<td>Gemini 與 Claude「train and serve」於 TPU（世代未揭露）；Vertex 開放模型 MaaS 的硬體未揭露</td>
+<td>1 年 / 3 年 commitment、DWS Calendar（1–90 天）、All Capacity mode</td>
+<td>Vertex AI endpoints：單主機 GA、多主機 Public preview；Model Garden 一鍵 vLLM TPU（預設配額 16 顆 v6e，europe-west4）</td>
+<td>GKE；Compute Engine（TPU VM 2026-06-01 GA）；v6e 的 zone 含 asia-northeast1-b；on-demand 不保證容量</td>
+<td class="muted">否</td>
+<td class="src"><a href="https://cloud.google.com/blog/products/compute/ironwood-tpus-and-new-axion-based-vms-for-your-ai-workloads" rel="noopener" target="_blank">Google Cloud, 6 Nov 2025</a>；<a href="https://cloud.google.com/tpu/pricing" rel="noopener" target="_blank">Cloud TPU pricing</a>；<a href="https://docs.cloud.google.com/tpu/docs/all-capacity-overview" rel="noopener" target="_blank">All Capacity mode overview</a>；<a href="https://docs.cloud.google.com/gemini-enterprise-agent-platform/machine-learning/predictions/use-tpu" rel="noopener" target="_blank">Use TPUs for online inference</a>；<a href="https://docs.cloud.google.com/gemini-enterprise-agent-platform/models/open-models/vllm/use-vllm-tpu" rel="noopener" target="_blank">vLLM TPU (Model Garden)</a>；<a href="https://docs.cloud.google.com/tpu/docs/release-notes" rel="noopener" target="_blank">Cloud TPU release notes</a>；<a href="https://docs.cloud.google.com/tpu/docs/regions-zones" rel="noopener" target="_blank">TPU regions and zones</a>；<a href="https://docs.cloud.google.com/kubernetes-engine/docs/concepts/tpus" rel="noopener" target="_blank">About TPUs in GKE</a></td>
+</tr>
+<tr id="b30">
+<td class="rowhead"><strong>TPU7x</strong>（Ironwood）與 <strong>TPU 8i / 8t</strong></td>
+<td class="muted">同上</td>
+<td class="muted">同上</td>
+<td>Vertex AI endpoints 單主機 <code>tpu7x-standard-4t</code></td>
+<td>TPU7x：GA 2026-03-31，zone 清單只有 us-central1-ai1a 與 us-central1-c（價目頁另列 europe-west2，兩頁不一致）。TPU 8i / 8t：已宣布未出貨（2026-04-22 宣布「will be generally available later this year」；至 2026-10-04 無文件頁、價格、release note）</td>
+<td>TPU7x 的買斷只見於 Anthropic 等級買家（首批約 40 萬顆經 Broadcom 直售，2025-11-28 報導）</td>
+<td class="src"><a href="https://docs.cloud.google.com/tpu/docs/release-notes" rel="noopener" target="_blank">Cloud TPU release notes</a>；<a href="https://docs.cloud.google.com/tpu/docs/regions-zones" rel="noopener" target="_blank">TPU regions and zones</a>；<a href="https://cloud.google.com/tpu/pricing" rel="noopener" target="_blank">Cloud TPU pricing</a>；<a href="https://docs.cloud.google.com/kubernetes-engine/docs/concepts/tpu-ironwood" rel="noopener" target="_blank">About Ironwood (TPU7x) in GKE</a>；<a href="https://docs.cloud.google.com/gemini-enterprise-agent-platform/machine-learning/predictions/use-tpu" rel="noopener" target="_blank">Use TPUs for online inference</a>；<a href="https://blog.google/innovation-and-ai/infrastructure-and-cloud/google-cloud/eighth-generation-tpu-agentic-era/" rel="noopener" target="_blank">Google, 22 Apr 2026</a>；<a href="https://newsletter.semianalysis.com/p/tpuv7-google-takes-a-swing-at-the" rel="noopener" target="_blank">SemiAnalysis, 28 Nov 2025</a></td>
+</tr>
+<tr id="b31">
+<td class="rowhead"><strong>NVIDIA 8-GPU 節點</strong>（H100、H200、B200、B300）</td>
+<td>第三方託管 API 的主力：Kimi K3、GLM-5.x、DeepSeek V4.x 的所有量測端點都在 GPU 機群或未揭露硬體上</td>
+<td>AWS Capacity Blocks（P5、P5e、P5en、P6-B200、P6-B300）；Google commitment 與 DWS</td>
+<td>SageMaker endpoints、SageMaker HyperPod</td>
+<td>AWS、Google Cloud、Azure、OCI、CoreWeave、Lambda、Nebius 都有公開價格；AWS Asia Pacific（Taipei）沒有任何加速運算執行個體</td>
+<td>可採購</td>
+<td class="src"><a href="https://artificialanalysis.ai/leaderboards/providers" rel="noopener" target="_blank">Artificial Analysis provider leaderboard</a>；<a href="https://blogs.nvidia.com/blog/inference-open-source-models-blackwell-reduce-cost-per-token" rel="noopener" target="_blank">NVIDIA blog, 12 Feb 2026</a>；<a href="https://aws.amazon.com/ec2/capacityblocks/pricing/" rel="noopener" target="_blank">AWS Capacity Blocks pricing</a>；<a href="https://cloud.google.com/products/compute/pricing/accelerator-optimized" rel="noopener" target="_blank">Google Cloud accelerator-optimized VM pricing</a>；<a href="https://aws.amazon.com/blogs/machine-learning/amazon-sagemaker-inference-2026-year-to-date-launches-in-review/" rel="noopener" target="_blank">AWS ML blog, 18 Sep 2026</a>；<a href="https://www.coreweave.com/pricing" rel="noopener" target="_blank">CoreWeave pricing</a>；<a href="https://docs.aws.amazon.com/ec2/latest/instancetypes/ec2-instance-regions.html" rel="noopener" target="_blank">AWS EC2, instance types by Region</a></td>
+</tr>
+<tr id="b32">
+<td><strong>NVIDIA 機櫃級</strong>（GB200 / GB300 NVL72、Vera Rubin NVL72、Groq 3 LPX）</td>
+<td class="muted">未見於來源</td>
+<td>AWS P6e-GB200 UltraServer：只有 Capacity Blocks，Dallas Local Zone</td>
+<td class="muted">未見於來源</td>
+<td>OCI 與 CoreWeave 有 GB200 公開價格，Google A4X 不在公開價目頁。Vera Rubin NVL72：Preview（CoreWeave limited availability，2026-09-30），三大雲沒有執行個體與價格。Groq 3 LPX：2026-08-24 宣布「full production」，首家雲為 Nebius、無公開 SKU</td>
+<td>可採購；Vera Rubin 每機櫃約 $3.5–4.0M（分析師，2026-07-21）</td>
+<td class="src"><a href="https://aws.amazon.com/ec2/capacityblocks/pricing/" rel="noopener" target="_blank">AWS Capacity Blocks pricing</a>；<a href="https://www.oracle.com/cloud/compute/pricing/" rel="noopener" target="_blank">Oracle Cloud compute pricing</a>；<a href="https://www.coreweave.com/pricing" rel="noopener" target="_blank">CoreWeave pricing</a>；<a href="https://cloud.google.com/products/compute/pricing/accelerator-optimized" rel="noopener" target="_blank">Google Cloud accelerator-optimized VM pricing</a>；<a href="https://www.coreweave.com/blog/cognition-becomes-first-customer-for-nvidia-vera-rubin-nvl72-on-coreweave-cloud" rel="noopener" target="_blank">CoreWeave blog, 30 Sep 2026</a>；<a href="https://nvidianews.nvidia.com/news/nvidia-groq-3-lpx-now-in-full-production-with-world-class-speed-for-agentic-ai" rel="noopener" target="_blank">NVIDIA Newsroom, 24 Aug 2026</a>；<a href="https://nebius.com/prices" rel="noopener" target="_blank">Nebius prices</a>；<a href="https://www.trendforce.com/news/2026/07/21/news-amds-first-rack-scale-ai-system-helios-challenges-nvidia-with-hbm4-memory-edge-but-reportedly-comes-at-a-higher-price/" rel="noopener" target="_blank">TrendForce, 21 Jul 2026</a></td>
+</tr>
+<tr id="b33">
+<td class="rowhead"><strong>AMD Instinct</strong>（MI300X、MI355X、Helios）</td>
+<td>Zyphra（MI355X，2026-05-04 宣布）</td>
+<td class="muted">未見於來源</td>
+<td class="muted">未見於來源</td>
+<td>OCI 有 MI300X、MI355X 公開價格；Helios 沒有雲端 SKU（AMD 稱 2026 Q3 末開始出貨）</td>
+<td>Helios 每機櫃約 $5.0–5.5M（分析師，2026-07-21）</td>
+<td class="src"><a href="https://www.zyphra.com/our-work/zyphra-and-amd-partner-to-power-zyphra-cloud-on-amd-instinct-mi355x-gpus" rel="noopener" target="_blank">Zyphra, 4 May 2026</a>；<a href="https://www.oracle.com/cloud/compute/pricing/" rel="noopener" target="_blank">Oracle Cloud compute pricing</a>；<a href="https://moorinsightsstrategy.com/field-notes/amd-advancing-ai-2026-helios-ships-venice-swings-and-the-software-moat-narrows/" rel="noopener" target="_blank">Moor Insights &amp; Strategy, 24 Jul 2026</a>；<a href="https://www.trendforce.com/news/2026/07/21/news-amds-first-rack-scale-ai-system-helios-challenges-nvidia-with-hbm4-memory-edge-but-reportedly-comes-at-a-higher-price/" rel="noopener" target="_blank">TrendForce, 21 Jul 2026</a></td>
+</tr>
+<tr id="b34">
+<td class="rowhead"><strong>Cerebras</strong>（CS-3、CS-4）</td>
+<td>Cerebras Inference（Shared）：GA，2 個模型；另經 AWS Marketplace、OpenRouter、Hugging Face、Vercel 轉售。Amazon Bedrock：已宣布未出貨（2026-03-13 宣布，預期 2027 Q1）</td>
+<td>Dedicated Inference（企業、洽業務）；其 service tiers 為 private Preview</td>
+<td>Dedicated 可部署微調權重</td>
+<td>不適用：沒有雲端執行個體型態</td>
+<td>CS-3 可採購（2026 Q2 硬體營收 $54.1M，財報文件）；CS-4 於 2026-08-18 宣布並稱當季首批出貨，是否已出貨查無公開資料</td>
+<td class="src"><a href="https://inference-docs.cerebras.ai/models/overview" rel="noopener" target="_blank">Cerebras model catalog</a>；<a href="https://www.cerebras.ai/pricing" rel="noopener" target="_blank">Cerebras pricing</a>；<a href="https://inference-docs.cerebras.ai/dedicated/overview" rel="noopener" target="_blank">Cerebras Dedicated Inference</a>；<a href="https://inference-docs.cerebras.ai/capabilities/service-tiers" rel="noopener" target="_blank">Cerebras service tiers</a>；<a href="https://www.sec.gov/Archives/edgar/data/2021728/000162828026056186/cbrsannouncesfinancialresu.htm" rel="noopener" target="_blank">Cerebras Q2 2026 results, SEC</a>；<a href="https://www.cerebras.ai/press-release/cerebras-unveils-cs-4-up-to-30-times-faster-than-gpu-based-solutions-3347356" rel="noopener" target="_blank">Cerebras press release, 18 Aug 2026</a></td>
+</tr>
+</tbody>
+</table></div></figure>
+<ul>
+<li id="b35"><strong>Trn3 的「GA」不等於可自助取得</strong>：沒有公開價格、Capacity Block 與 Region 清單，且 Amazon 在 2026-04-09 稱 Trainium3「nearly fully-subscribed」（<a href="https://www.aboutamazon.com/news/company-news/amazon-ceo-andy-jassy-2025-letter-to-shareholders" rel="noopener" target="_blank">Amazon shareholder letter, 9 Apr 2026</a>）。</li>
+<li id="b36"><strong>東亞的在地選項</strong>：Tokyo、Singapore、Taipei 都沒有 Trainium；Inferentia2 最近在 Tokyo、Seoul（只有 xlarge）、Singapore。GPU 執行個體在亞太各 Region 的供應，指定筆記沒有逐一列出（<a href="https://docs.aws.amazon.com/ec2/latest/instancetypes/ec2-instance-regions.html" rel="noopener" target="_blank">AWS EC2, instance types by Region</a>；<a href="https://b0.p.awsstatic.com/pricing/2.0/meteredUnitMaps/ec2/USD/current/ec2-ondemand-without-sec-sel/US%20East%20%28N.%20Virginia%29/Linux/index.json" rel="noopener" target="_blank">AWS price list (us-east-1)</a>）。</li>
+</ul>
+</div></div><div class="subpanel" role="tabpanel" id="s2-2" aria-labelledby="tab-s2-2"><div class="prose"><h3>叢集層技術的證據</h3><figure class="tbl" data-cols="6" data-rows="20"><div aria-label="資料表" class="tbl-scroll" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th class="w1" scope="col">技術</th>
+<th class="w2" scope="col">證據顯示</th>
+<th class="w3" scope="col">數字</th>
+<th class="w3" scope="col">條件</th>
+<th scope="col">等級</th>
+<th class="src" scope="col">來源</th>
+</tr>
+</thead>
+<tbody>
+<tr id="b37">
+<td class="rowhead">PD disaggregation</td>
+<td>壓低尾端 ITL 與 E2E，TTFT 變差</td>
+<td>ITL mean 25 → 4.9 ms；E2E mean 6.7 → 2.78 s；TTFT mean 532 → 1,157 ms（+117%）</td>
+<td>gpt-oss-120b；16× H200（GKE，RoCE）；8 個 prefill（TP=1）加 2 個 decode（TP=4）；5,000 in / 250 out；45 req/s；llm-d + vLLM；對照組是一般 Kubernetes Service 後的 aggregated 部署</td>
+<td><span class="g g-b" title="等級 B：廠商或夥伴公布，且揭露方法">B</span></td>
+<td class="src"><a href="https://github.com/llm-d/llm-d/blob/main/guides/pd-disaggregation/README.md" rel="noopener" target="_blank">llm-d P/D guide</a>；<a href="https://vllm.ai/blog/2026-09-29-disaggregated-serving-guide" rel="noopener" target="_blank">vLLM blog, 29 Sep 2026</a></td>
+</tr>
+<tr id="b38">
+<td class="rowhead">PD disaggregation</td>
+<td>同一批 GPU 的吞吐量：Dynamo 舊版文件的配置工具估出 +31%（預測值，非量測），vLLM 文件則寫明不改善</td>
+<td>AIConfigurator 預測 521.77 對 397.31 tok/s/GPU；TTFT 388.11 對 509.14 ms。同頁對 aggregated 配置的實測 TTFT 為 209 ms（預測 509 ms），並稱實際吞吐量約為預測的 85–90%</td>
+<td>Qwen3-32B-FP8；8× H200；vLLM 0.12.0；ISL 4,000 / OSL 500；SLA 為 TTFT ≤ 600 ms、TPOT ≤ 16.67 ms；2-GPU prefill worker 與 4-GPU decode worker。出自 Dynamo v0.9.x 文件，v1.2 起的文件已不含此例。vLLM 文件原文：「Disaggregated prefill DOES NOT improve throughput.」</td>
+<td><span class="g g-c" title="等級 C：廠商宣稱或規格，未揭露方法">C</span></td>
+<td class="src"><a href="https://docs.nvidia.com/dynamo/v-0-9-1/user-guides/disaggregated-serving" rel="noopener" target="_blank">Dynamo v0.9.1 docs</a>；<a href="https://docs.vllm.ai/en/latest/features/disagg_prefill/" rel="noopener" target="_blank">vLLM docs</a></td>
+</tr>
+<tr id="b39">
+<td class="rowhead">PD disaggregation</td>
+<td>硬體加倍後 TPOT 下降，換算每 GPU 吞吐量反而降低</td>
+<td>H100：TPOT −22% 至 −66%、輸出 +35%，每 GPU 0.68×（1.35 ÷ 2）；H200：TPOT −28% 至 −48%、輸出 +64%，每 GPU 0.82×（1.64 ÷ 2）</td>
+<td>Llama-3.3-70B-Instruct，TP=8；PD 用 2 台（16 GPU），對照組 1 台 ml.p5.48xlarge（8 GPU）；4,096 in / 256 out；concurrency 8–64；LMCache v0.4.3 on SageMaker HyperPod；EFA；2026-09-15</td>
+<td><span class="g g-b" title="等級 B：廠商或夥伴公布，且揭露方法">B</span>；每 GPU 值為 <span class="g g-d" title="等級 D：本文推算，附算式">D</span></td>
+<td class="src"><a href="https://blog.lmcache.ai/en/2026/09/15/lmcache-on-amazon-sagemaker-hyperpod-disaggregated-prefill-and-decode/" rel="noopener" target="_blank">LMCache blog, 15 Sep 2026</a></td>
+</tr>
+<tr id="b40">
+<td class="rowhead">PD disaggregation</td>
+<td>KV 傳輸必須是 RDMA 等級</td>
+<td>無 RDMA 時 TTFT 由 355 ms 升到 10 s 以上（「performance degrades by 40x」，Dynamo v0.9–v1.1 文件）；約 470 MB 的 KV 在只有 PCIe 的機器上約 1.3 s 才到 decode 端</td>
+<td>前者是 Dynamo 舊版文件的敘述，條件未揭露；現行文件改寫為單節點走 NVLink、跨節點才需要 RDMA，否則退回 TCP。後者為 Qwen2.5-7B、2× L40S（PCIe 4.0、無 NVLink）、約 8k-token prompt</td>
+<td><span class="g g-c" title="等級 C：廠商宣稱或規格，未揭露方法">C</span>；<span class="g g-b" title="等級 B：廠商或夥伴公布，且揭露方法">B</span></td>
+<td class="src"><a href="https://docs.nvidia.com/dynamo/v1.1.0/user-guides/disaggregated-serving" rel="noopener" target="_blank">Dynamo v1.1.0 docs</a>；<a href="https://docs.nvidia.com/dynamo/user-guides/disaggregated-serving" rel="noopener" target="_blank">Dynamo docs</a>；<a href="https://vllm.ai/blog/2026-09-29-disaggregated-serving-guide" rel="noopener" target="_blank">vLLM blog, 29 Sep 2026</a></td>
+</tr>
+<tr id="b41">
+<td class="rowhead">KV-cache tiering / offload</td>
+<td>共享 KV tier 提高每 GPU 產出並壓低 TTFT</td>
+<td>每 GPU-hour 輸出 token 169,000 對 46,000（3.7×）；median TTFT 1.05 對 5.68 s；cache 命中率 93% 對 40%</td>
+<td>DeepSeek-V4-Pro（NVFP4）；8 節點 × 8× B300；vLLM v0.23；context 上限 1M；512 個 active session；8 小時；WEKA 共享 tier 對照 HBM-only；2026-09-24</td>
+<td><span class="g g-b" title="等級 B：廠商或夥伴公布，且揭露方法">B</span></td>
+<td class="src"><a href="https://nebius.com/blog/posts/nebius-weka-shared-kv-cache-benchmark-hgx-b300" rel="noopener" target="_blank">Nebius blog, 24 Sep 2026</a></td>
+</tr>
+<tr id="b42">
+<td class="rowhead">KV-cache tiering / offload</td>
+<td>tier 比重算慢時 TTFT 變差；cache 放得進 HBM 時沒有效益</td>
+<td>100k prompt（中型 cache）：TTFT −79%、吞吐量 +264%；10k prompt（大型 cache）：TTFT +121%、吞吐量 +23%</td>
+<td>Llama-3.3-70B-Instruct；GKE A3 Mega 8× H100；HBM 加 CPU RAM 1 Ti 加 local SSD 5 Ti；LMCache v0.3.3 + vLLM；2025-11-07</td>
+<td><span class="g g-b" title="等級 B：廠商或夥伴公布，且揭露方法">B</span></td>
+<td class="src"><a href="https://cloud.google.com/blog/topics/developers-practitioners/boosting-llm-performance-with-tiered-kv-cache-on-google-kubernetes-engine" rel="noopener" target="_blank">Google Cloud blog, 7 Nov 2025</a></td>
+</tr>
+<tr id="b43">
+<td class="rowhead">KV-cache tiering / offload</td>
+<td>GPU cache 不足時，CPU-DRAM offload 避免崩潰</td>
+<td>有 offload：3,505 tok/s、TTFT 8.3 s；沒有：778 tok/s、65 s。暫停對話 restore 8.4 s，重算 14.8 s</td>
+<td>GLM-5.2 FP8；H200；vLLM + llm-d；concurrency 128；每個 prefill rank 100–150 GiB DRAM；2026-07-22</td>
+<td><span class="g g-b" title="等級 B：廠商或夥伴公布，且揭露方法">B</span></td>
+<td class="src"><a href="https://llm-d.ai/blog/serving-glm-5-2-agentic-workloads-on-llm-d" rel="noopener" target="_blank">llm-d blog, 22 Jul 2026</a></td>
+</tr>
+<tr id="b44">
+<td class="rowhead">Prefix-aware routing</td>
+<td>精確的 prefix-cache 路由是同一批硬體上最大的 TTFT 槓桿</td>
+<td>P90 TTFT：precise 0.542 s、approximate 31.083 s、load-aware 94.865 s；輸出 8,730、6,944、4,429 tok/s</td>
+<td>Qwen 32B 級模型；8 個 vLLM pod、16× H100；150 個租戶群 × 6,000-token context × 5 位同時使用者；3–60 QPS；cache 需求為叢集容量的 73%；2025-09-24</td>
+<td><span class="g g-b" title="等級 B：廠商或夥伴公布，且揭露方法">B</span></td>
+<td class="src"><a href="https://llm-d.ai/blog/kvcache-wins-you-can-see" rel="noopener" target="_blank">llm-d blog, 24 Sep 2025</a></td>
+</tr>
+<tr id="b45">
+<td class="rowhead">Prefix-aware routing</td>
+<td>AWS 受管版本只有廠商宣稱</td>
+<td>P90 TTFT −33–37%；KV cache 命中率約 25% → 82%</td>
+<td>SageMaker endpoints prefix-aware routing（2026-09）；模型與硬體未揭露</td>
+<td><span class="g g-c" title="等級 C：廠商宣稱或規格，未揭露方法">C</span></td>
+<td class="src"><a href="https://aws.amazon.com/blogs/machine-learning/amazon-sagemaker-inference-2026-year-to-date-launches-in-review/" rel="noopener" target="_blank">AWS ML blog, 18 Sep 2026</a></td>
+</tr>
+<tr id="b46">
+<td class="rowhead">多節點與機櫃級 parallelism</td>
+<td>機櫃級 NVLink 在高 interactivity 下的每 GPU 吞吐量是 8-GPU 節點的 2.2–4.4 倍</td>
+<td>100 tok/s/user：6,781 對 3,047 tok/s/GPU（2.23×）；125：4,130 對 941（4.39×）；75：9,379 對 6,968（1.35×）</td>
+<td>DeepSeek R1 0528，FP4；Dynamo + TensorRT-LLM；兩邊都用 PD；1,024 in / 1,024 out；GB200 NVL72 對 B200 8-GPU 節點（RoCEv2）；2026-05-22 量測</td>
+<td><span class="g g-a" title="等級 A：獨立第三方量測">A</span></td>
+<td class="src"><a href="https://inferencex.semianalysis.com/blog/gb200-nvl72-vs-b200-disagg-deepseek-r1-fp4-dynamo-trt" rel="noopener" target="_blank">InferenceX, 23 May 2026</a></td>
+</tr>
+<tr id="b47">
+<td class="rowhead">多節點與機櫃級 parallelism</td>
+<td>1.6T 模型只在整櫃 72 GPU 上有獨立量測；每 GPU 記憶體決定產出</td>
+<td>27 tok/s/user：6,182 對 2,189 tok/s/GPU（2.83×）</td>
+<td>DeepSeek-V4-Pro（1.6T、49B active），FP4；Dynamo + vLLM；PD；8,192 in / 1,024 out；GB300 NVL72（288 GB/GPU）對 GB200 NVL72（192 GB/GPU）；2026-05-27</td>
+<td><span class="g g-a" title="等級 A：獨立第三方量測">A</span></td>
+<td class="src"><a href="https://inferencex.semianalysis.com/blog/gb300-nvl72-vs-gb200-nvl72-dsv4-pro-vllm-fp4" rel="noopener" target="_blank">InferenceX, 27 May 2026</a></td>
+</tr>
+<tr id="b48">
+<td class="rowhead">多節點與機櫃級 parallelism</td>
+<td>8-GPU 節點能服務 744B 模型，per-user 速度約 35–52 tok/s</td>
+<td>6,281 output tok/s（98 tok/s/GPU）、431K input tok/s；TTFT p50 / p90 為 2.18 / 15.82 s</td>
+<td>GLM-5.2 FP8；64× H200（8 節點，InfiniBand）；LeaderWorkerSet，TP=1、EP 16；3 個 prefill 加 1 個 decode；concurrency 128；agentic coding 語料（輸入 p50 195K tokens）；2026-07-22</td>
+<td><span class="g g-b" title="等級 B：廠商或夥伴公布，且揭露方法">B</span></td>
+<td class="src"><a href="https://llm-d.ai/blog/serving-glm-5-2-agentic-workloads-on-llm-d" rel="noopener" target="_blank">llm-d blog, 22 Jul 2026</a></td>
+</tr>
+<tr id="b49">
+<td class="rowhead">Autoscaling 與 cold start</td>
+<td>GPU 上的權重載入可到秒級</td>
+<td>408 GB（FP8）6.4 s；812 GB（BF16）10.4 s；標準 vLLM 載入約 18 min</td>
+<td>Llama 3.1 405B；p5en.48xlarge（8× H200）；FSx for Lustre 96 TiB、1000 MBps/TiB、EFA；GPUDirect Storage；權重預先 8-way shard；2026-06-01</td>
+<td><span class="g g-b" title="等級 B：廠商或夥伴公布，且揭露方法">B</span></td>
+<td class="src"><a href="https://aws.amazon.com/blogs/machine-learning/accelerate-llm-model-loading-and-increase-context-windows-with-gpudirect-on-amazon-fsx-for-lustre-and-turboquant/" rel="noopener" target="_blank">AWS ML blog, 1 Jun 2026</a></td>
+</tr>
+<tr id="b50">
+<td class="rowhead">Autoscaling 與 cold start</td>
+<td>S3 串流載入把 scale-out 縮短約兩成</td>
+<td>Llama 3.1 70B 約 1 min 載入；scale-out 407 s → 334.6 s（−21.64%）</td>
+<td>SageMaker Fast Model Loader；ml.p4d.24xlarge；2024-12-02</td>
+<td><span class="g g-b" title="等級 B：廠商或夥伴公布，且揭露方法">B</span></td>
+<td class="src"><a href="https://aws.amazon.com/blogs/machine-learning/introducing-fast-model-loader-in-sagemaker-inference-accelerate-autoscaling-for-your-large-language-models-llms-part-1" rel="noopener" target="_blank">AWS ML blog, 2 Dec 2024</a></td>
+</tr>
+<tr id="b51">
+<td class="rowhead">Autoscaling 與 cold start</td>
+<td>編譯式堆疊的啟動以數十分鐘計</td>
+<td>vLLM Neuron 的 gpt-oss 配方：compile timeout 1,200–2,400 s、engine-ready timeout 5,400 s；Inf2 編譯 Llama-3.2-11B-Vision 需 12–38 min</td>
+<td>前者為 Trn2 / Trn3，2026-07；後者為 inf2.24xlarge、TP=8、context 2K–32K，2025-09-30 獨立實測</td>
+<td><span class="g g-c" title="等級 C：廠商宣稱或規格，未揭露方法">C</span>；<span class="g g-a" title="等級 A：獨立第三方量測">A</span></td>
+<td class="src"><a href="https://awsdocs-neuron.readthedocs-hosted.com/en/latest/vllm-neuron/docs/tutorials/tutorial-gpt-oss.html" rel="noopener" target="_blank">vLLM Neuron gpt-oss tutorial</a>；<a href="https://zenn.dev/exwzd/articles/20250930-inferentia-llama" rel="noopener" target="_blank">Exawizards (Zenn), 30 Sep 2025</a></td>
+</tr>
+<tr id="b52">
+<td class="rowhead">異質 prefill / decode</td>
+<td>Trainium + Cerebras CS-3（Amazon Bedrock）：已宣布未出貨，沒有任何量測</td>
+<td>廠商宣稱「5x more high-speed token capacity」「up to 3,000 tokens per second」</td>
+<td>2026-03-13 宣布「in the next couple of months」；Cerebras 2026-08-12 財報稱預期 2027 Q1；prefill 用 Trainium3，KV 經 EFA 送到晶圓</td>
+<td><span class="g g-c" title="等級 C：廠商宣稱或規格，未揭露方法">C</span></td>
+<td class="src"><a href="https://www.aboutamazon.com/news/aws/aws-cerebras-ai-inference" rel="noopener" target="_blank">About Amazon, 13 Mar 2026</a>；<a href="https://www.cerebras.ai/blog/cerebras-is-coming-to-aws" rel="noopener" target="_blank">Cerebras blog, Mar 2026</a>；<a href="https://www.sec.gov/Archives/edgar/data/2021728/000162828026056186/cbrsannouncesfinancialresu.htm" rel="noopener" target="_blank">Cerebras Q2 2026 results, SEC</a></td>
+</tr>
+<tr id="b53">
+<td class="rowhead">異質 prefill / decode</td>
+<td>GPU + Groq 3 LPX：2026-08-24 宣布「full production」，供應有限</td>
+<td>Artificial Analysis 量到 3,431 output tok/s（另一份筆記依 NVIDIA 新聞稿記為 3,400）；「up to 35x higher inference throughput per megawatt」是廠商宣稱</td>
+<td>Gemma 4 31B、100K context、私有預發布端點；首家雲為 Nebius、無公開 SKU；兆級參數模型需 4–8 個 LPX 機櫃</td>
+<td><span class="g g-a" title="等級 A：獨立第三方量測">A</span>；<span class="g g-c" title="等級 C：廠商宣稱或規格，未揭露方法">C</span></td>
+<td class="src"><a href="https://www.tomshardware.com/tech-industry/semiconductors/nvidia-presents-groq-3-lpx-architecture-and-unveils-its-first-third-party-inference-benchmark" rel="noopener" target="_blank">Tom's Hardware, 26 Aug 2026</a>；<a href="https://nvidianews.nvidia.com/news/nvidia-groq-3-lpx-now-in-full-production-with-world-class-speed-for-agentic-ai" rel="noopener" target="_blank">NVIDIA Newsroom, 24 Aug 2026</a>；<a href="https://investor.nvidia.com/news/press-release-details/2026/NVIDIA-Vera-Rubin-Opens-Agentic-AI-Frontier/default.aspx" rel="noopener" target="_blank">NVIDIA press release, 16 Mar 2026</a>；<a href="https://www.theregister.com/special-features/2026/03/19/a-closer-look-at-nvidias-groq-powered-lpx-rack-systems/5223364" rel="noopener" target="_blank">The Register, 19 Mar 2026</a></td>
+</tr>
+<tr id="b54">
+<td class="rowhead">異質 prefill / decode</td>
+<td>學術量測支持分工方向，但 GPU 到加速器的 KV 傳輸仍是未解問題</td>
+<td>prefill 峰值：A100 16,322 對 GroqRack 370–397 tok/s（約 41×）；decode TPOT：GroqRack 2.98–3.05 對 A100 11.88–13.64 ms（batch 1）</td>
+<td>Llama2-7B FP16；A100 40 GB 對 GroqRack；輸入 100–1,600 tokens；2026-06-14</td>
+<td><span class="g g-a" title="等級 A：獨立第三方量測">A</span></td>
+<td class="src"><a href="https://arxiv.org/html/2606.17104v1" rel="noopener" target="_blank">arXiv 2606.17104</a></td>
+</tr>
+<tr id="b55">
+<td class="rowhead">企業閘道與配額切分</td>
+<td>把共用配額硬切給各單位很昂貴</td>
+<td>每個 100-session 團隊各配自己的尖峰，需 7.6× 共用配額（19.3k ÷ 2.55k）；1,000-session 事業單位為 2.3×（5.8k ÷ 2.55k）</td>
+<td>由 2026-06 GitHub Copilot coding-agent trace 的尖峰分鐘每 session token 數推算</td>
+<td><span class="g g-d" title="等級 D：本文推算，附算式">D</span></td>
+<td class="src"><a href="https://github.com/Azure/AzurePublicDataset/blob/master/GitHubCopilotCodingAgentDataset2026.md" rel="noopener" target="_blank">Copilot agent trace</a></td>
+</tr>
+<tr id="b56">
+<td class="rowhead">企業閘道與配額切分</td>
+<td>閘道以 total tokens 計數時，會比供應商早 4–7 倍限流</td>
+<td>同一流量：7.02M all tokens/min；Anthropic 計為 1.0M ITPM（7.0×）；Bedrock 的 Opus 5.5 計為 1.54M TPM（4.6×）</td>
+<td>每分鐘 100 個 coding-agent call；每 call 10,000 uncached input、59,700 cache-read、543 output tokens；兩者都不計 cache read</td>
+<td><span class="g g-d" title="等級 D：本文推算，附算式">D</span></td>
+<td class="src"><a href="https://platform.claude.com/docs/en/api/rate-limits" rel="noopener" target="_blank">Anthropic rate limits</a>；<a href="https://docs.aws.amazon.com/bedrock/latest/userguide/quotas-token-burndown.html" rel="noopener" target="_blank">How tokens are counted in Amazon Bedrock</a></td>
+</tr>
+</tbody>
+</table></div></figure>
+</div></div><div class="subpanel" role="tabpanel" id="s2-3" aria-labelledby="tab-s2-3"><div class="prose"><h3>叢集層技術在各家族的狀態</h3><figure class="tbl" data-cols="7" data-rows="5"><div aria-label="資料表" class="tbl-scroll" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th class="w1" scope="col">技術</th>
+<th class="w3" scope="col">NVIDIA GPU</th>
+<th class="w3" scope="col">AWS Trainium2 / 3</th>
+<th class="w2" scope="col">AWS Inferentia2</th>
+<th class="w3" scope="col">Google TPU</th>
+<th class="w2" scope="col">Cerebras</th>
+<th class="src" scope="col">來源</th>
+</tr>
+</thead>
+<tbody>
+<tr id="b57">
+<td class="rowhead">PD disaggregation</td>
+<td>Dynamo v1.5.0（GA）、llm-d v0.9.0、SGLang 都支援；vLLM 原生仍標 experimental；AWS 上經 NIXL → libfabric → EFA；SageMaker HyperPod 自 2026-07 提供</td>
+<td>vLLM Neuron（Beta）支援 1P1D 與 xPyD，KV 經 NIXL / LIBFABRIC（EFA）；開源控制面（Dynamo、llm-d、SGLang）未見 Neuron connector</td>
+<td>只在舊的 vLLM v0 fork（已停用）</td>
+<td>vLLM TPU 的 DCN-based P/D 標示 Passing；SemiAnalysis 稱外部堆疊「does not have a fully optimized disagg path yet」；沒有 TPU 的 PD 量測</td>
+<td>沒有自管 PD；定位為 decode 端，prefill 交給 Trainium（預期 2027 Q1）或 AMD Helios（目標 2026 Q4）</td>
+<td class="src"><a href="https://docs.nvidia.com/dynamo/dev/reference/releases/v1-5-0" rel="noopener" target="_blank">Dynamo v1.5.0 notes</a>；<a href="https://docs.vllm.ai/en/latest/features/disagg_prefill/" rel="noopener" target="_blank">vLLM docs</a>；<a href="https://blog.lmcache.ai/en/2026/09/15/lmcache-on-amazon-sagemaker-hyperpod-disaggregated-prefill-and-decode/" rel="noopener" target="_blank">LMCache blog, 15 Sep 2026</a>；<a href="https://awsdocs-neuron.readthedocs-hosted.com/en/latest/vllm-neuron/docs/design/vllm/disaggregated-inference.html" rel="noopener" target="_blank">vLLM Neuron DI design</a>；<a href="https://awsdocs-neuron.readthedocs-hosted.com/en/latest/libraries/nxd-inference/developer_guides/vllm-user-guide-v1.html" rel="noopener" target="_blank">vLLM guide for NxDI</a>；<a href="https://github.com/vllm-project/tpu-inference/tree/main/support_matrices" rel="noopener" target="_blank">tpu-inference support matrices</a>；<a href="https://inferencex.semianalysis.com/blog/tpu-inferencex-full-steam" rel="noopener" target="_blank">SemiAnalysis InferenceX, 7 Sep 2026</a>；<a href="https://www.sec.gov/Archives/edgar/data/2021728/000162828026056186/cbrsannouncesfinancialresu.htm" rel="noopener" target="_blank">Cerebras Q2 2026 results, SEC</a></td>
+</tr>
+<tr id="b58">
+<td class="rowhead">KV-cache tiering / offload</td>
+<td>所有 tier 可用；GPUDirect Storage（FSx for Lustre）只在 NVIDIA GPU 執行個體；Dynamo KVBM 於 v1.5.0 deprecated，改用引擎原生 offload；HyperPod 有受管 tiered KV cache</td>
+<td>vLLM Neuron 不支援 KV offload；共享 tier 走 EFA、沒有 GDS</td>
+<td>未見文件</td>
+<td>host DRAM offload 標示 Passing；沒有 disk tier 的文件；TPU-Sync「not yet recommended for general use」</td>
+<td>沒有客戶可見的控制，查無公開資料</td>
+<td class="src"><a href="https://aws.amazon.com/blogs/storage/accelerate-inference-with-kv-cache-tiering-on-aws/" rel="noopener" target="_blank">AWS Storage Blog, 21 Sep 2026</a>；<a href="https://docs.nvidia.com/dynamo/dev/reference/releases/deprecations" rel="noopener" target="_blank">Dynamo deprecations</a>；<a href="https://aws.amazon.com/blogs/machine-learning/amazon-sagemaker-inference-2026-year-to-date-launches-in-review/" rel="noopener" target="_blank">AWS ML blog, 18 Sep 2026</a>；<a href="https://github.com/vllm-project/vllm-neuron/blob/release-0.24.0.1.1.0/README.md" rel="noopener" target="_blank">vLLM Neuron README</a>；<a href="https://github.com/vllm-project/tpu-inference/tree/main/examples/offload/gke/benchmarks" rel="noopener" target="_blank">tpu-inference offload example</a>；<a href="https://github.com/google/tpu-sync" rel="noopener" target="_blank">google/tpu-sync</a></td>
+</tr>
+<tr id="b59">
+<td class="rowhead">Prefix-aware routing</td>
+<td>llm-d endpoint picker、Dynamo router、SGLang Model Gateway、AIBrix；SageMaker endpoints（2026-09）與 HyperPod intelligent routing</td>
+<td>引擎層 prefix caching 預設開啟；叢集層 router 未見文件</td>
+<td>引擎層 prefix caching 經 NxDI（自 Neuron 2.24）；叢集層未見文件</td>
+<td>GKE Inference Gateway（GA）的 picker 追蹤 TPU 使用率與 KV-cache 命中</td>
+<td>prompt caching 自動啟用；路由不可控</td>
+<td class="src"><a href="https://llm-d.ai/blog/llm-d-v0.8-from-platform-to-control-plane" rel="noopener" target="_blank">llm-d v0.8 blog</a>；<a href="https://docs.nvidia.com/dynamo/knowledge-base/concepts/system-architecture/kv-aware-routing" rel="noopener" target="_blank">Dynamo KV-aware routing docs</a>；<a href="https://docs.sglang.io/docs/advanced_features/sgl_model_gateway" rel="noopener" target="_blank">SGLang gateway docs</a>；<a href="https://aibrix.readthedocs.io/latest/features/gateway-plugins.html" rel="noopener" target="_blank">AIBrix routing docs</a>；<a href="https://aws.amazon.com/blogs/machine-learning/amazon-sagemaker-inference-2026-year-to-date-launches-in-review/" rel="noopener" target="_blank">AWS ML blog, 18 Sep 2026</a>；<a href="https://awsdocs-neuron.readthedocs-hosted.com/en/latest/vllm-neuron/docs/guides/features-guide.html" rel="noopener" target="_blank">vLLM Neuron features guide</a>；<a href="https://docs.cloud.google.com/kubernetes-engine/docs/concepts/about-gke-inference-gateway" rel="noopener" target="_blank">GKE docs</a>；<a href="https://inference-docs.cerebras.ai/capabilities/prompt-caching" rel="noopener" target="_blank">Cerebras prompt caching</a></td>
+</tr>
+<tr id="b60">
+<td class="rowhead">多節點與機櫃級 parallelism</td>
+<td>LeaderWorkerSet（llm-d、KServe）、Grove（Dynamo）；NVL72 機櫃內可到 EP=32；跨 8-GPU 節點需 RDMA 全網狀</td>
+<td>在單一 scale-up 網域內切分（trn2.48xlarge 16 顆；Trn3 UltraServer 64 或 144 顆）；跨執行個體只有 PD pool，沒有多節點 TP 的文件</td>
+<td>單一執行個體內 TP 1、2、4、8、24</td>
+<td>vLLM TPU 多主機 TP / DP / EP 為 Untested；GKE 教學稱不支援多主機；SGL-JAX 有多主機驗證；Vertex 多主機為 Public preview</td>
+<td>跨晶圓 pipeline（依層切分）</td>
+<td class="src"><a href="https://llm-d.ai/blog/serving-glm-5-2-agentic-workloads-on-llm-d" rel="noopener" target="_blank">llm-d blog, 22 Jul 2026</a>；<a href="https://inferencex.semianalysis.com/blog/gb200-nvl72-vs-b200-disagg-deepseek-r1-fp4-dynamo-trt" rel="noopener" target="_blank">InferenceX, 23 May 2026</a>；<a href="https://awsdocs-neuron.readthedocs-hosted.com/en/latest/vllm-neuron/docs/design/vllm/disaggregated-inference.html" rel="noopener" target="_blank">vLLM Neuron DI design</a>；<a href="https://awsdocs-neuron.readthedocs-hosted.com/en/latest/about-neuron/arch/neuron-hardware/trn3-arch.html" rel="noopener" target="_blank">Neuron docs, Trn3 architecture</a>；<a href="https://awsdocs-neuron.readthedocs-hosted.com/en/latest/libraries/nxd-inference/developer_guides/feature-guide.html" rel="noopener" target="_blank">NxDI feature guide</a>；<a href="https://github.com/vllm-project/tpu-inference/tree/main/support_matrices" rel="noopener" target="_blank">tpu-inference support matrices</a>；<a href="https://docs.cloud.google.com/kubernetes-engine/docs/tutorials/serve-vllm-tpu" rel="noopener" target="_blank">GKE vLLM TPU tutorial</a>；<a href="https://github.com/sgl-project/sglang-jax/tree/main/docs/cookbook/autoregressive" rel="noopener" target="_blank">sglang-jax cookbook</a>；<a href="https://docs.cloud.google.com/gemini-enterprise-agent-platform/machine-learning/predictions/use-tpu" rel="noopener" target="_blank">Use TPUs for online inference</a>；<a href="https://newsletter.semianalysis.com/p/cerebras-faster-tokens-please" rel="noopener" target="_blank">SemiAnalysis, 13 May 2026</a></td>
+</tr>
+<tr id="b61">
+<td class="rowhead">Autoscaling 與 cold start</td>
+<td>FSx for Lustre + GDS、SageMaker Fast Model Loader、container caching、HyperPod model caching、Dynamo ModelExpress</td>
+<td>暖機時逐 bucket 編譯 NEFF，之後出現新 shape 就是硬錯誤；可在 CPU 執行個體預編譯並以 FSx / NFS 共用 cache；沒有 GDS</td>
+<td>每個組態編譯 12–38 min；在大機器編譯、小機器服務</td>
+<td>XLA 預編譯多個 shape bucket；Google CI 對 2.4T 模型設 engine-ready timeout 10,800 s</td>
+<td>受管服務，不適用</td>
+<td class="src"><a href="https://aws.amazon.com/blogs/machine-learning/accelerate-llm-model-loading-and-increase-context-windows-with-gpudirect-on-amazon-fsx-for-lustre-and-turboquant/" rel="noopener" target="_blank">AWS ML blog, 1 Jun 2026</a>；<a href="https://aws.amazon.com/blogs/machine-learning/amazon-sagemaker-inference-2026-year-to-date-launches-in-review/" rel="noopener" target="_blank">AWS ML blog, 18 Sep 2026</a>；<a href="https://developer.nvidia.com/blog/nvidia-dynamo-1-production-ready/" rel="noopener" target="_blank">Dynamo 1.0 blog</a>；<a href="https://awsdocs-neuron.readthedocs-hosted.com/en/latest/vllm-neuron/docs/guides/features-guide.html" rel="noopener" target="_blank">vLLM Neuron features guide</a>；<a href="https://awsdocs-neuron.readthedocs-hosted.com/en/latest/vllm-neuron/docs/model-dev/onboarding-models.html" rel="noopener" target="_blank">vLLM Neuron onboarding guide</a>；<a href="https://awsdocs-neuron.readthedocs-hosted.com/en/latest/vllm-neuron/docs/design/compilation/cpu_compilation.html" rel="noopener" target="_blank">vLLM Neuron CPU compilation design</a>；<a href="https://awsdocs-neuron.readthedocs-hosted.com/en/latest/vllm-neuron/docs/design/compilation/compilation_cache.html" rel="noopener" target="_blank">vLLM Neuron compilation cache design</a>；<a href="https://zenn.dev/exwzd/articles/20250930-inferentia-llama" rel="noopener" target="_blank">Exawizards (Zenn), 30 Sep 2025</a>；<a href="https://zenn.dev/exwzd/articles/20250827_inferentia_compile" rel="noopener" target="_blank">Exawizards (Zenn), 28 Aug 2025</a>；<a href="https://github.com/vllm-project/tpu-inference/blob/main/.buildkite/benchmark/cases/daily/daily_qwen3_8_2p4t_fp8_tpu7x_32.json" rel="noopener" target="_blank">tpu-inference CI case</a></td>
+</tr>
+</tbody>
+</table></div></figure>
+<ul>
+<li id="b62"><strong>PD 何時用</strong>：Dynamo v0.9–v1.1 文件的指引是輸入很長（ISL &gt; 8000）且輸出短時才有利，ISL/OSL 在 2:1 到 10:1 的均衡負載「aggregated is often better」；llm-d 明確不建議短 context（200 in / 200 out）。成熟堆疊都改成條件式 PD：Dynamo v1.5.0 讓短請求直接進 decode，LMCache 以 prompt 長度門檻（測試用 4,096 tokens）分流（<a href="https://docs.nvidia.com/dynamo/v1.1.0/user-guides/disaggregated-serving" rel="noopener" target="_blank">Dynamo v1.1.0 docs</a>；<a href="https://github.com/llm-d/llm-d/blob/main/guides/pd-disaggregation/README.md" rel="noopener" target="_blank">llm-d P/D guide</a>；<a href="https://docs.nvidia.com/dynamo/dev/reference/releases/v1-5-0" rel="noopener" target="_blank">Dynamo v1.5.0 notes</a>；<a href="https://blog.lmcache.ai/en/2026/09/15/lmcache-on-amazon-sagemaker-hyperpod-disaggregated-prefill-and-decode/" rel="noopener" target="_blank">LMCache blog, 15 Sep 2026</a>）。</li>
+<li id="b63"><strong>RDMA 在 AWS 上就是 EFA</strong>：P5en 每節點 16 個 EFA 介面 × 200 Gbps，約每 GPU 50 GB/s，NVLink 5 為每 GPU 900 GB/s（18 倍），因此跨 8-GPU 節點的 wide-EP 落在 InferenceX 比較中較慢的一側，但沒有 EFA 上的 wide-EP 實測。KV 傳輸時間的理想值如下式 <span class="g g-d" title="等級 D：本文推算，附算式">D</span>：Llama-3.1-70B BF16 的 10,000-token prompt 為 3.3 GB，在 50 GB/s 下是 66 ms；實測速率遠低於線速（4 GB 在 200 Gb/s 鏈路約 360 ms，約線速的 44%）（<a href="https://aws.amazon.com/blogs/machine-learning/accelerate-llm-model-loading-and-increase-context-windows-with-gpudirect-on-amazon-fsx-for-lustre-and-turboquant/" rel="noopener" target="_blank">AWS ML blog, 1 Jun 2026</a>；<a href="https://inferencex.semianalysis.com/blog/gb200-nvl72-vs-b200-disagg-deepseek-r1-fp4-dynamo-trt" rel="noopener" target="_blank">InferenceX, 23 May 2026</a>；<a href="https://vllm.ai/blog/2026-09-29-disaggregated-serving-guide" rel="noopener" target="_blank">vLLM blog, 29 Sep 2026</a>；<a href="https://llm-d.ai/blog/llm-d-v0.5-sustaining-performance-at-scale" rel="noopener" target="_blank">llm-d v0.5 blog</a>）。</li>
+</ul>
+<div class="formula"><span class="katex-display"><span class="katex"><span class="katex-mathml"><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>t</mi><mrow><mi mathvariant="normal">K</mi><mi mathvariant="normal">V</mi></mrow></msub><mo>=</mo><mfrac><mrow><msub><mi>N</mi><mrow><mi mathvariant="normal">t</mi><mi mathvariant="normal">o</mi><mi mathvariant="normal">k</mi></mrow></msub><mo>×</mo><msub><mi>b</mi><mrow><mi mathvariant="normal">t</mi><mi mathvariant="normal">o</mi><mi mathvariant="normal">k</mi></mrow></msub></mrow><msub><mi>B</mi><mrow><mi mathvariant="normal">l</mi><mi mathvariant="normal">i</mi><mi mathvariant="normal">n</mi><mi mathvariant="normal">k</mi></mrow></msub></mfrac></mrow><annotation encoding="application/x-tex">t_{\mathrm{KV}} = \frac{N_{\mathrm{tok}} \times b_{\mathrm{tok}}}{B_{\mathrm{link}}}</annotation></semantics></math></span><span aria-hidden="true" class="katex-html"><span class="katex-base"><span class="katex-strut" style="height:0.7651em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathnormal">t</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3283em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight"><span class="mord mathrm mtight" style="margin-right:0.0139em;">KV</span></span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:2.2074em;vertical-align:-0.836em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.3714em;"><span style="top:-2.314em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord"><span class="mord mathnormal" style="margin-right:0.0502em;">B</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3361em;"><span style="top:-2.55em;margin-left:-0.0502em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight"><span class="mord mathrm mtight">link</span></span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.677em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord"><span class="mord mathnormal" style="margin-right:0.109em;">N</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3361em;"><span style="top:-2.55em;margin-left:-0.109em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight"><span class="mord mathrm mtight">tok</span></span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mord"><span class="mord mathnormal">b</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3361em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight"><span class="mord mathrm mtight">tok</span></span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.836em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span></span></span></span></span></div>
+<ul>
+<li id="b64"><strong>cold start 的剩餘瓶頸</strong>：scale-to-zero 仍是實驗性質（llm-d 的 cold-start activator 在 v0.5 標示 Experimental；KServe v0.18 提供 <code>idleReplicaCount: 0</code>）。0.5–3 TB 模型沒有端到端啟動時間的量測，而且冷 replica 的 prefix cache 是空的：GLM-5.2 冷啟首 token 7.46 s，有 cache 時 2.68 s <span class="g g-b" title="等級 B：廠商或夥伴公布，且揭露方法">B</span>（<a href="https://llm-d.ai/blog/llm-d-v0.5-sustaining-performance-at-scale" rel="noopener" target="_blank">llm-d v0.5 blog</a>；<a href="https://kserve.github.io/website/blog/kserve-0.18-release" rel="noopener" target="_blank">KServe v0.18 blog</a>；<a href="https://llm-d.ai/blog/serving-glm-5-2-agentic-workloads-on-llm-d" rel="noopener" target="_blank">llm-d blog, 22 Jul 2026</a>）。</li>
+<li id="b65"><strong>閘道有兩個執行點</strong>：API gateway 管身分、預算與每個 key 或 team 的 TPM、RPM；推論層 router 依實際 GPU 飽和度做優先權與 shedding（llm-d flow control 自 v0.8 進入 production，GKE Inference Gateway 為 GA）。Bedrock 配額是帳號 × Region 共用，AWS 文件的排序是：分帳號（「Recommended for most organizations」）、application inference profile（只做用量與成本追蹤，不限流）、自建集中式限流、保留容量；AWS 另把 LiteLLM 包成 Guidance for Multi-Provider Generative AI Gateway on AWS。API Gateway usage plan 以 request 計數且只是 best-effort，AgentCore Gateway 的配額頁沒有 LLM token 配額（<a href="https://llm-d.ai/blog/llm-d-v0.8-from-platform-to-control-plane" rel="noopener" target="_blank">llm-d v0.8 blog</a>；<a href="https://docs.cloud.google.com/kubernetes-engine/docs/concepts/about-gke-inference-gateway" rel="noopener" target="_blank">GKE docs</a>；<a href="https://aws.amazon.com/blogs/machine-learning/optimize-your-applications-for-scale-and-reliability-on-amazon-bedrock/" rel="noopener" target="_blank">AWS ML blog, 11 Feb 2026</a>；<a href="https://docs.aws.amazon.com/bedrock/latest/userguide/inference-profiles.html" rel="noopener" target="_blank">Bedrock inference profiles</a>；<a href="https://github.com/aws-solutions-library-samples/guidance-for-multi-provider-generative-ai-gateway-on-aws" rel="noopener" target="_blank">AWS multi-provider gateway guidance</a>；<a href="https://docs.aws.amazon.com/apigateway/latest/developerguide/api-gateway-api-usage-plans.html" rel="noopener" target="_blank">API Gateway usage plans</a>；<a href="https://docs.aws.amazon.com/bedrock-agentcore/latest/devguide/bedrock-agentcore-limits.html" rel="noopener" target="_blank">AgentCore quotas</a>）。</li>
+</ul>
+</div></div><div class="subpanel" role="tabpanel" id="s2-4" aria-labelledby="tab-s2-4"><div class="prose"><h3>各家族的部署優缺點</h3><h4 id="b66">AWS Trainium</h4>
+<figure class="tbl" data-cols="5" data-rows="10"><div aria-label="資料表" class="tbl-scroll" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th scope="col">優 / 缺</th>
+<th class="w1" scope="col">要點</th>
+<th class="w3" scope="col">證據（日期）</th>
+<th scope="col">等級</th>
+<th class="src" scope="col">來源</th>
+</tr>
+</thead>
+<tbody>
+<tr id="b67">
+<td class="rowhead"><span class="pc pc-pro">優</span></td>
+<td>不必自管就能用到</td>
+<td>Claude 跑在超過 100 萬顆 Trainium2 上（2026-07-31）；Bedrock「runs most of its inference on Trainium」（2026-04-09）</td>
+<td><span class="g g-c" title="等級 C：廠商宣稱或規格，未揭露方法">C</span></td>
+<td class="src"><a href="https://www.aboutamazon.com/news/aws/amazon-ai-chips-business-history" rel="noopener" target="_blank">About Amazon, 31 Jul 2026</a>；<a href="https://www.aboutamazon.com/news/company-news/amazon-ceo-andy-jassy-2025-letter-to-shareholders" rel="noopener" target="_blank">Amazon shareholder letter, 9 Apr 2026</a></td>
+</tr>
+<tr id="b68">
+<td class="rowhead"><span class="pc pc-pro">優</span></td>
+<td>Capacity Blocks 單價低，且不隨 GPU 調漲</td>
+<td>Trainium2 每晶片-小時 $2.235，H200 $5.97–6.865，B200 $12.355；2026-10-07 GPU 費率調漲時 Trainium 費率「remain unchanged」</td>
+<td><span class="g g-c" title="等級 C：廠商宣稱或規格，未揭露方法">C</span>（列表價）</td>
+<td class="src"><a href="https://aws.amazon.com/ec2/capacityblocks/pricing/" rel="noopener" target="_blank">AWS Capacity Blocks pricing</a></td>
+</tr>
+<tr id="b69">
+<td class="rowhead"><span class="pc pc-pro">優</span></td>
+<td>容量池與 GPU 分開</td>
+<td>「often available when your GPU request is still queued」（單一實務者，2026-06-30）</td>
+<td><span class="g g-c" title="等級 C：廠商宣稱或規格，未揭露方法">C</span></td>
+<td class="src"><a href="https://helix.ml/blog/the-subtraction-dividend" rel="noopener" target="_blank">HelixML blog, 30 Jun 2026</a></td>
+</tr>
+<tr id="b70">
+<td class="rowhead"><span class="pc pc-pro">優</span></td>
+<td>單一 scale-up 網域的大記憶體</td>
+<td>Trn3 Gen2 UltraServer：144 顆、20.7 TiB HBM；2.8T 參數 × 8 bit = 2.8 TB，放得下且不必跨節點</td>
+<td><span class="g g-c" title="等級 C：廠商宣稱或規格，未揭露方法">C</span>；<span class="g g-d" title="等級 D：本文推算，附算式">D</span></td>
+<td class="src"><a href="https://awsdocs-neuron.readthedocs-hosted.com/en/latest/about-neuron/arch/neuron-hardware/trn3-arch.html" rel="noopener" target="_blank">Neuron docs, Trn3 architecture</a></td>
+</tr>
+<tr id="b71">
+<td class="rowhead"><span class="pc pc-pro">優</span></td>
+<td>堆疊內建 PD</td>
+<td>vLLM Neuron 以 NIXL / EFA 傳 KV；AWS 稱「only the DI setup delivers the full throughput and latency of gpt-oss on Neuron」（2026-07-15）</td>
+<td><span class="g g-c" title="等級 C：廠商宣稱或規格，未揭露方法">C</span></td>
+<td class="src"><a href="https://awsdocs-neuron.readthedocs-hosted.com/en/latest/vllm-neuron/docs/tutorials/tutorial-gpt-oss.html" rel="noopener" target="_blank">vLLM Neuron gpt-oss tutorial</a></td>
+</tr>
+<tr id="b72">
+<td class="rowhead"><span class="pc pc-con">缺</span></td>
+<td>自助取得受限</td>
+<td>Trn2 只有 Capacity Blocks，4 個 Region（Ohio、Hyderabad、Melbourne、São Paulo）；Tokyo、Singapore、Taipei 沒有 Trainium；Trn3 無公開價格與 Region</td>
+<td><span class="g g-c" title="等級 C：廠商宣稱或規格，未揭露方法">C</span></td>
+<td class="src"><a href="https://aws.amazon.com/ec2/capacityblocks/pricing/" rel="noopener" target="_blank">AWS Capacity Blocks pricing</a>；<a href="https://docs.aws.amazon.com/ec2/latest/instancetypes/ec2-instance-regions.html" rel="noopener" target="_blank">AWS EC2, instance types by Region</a></td>
+</tr>
+<tr id="b73">
+<td class="rowhead"><span class="pc pc-con">缺</span></td>
+<td>容量多已預售</td>
+<td>Trainium2「has largely sold out」、Trainium3「nearly fully-subscribed」（2026-04-09）</td>
+<td><span class="g g-c" title="等級 C：廠商宣稱或規格，未揭露方法">C</span></td>
+<td class="src"><a href="https://www.aboutamazon.com/news/company-news/amazon-ceo-andy-jassy-2025-letter-to-shareholders" rel="noopener" target="_blank">Amazon shareholder letter, 9 Apr 2026</a></td>
+</tr>
+<tr id="b74">
+<td class="rowhead"><span class="pc pc-con">缺</span></td>
+<td>編譯式堆疊</td>
+<td>每個 bucket 一個 NEFF，暖機後不再重新編譯；context 上限、同時序列數、KV 預算、量化都是編譯期決定</td>
+<td><span class="g g-c" title="等級 C：廠商宣稱或規格，未揭露方法">C</span></td>
+<td class="src"><a href="https://awsdocs-neuron.readthedocs-hosted.com/en/latest/vllm-neuron/docs/guides/features-guide.html" rel="noopener" target="_blank">vLLM Neuron features guide</a>；<a href="https://awsdocs-neuron.readthedocs-hosted.com/en/latest/vllm-neuron/docs/model-dev/onboarding-models.html" rel="noopener" target="_blank">vLLM Neuron onboarding guide</a></td>
+</tr>
+<tr id="b75">
+<td class="rowhead"><span class="pc pc-con">缺</span></td>
+<td>可部署的模型少</td>
+<td>vLLM Neuron（Beta）只驗證 Llama 3、gpt-oss、Qwen3-VL、Qwen3-Embedding；DeepSeek-V3 與 GLM-5.2 只有社群移植：48.7 與 2.96 tok/s，context 512 與 2,048（trn2.48xlarge，TP=64，batch 1）</td>
+<td><span class="g g-b" title="等級 B：廠商或夥伴公布，且揭露方法">B</span>（社群）</td>
+<td class="src"><a href="https://github.com/vllm-project/vllm-neuron/blob/release-0.24.0.1.1.0/README.md" rel="noopener" target="_blank">vLLM Neuron README</a>；<a href="https://github.com/aws-neuron/neuronx-distributed-inference/blob/main/contrib/models/DeepSeek-V3/README.md" rel="noopener" target="_blank">NxDI contrib, DeepSeek-V3</a>；<a href="https://github.com/aws-neuron/neuronx-distributed-inference/blob/main/contrib/models/GLM-5.2/README.md" rel="noopener" target="_blank">NxDI contrib, GLM-5.2</a></td>
+</tr>
+<tr id="b76">
+<td class="rowhead"><span class="pc pc-con">缺</span></td>
+<td>受管工具鏈退場</td>
+<td>SageMaker LMI 於 2025-11 移除 Neuron，TGI-on-Neuron 於 2026-01 移除；NxDI 為維護模式而後繼的 vLLM Neuron 仍是 Beta；沒有 KV offload 與 GDS</td>
+<td><span class="g g-c" title="等級 C：廠商宣稱或規格，未揭露方法">C</span></td>
+<td class="src"><a href="https://github.com/deepjavalibrary/djl-serving/pull/2939" rel="noopener" target="_blank">DJL PR #2939</a>；<a href="https://github.com/huggingface/optimum-neuron/commits/main" rel="noopener" target="_blank">Optimum Neuron commits</a>；<a href="https://awsdocs-neuron.readthedocs-hosted.com/en/latest/about-neuron/announcements/neuron2.x/announce-nxdi-maintenance-support-2-31.html" rel="noopener" target="_blank">NxDI maintenance announcement</a>；<a href="https://github.com/vllm-project/vllm-neuron/blob/release-0.24.0.1.1.0/README.md" rel="noopener" target="_blank">vLLM Neuron README</a>；<a href="https://aws.amazon.com/blogs/storage/accelerate-inference-with-kv-cache-tiering-on-aws/" rel="noopener" target="_blank">AWS Storage Blog, 21 Sep 2026</a></td>
+</tr>
+</tbody>
+</table></div></figure>
+<h4 id="b77">AWS Inferentia</h4>
+<figure class="tbl" data-cols="5" data-rows="9"><div aria-label="資料表" class="tbl-scroll" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th scope="col">優 / 缺</th>
+<th class="w1" scope="col">要點</th>
+<th class="w3" scope="col">證據（日期）</th>
+<th scope="col">等級</th>
+<th class="src" scope="col">來源</th>
+</tr>
+</thead>
+<tbody>
+<tr id="b78">
+<td class="rowhead"><span class="pc pc-pro">優</span></td>
+<td>on-demand，Region 最廣</td>
+<td>14 個 Region 有 Inf2 價格，含 Tokyo、Singapore、Sydney、Mumbai，Seoul 只有 xlarge；Trn1 的 on-demand 只在 3 個美國 Region（2026-09-25 價目）</td>
+<td><span class="g g-c" title="等級 C：廠商宣稱或規格，未揭露方法">C</span></td>
+<td class="src"><a href="https://b0.p.awsstatic.com/pricing/2.0/meteredUnitMaps/ec2/USD/current/ec2-ondemand-without-sec-sel/US%20East%20%28N.%20Virginia%29/Linux/index.json" rel="noopener" target="_blank">AWS price list (us-east-1)</a></td>
+</tr>
+<tr id="b79">
+<td class="rowhead"><span class="pc pc-pro">優</span></td>
+<td>入門門檻低，每美元的加速器記憶體多</td>
+<td>inf2.xlarge $0.7582/h（us-east-1）；每 on-demand $/h 的加速器記憶體 29.6–42.2 GB，G5、G6、G6e 為 11.8–29.8 GB（記憶體 ÷ 時價）</td>
+<td><span class="g g-c" title="等級 C：廠商宣稱或規格，未揭露方法">C</span>；<span class="g g-d" title="等級 D：本文推算，附算式">D</span></td>
+<td class="src"><a href="https://b0.p.awsstatic.com/pricing/2.0/meteredUnitMaps/ec2/USD/current/ec2-ondemand-without-sec-sel/US%20East%20%28N.%20Virginia%29/Linux/index.json" rel="noopener" target="_blank">AWS price list (us-east-1)</a></td>
+</tr>
+<tr id="b80">
+<td class="rowhead"><span class="pc pc-pro">優</span></td>
+<td>小模型穩定流量的成本已有量測</td>
+<td>Llama 3.1 8B 在 inf2.48xlarge：1,226.8 output tok/s（3 個 replica × TP=8、batch 32、sequence 4,096；輸入約 1,500、輸出約 250 tokens；2026-08-27），$12.9813 ÷（1,226.8 × 0.0036）= $2.94 每 1M output tokens</td>
+<td><span class="g g-b" title="等級 B：廠商或夥伴公布，且揭露方法">B</span>；<span class="g g-d" title="等級 D：本文推算，附算式">D</span></td>
+<td class="src"><a href="https://github.com/huggingface/optimum-neuron/blob/main/benchmark/vllm/data-parallel/llama3.1-8b/vllm-results-dp3.csv" rel="noopener" target="_blank">Optimum Neuron result CSV</a></td>
+</tr>
+<tr id="b81">
+<td class="rowhead"><span class="pc pc-pro">優</span></td>
+<td>仍有受管路徑</td>
+<td>SageMaker 的 Hugging Face 容器；Hugging Face Inference Endpoints 的「INF2」選項</td>
+<td><span class="g g-c" title="等級 C：廠商宣稱或規格，未揭露方法">C</span></td>
+<td class="src"><a href="https://github.com/huggingface/optimum-neuron/blob/main/docs/source/containers.mdx" rel="noopener" target="_blank">Optimum Neuron containers doc</a>；<a href="https://github.com/huggingface/optimum-neuron/blob/main/docs/source/guides/vllm_on_ie.mdx" rel="noopener" target="_blank">Optimum Neuron Inference Endpoints guide</a></td>
+</tr>
+<tr id="b82">
+<td class="rowhead"><span class="pc pc-con">缺</span></td>
+<td>軟體凍結</td>
+<td>Torch/XLA inference 自 Neuron 2.31 起為維護模式；NxDI 為維護模式（2026-05-20 宣布）；vLLM Neuron 只支援 Trn2、Trn3；Inf2 路徑停在 vLLM 0.16.0</td>
+<td><span class="g g-c" title="等級 C：廠商宣稱或規格，未揭露方法">C</span></td>
+<td class="src"><a href="https://awsdocs-neuron.readthedocs-hosted.com/en/latest/about-neuron/announcements/neuron2.x/announce-maintenance-pytorch-xla-inference.html" rel="noopener" target="_blank">XLA inference maintenance announcement</a>；<a href="https://awsdocs-neuron.readthedocs-hosted.com/en/latest/about-neuron/announcements/neuron2.x/announce-nxdi-maintenance-support-2-31.html" rel="noopener" target="_blank">NxDI maintenance announcement</a>；<a href="https://github.com/vllm-project/vllm-neuron/blob/release-0.24.0.1.1.0/README.md" rel="noopener" target="_blank">vLLM Neuron README</a></td>
+</tr>
+<tr id="b83">
+<td class="rowhead"><span class="pc pc-con">缺</span></td>
+<td>部署摩擦</td>
+<td>每個組態 AOT 編譯 12–38 min，尺寸不對時要數小時；啟動參數必須與編譯參數一致（2025-08-28、2025-09-30）</td>
+<td><span class="g g-a" title="等級 A：獨立第三方量測">A</span></td>
+<td class="src"><a href="https://zenn.dev/exwzd/articles/20250930-inferentia-llama" rel="noopener" target="_blank">Exawizards (Zenn), 30 Sep 2025</a>；<a href="https://zenn.dev/exwzd/articles/20250827_inferentia_compile" rel="noopener" target="_blank">Exawizards (Zenn), 28 Aug 2025</a></td>
+</tr>
+<tr id="b84">
+<td class="rowhead"><span class="pc pc-con">缺</span></td>
+<td>context 上限低</td>
+<td>11B 模型在 1 晶片機型最多 1,024 tokens，inf2.24xlarge（TP=8）最多 32,768 tokens（2025-09-30）</td>
+<td><span class="g g-a" title="等級 A：獨立第三方量測">A</span></td>
+<td class="src"><a href="https://zenn.dev/exwzd/articles/20250930-inferentia-llama" rel="noopener" target="_blank">Exawizards (Zenn), 30 Sep 2025</a></td>
+</tr>
+<tr id="b85">
+<td class="rowhead"><span class="pc pc-con">缺</span></td>
+<td>沒有後繼晶片，也沒有目標模型</td>
+<td>AWS 頁面只列 Inferentia 與 Inferentia2 兩代（2026-09-25 更新）；gpt-oss、Qwen3-235B 與 DeepSeek、GLM 的社群移植都以 Trn2、Trn3 為目標</td>
+<td><span class="g g-c" title="等級 C：廠商宣稱或規格，未揭露方法">C</span></td>
+<td class="src"><a href="https://aws.amazon.com/ai/machine-learning/inferentia/" rel="noopener" target="_blank">AWS Inferentia</a>；<a href="https://github.com/vllm-project/vllm-neuron/blob/release-0.24.0.1.1.0/README.md" rel="noopener" target="_blank">vLLM Neuron README</a></td>
+</tr>
+<tr id="b86">
+<td class="rowhead"><span class="pc pc-con">缺</span></td>
+<td>亞太較貴，且沒有 Taipei</td>
+<td>inf2.48xlarge 在 Tokyo $19.4719/h，美國 $12.9813/h（1.5×）；Taipei、Hong Kong、Osaka 沒有 Inf2</td>
+<td><span class="g g-c" title="等級 C：廠商宣稱或規格，未揭露方法">C</span>；<span class="g g-d" title="等級 D：本文推算，附算式">D</span></td>
+<td class="src"><a href="https://b0.p.awsstatic.com/pricing/2.0/meteredUnitMaps/ec2/USD/current/ec2-ondemand-without-sec-sel/US%20East%20%28N.%20Virginia%29/Linux/index.json" rel="noopener" target="_blank">AWS price list (us-east-1)</a>；<a href="https://b0.p.awsstatic.com/pricing/2.0/meteredUnitMaps/ec2/USD/current/ec2-ondemand-without-sec-sel/Asia%20Pacific%20%28Tokyo%29/Linux/index.json" rel="noopener" target="_blank">AWS price list (Tokyo)</a></td>
+</tr>
+</tbody>
+</table></div></figure>
+<h4 id="b87">Google TPU</h4>
+<figure class="tbl" data-cols="5" data-rows="9"><div aria-label="資料表" class="tbl-scroll" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th scope="col">優 / 缺</th>
+<th class="w1" scope="col">要點</th>
+<th class="w3" scope="col">證據（日期）</th>
+<th scope="col">等級</th>
+<th class="src" scope="col">來源</th>
+</tr>
+</thead>
+<tbody>
+<tr id="b88">
+<td class="rowhead"><span class="pc pc-pro">優</span></td>
+<td>三種取用面</td>
+<td>GKE（Standard 與 Autopilot）、Compute Engine（TPU VM 2026-06-01 GA）、Vertex AI endpoints（單主機）</td>
+<td><span class="g g-c" title="等級 C：廠商宣稱或規格，未揭露方法">C</span></td>
+<td class="src"><a href="https://docs.cloud.google.com/kubernetes-engine/docs/concepts/tpu-ironwood" rel="noopener" target="_blank">About Ironwood (TPU7x) in GKE</a>；<a href="https://docs.cloud.google.com/tpu/docs/release-notes" rel="noopener" target="_blank">Cloud TPU release notes</a>；<a href="https://docs.cloud.google.com/gemini-enterprise-agent-platform/machine-learning/predictions/use-tpu" rel="noopener" target="_blank">Use TPUs for online inference</a></td>
+</tr>
+<tr id="b89">
+<td class="rowhead"><span class="pc pc-pro">優</span></td>
+<td>commitment 與 DWS 的折扣深</td>
+<td>Ironwood 每晶片-小時（us-central1）：on-demand $12.00、DWS Flex-start $6.00、3 年 commitment $5.40</td>
+<td><span class="g g-c" title="等級 C：廠商宣稱或規格，未揭露方法">C</span>（列表價）</td>
+<td class="src"><a href="https://cloud.google.com/tpu/pricing" rel="noopener" target="_blank">Cloud TPU pricing</a></td>
+</tr>
+<tr id="b90">
+<td class="rowhead"><span class="pc pc-pro">優</span></td>
+<td>介面與 GPU 相同</td>
+<td>vLLM TPU 維持「the same user experience, telemetry, and interface」；GPU 與 TPU 間切換「only a few minor configuration changes」</td>
+<td><span class="g g-c" title="等級 C：廠商宣稱或規格，未揭露方法">C</span></td>
+<td class="src"><a href="https://github.com/vllm-project/tpu-inference" rel="noopener" target="_blank">tpu-inference README</a>；<a href="https://cloud.google.com/blog/products/compute/ironwood-tpus-and-new-axion-based-vms-for-your-ai-workloads" rel="noopener" target="_blank">Google Cloud, 6 Nov 2025</a></td>
+</tr>
+<tr id="b91">
+<td class="rowhead"><span class="pc pc-pro">優</span></td>
+<td>受管路由涵蓋 TPU</td>
+<td>GKE Inference Gateway（GA，2025-09-11）含 prefix-cache-aware routing，picker 追蹤 TPU 使用率</td>
+<td><span class="g g-c" title="等級 C：廠商宣稱或規格，未揭露方法">C</span></td>
+<td class="src"><a href="https://cloud.google.com/blog/products/ai-machine-learning/gke-inference-gateway-and-quickstart-are-ga" rel="noopener" target="_blank">Google Cloud blog, 11 Sep 2025</a>；<a href="https://docs.cloud.google.com/kubernetes-engine/docs/concepts/about-gke-inference-gateway" rel="noopener" target="_blank">GKE docs</a></td>
+</tr>
+<tr id="b92">
+<td class="rowhead"><span class="pc pc-con">缺</span></td>
+<td>zone 少，容量不保證</td>
+<td>TPU7x 的 zone 清單只有 us-central1；on-demand「no guarantee that enough on-demand resources will be available」；亞洲只有 v6e（asia-northeast1-b）</td>
+<td><span class="g g-c" title="等級 C：廠商宣稱或規格，未揭露方法">C</span></td>
+<td class="src"><a href="https://docs.cloud.google.com/tpu/docs/regions-zones" rel="noopener" target="_blank">TPU regions and zones</a>；<a href="https://docs.cloud.google.com/kubernetes-engine/docs/concepts/tpus" rel="noopener" target="_blank">About TPUs in GKE</a>；<a href="https://docs.cloud.google.com/kubernetes-engine/docs/concepts/tpu-ironwood" rel="noopener" target="_blank">About Ironwood (TPU7x) in GKE</a></td>
+</tr>
+<tr id="b93">
+<td class="rowhead"><span class="pc pc-con">缺</span></td>
+<td>TPU 8i / 8t 已宣布未出貨</td>
+<td>2026-04-22 宣布「will be generally available later this year」；至 2026-10-04 沒有文件頁、價格、release note</td>
+<td><span class="g g-c" title="等級 C：廠商宣稱或規格，未揭露方法">C</span></td>
+<td class="src"><a href="https://blog.google/innovation-and-ai/infrastructure-and-cloud/google-cloud/eighth-generation-tpu-agentic-era/" rel="noopener" target="_blank">Google, 22 Apr 2026</a>；<a href="https://docs.cloud.google.com/tpu/docs/release-notes" rel="noopener" target="_blank">Cloud TPU release notes</a>；<a href="https://cloud.google.com/tpu/pricing" rel="noopener" target="_blank">Cloud TPU pricing</a></td>
+</tr>
+<tr id="b94">
+<td class="rowhead"><span class="pc pc-con">缺</span></td>
+<td>多主機路徑未成熟</td>
+<td>vLLM TPU 多主機 TP / DP / EP 為 Untested；GKE 教學稱 vLLM on TPU 不支援多主機並建議 JetStream，而 JetStream 已於 2026-02-01 停用（封存）；Vertex 多主機為 Public preview</td>
+<td><span class="g g-c" title="等級 C：廠商宣稱或規格，未揭露方法">C</span></td>
+<td class="src"><a href="https://github.com/vllm-project/tpu-inference/tree/main/support_matrices" rel="noopener" target="_blank">tpu-inference support matrices</a>；<a href="https://docs.cloud.google.com/kubernetes-engine/docs/tutorials/serve-vllm-tpu" rel="noopener" target="_blank">GKE vLLM TPU tutorial</a>；<a href="https://github.com/AI-Hypercomputer/JetStream" rel="noopener" target="_blank">JetStream repo</a>；<a href="https://docs.cloud.google.com/gemini-enterprise-agent-platform/machine-learning/predictions/use-tpu" rel="noopener" target="_blank">Use TPUs for online inference</a></td>
+</tr>
+<tr id="b95">
+<td class="rowhead"><span class="pc pc-con">缺</span></td>
+<td>堆疊汰換快</td>
+<td>JetStream 封存（2026-02-01）、Hex-LLM deprecated、TorchAX「will soon be deprecated」、TorchTPU 仍是 private beta（2026-09-07）</td>
+<td><span class="g g-c" title="等級 C：廠商宣稱或規格，未揭露方法">C</span></td>
+<td class="src"><a href="https://github.com/AI-Hypercomputer/JetStream" rel="noopener" target="_blank">JetStream repo</a>；<a href="https://docs.cloud.google.com/gemini-enterprise-agent-platform/models/open-models/use-hex-llm" rel="noopener" target="_blank">Hex-LLM docs</a>；<a href="https://inferencex.semianalysis.com/blog/tpu-inferencex-full-steam" rel="noopener" target="_blank">SemiAnalysis InferenceX, 7 Sep 2026</a></td>
+</tr>
+<tr id="b96">
+<td class="rowhead"><span class="pc pc-con">缺</span></td>
+<td>靜態 shape，新模型落後</td>
+<td>不同 workload shape 要改旗標並重啟伺服器；Kimi K3 與 GLM 5.3 的支援仍在計畫中；外部 PD 路徑尚未最佳化（2026-09-07）</td>
+<td><span class="g g-c" title="等級 C：廠商宣稱或規格，未揭露方法">C</span></td>
+<td class="src"><a href="https://github.com/AI-Hypercomputer/tpu-recipes/tree/main/inference/ironwood/vLLM/Qwen3-32B" rel="noopener" target="_blank">tpu-recipes Qwen3-32B</a>；<a href="https://inferencex.semianalysis.com/blog/tpu-inferencex-full-steam" rel="noopener" target="_blank">SemiAnalysis InferenceX, 7 Sep 2026</a></td>
+</tr>
+</tbody>
+</table></div></figure>
+<h4 id="b97">GPU（NVIDIA 為主）</h4>
+<figure class="tbl" data-cols="5" data-rows="10"><div aria-label="資料表" class="tbl-scroll" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th scope="col">優 / 缺</th>
+<th class="w1" scope="col">要點</th>
+<th class="w3" scope="col">證據（日期）</th>
+<th scope="col">等級</th>
+<th class="src" scope="col">來源</th>
+</tr>
+</thead>
+<tbody>
+<tr id="b98">
+<td class="rowhead"><span class="pc pc-pro">優</span></td>
+<td>6 類部署模式都買得到</td>
+<td>7 家雲有公開的每小時價格（AWS、Google Cloud、Azure、OCI、CoreWeave、Lambda、Nebius）；Kimi K3、GLM-5.x、DeepSeek V4.x 的所有量測端點都在 GPU 機群或未揭露硬體上</td>
+<td><span class="g g-b" title="等級 B：廠商或夥伴公布，且揭露方法">B</span>；<span class="g g-a" title="等級 A：獨立第三方量測">A</span></td>
+<td class="src"><a href="https://aws.amazon.com/ec2/capacityblocks/pricing/" rel="noopener" target="_blank">AWS Capacity Blocks pricing</a>；<a href="https://cloud.google.com/products/compute/pricing/accelerator-optimized" rel="noopener" target="_blank">Google Cloud accelerator-optimized VM pricing</a>；<a href="https://www.oracle.com/cloud/compute/pricing/" rel="noopener" target="_blank">Oracle Cloud compute pricing</a>；<a href="https://www.coreweave.com/pricing" rel="noopener" target="_blank">CoreWeave pricing</a>；<a href="https://artificialanalysis.ai/leaderboards/providers" rel="noopener" target="_blank">Artificial Analysis provider leaderboard</a></td>
+</tr>
+<tr id="b99">
+<td class="rowhead"><span class="pc pc-pro">優</span></td>
+<td>叢集控制面只在 GPU 上有實證</td>
+<td>llm-d 的上游映像只涵蓋 NVIDIA CUDA、AMD ROCm、Intel XPU（v0.8，2026-06-24）</td>
+<td><span class="g g-c" title="等級 C：廠商宣稱或規格，未揭露方法">C</span></td>
+<td class="src"><a href="https://llm-d.ai/blog/llm-d-v0.8-from-platform-to-control-plane" rel="noopener" target="_blank">llm-d v0.8 blog</a>；<a href="https://github.com/llm-d/llm-d/releases" rel="noopener" target="_blank">llm-d releases</a></td>
+</tr>
+<tr id="b100">
+<td class="rowhead"><span class="pc pc-pro">優</span></td>
+<td>AWS 的受管功能集中在 GPU</td>
+<td>SageMaker HyperPod 的 PD（2026-07）與受管 tiered KV cache、SageMaker endpoints 的 prefix-aware routing（2026-09）；GPUDirect Storage 只在 NVIDIA GPU 執行個體可用</td>
+<td><span class="g g-c" title="等級 C：廠商宣稱或規格，未揭露方法">C</span></td>
+<td class="src"><a href="https://aws.amazon.com/blogs/machine-learning/amazon-sagemaker-inference-2026-year-to-date-launches-in-review/" rel="noopener" target="_blank">AWS ML blog, 18 Sep 2026</a>；<a href="https://aws.amazon.com/blogs/storage/accelerate-inference-with-kv-cache-tiering-on-aws/" rel="noopener" target="_blank">AWS Storage Blog, 21 Sep 2026</a></td>
+</tr>
+<tr id="b101">
+<td class="rowhead"><span class="pc pc-pro">優</span></td>
+<td>新模型 day-0</td>
+<td>「vLLM and SGLang concentrate their day-0 support on NVIDIA」（2026-09-07）</td>
+<td><span class="g g-c" title="等級 C：廠商宣稱或規格，未揭露方法">C</span></td>
+<td class="src"><a href="https://inferencex.semianalysis.com/blog/tpu-inferencex-full-steam" rel="noopener" target="_blank">SemiAnalysis InferenceX, 7 Sep 2026</a></td>
+</tr>
+<tr id="b102">
+<td class="rowhead"><span class="pc pc-pro">優</span></td>
+<td>記憶體放得下兆級參數 MoE 並留 KV 空間</td>
+<td>NVL72 每櫃 13.4–20.7 TB HBM；2.8T 模型在 FP8 下佔 2.8 TB</td>
+<td><span class="g g-c" title="等級 C：廠商宣稱或規格，未揭露方法">C</span>；<span class="g g-d" title="等級 D：本文推算，附算式">D</span></td>
+<td class="src"><a href="https://www.nvidia.com/en-us/data-center/gb200-nvl72/" rel="noopener" target="_blank">NVIDIA GB200 NVL72 page</a>；<a href="https://www.nvidia.com/en-us/data-center/vera-rubin-nvl72/" rel="noopener" target="_blank">NVIDIA Vera Rubin NVL72 page</a></td>
+</tr>
+<tr id="b103">
+<td class="rowhead"><span class="pc pc-con">缺</span></td>
+<td>價格高且在漲</td>
+<td>AWS Capacity Blocks 於 2026-07-01 調漲約 20%；2026-10-07 P6-B200 由 $12.355 調到 $14.208 每 GPU-小時（+15%）</td>
+<td><span class="g g-b" title="等級 B：廠商或夥伴公布，且揭露方法">B</span>；<span class="g g-d" title="等級 D：本文推算，附算式">D</span></td>
+<td class="src"><a href="https://ca.finance.yahoo.com/news/aws-raising-gpu-instance-prices-134610388.html" rel="noopener" target="_blank">Yahoo Finance, 26 Jun 2026</a>；<a href="https://aws.amazon.com/ec2/capacityblocks/pricing/" rel="noopener" target="_blank">AWS Capacity Blocks pricing</a></td>
+</tr>
+<tr id="b104">
+<td class="rowhead"><span class="pc pc-con">缺</span></td>
+<td>機櫃級供應有限</td>
+<td>AWS P6e-GB200 UltraServer 只有 Capacity Blocks、Dallas Local Zone；Vera Rubin NVL72 只在 CoreWeave limited availability（2026-09-30）；三大雲沒有 Rubin 執行個體與價格</td>
+<td><span class="g g-b" title="等級 B：廠商或夥伴公布，且揭露方法">B</span></td>
+<td class="src"><a href="https://aws.amazon.com/ec2/capacityblocks/pricing/" rel="noopener" target="_blank">AWS Capacity Blocks pricing</a>；<a href="https://www.coreweave.com/blog/cognition-becomes-first-customer-for-nvidia-vera-rubin-nvl72-on-coreweave-cloud" rel="noopener" target="_blank">CoreWeave blog, 30 Sep 2026</a></td>
+</tr>
+<tr id="b105">
+<td class="rowhead"><span class="pc pc-con">缺</span></td>
+<td>高 interactivity 需要機櫃級</td>
+<td>100–125 tok/s/user 下，8-GPU 節點跨 RoCE 的每 GPU 吞吐量是 NVL72 的 1/2.23 到 1/4.39（DeepSeek R1，FP4，1,024 in / 1,024 out，2026-05-22）</td>
+<td><span class="g g-a" title="等級 A：獨立第三方量測">A</span></td>
+<td class="src"><a href="https://inferencex.semianalysis.com/blog/gb200-nvl72-vs-b200-disagg-deepseek-r1-fp4-dynamo-trt" rel="noopener" target="_blank">InferenceX, 23 May 2026</a></td>
+</tr>
+<tr id="b106">
+<td class="rowhead"><span class="pc pc-con">缺</span></td>
+<td>要自己維運，介面仍在變</td>
+<td>跨節點的 PD 必須有 RDMA；Dynamo v1.5.0 把 CRD storage version 改為 <code>nvidia.com/v1beta1</code> 並列 12 個 known issues；llm-d 未到 1.0</td>
+<td><span class="g g-c" title="等級 C：廠商宣稱或規格，未揭露方法">C</span></td>
+<td class="src"><a href="https://docs.nvidia.com/dynamo/user-guides/disaggregated-serving" rel="noopener" target="_blank">Dynamo docs</a>；<a href="https://docs.nvidia.com/dynamo/dev/reference/releases/v1-5-0" rel="noopener" target="_blank">Dynamo v1.5.0 notes</a>；<a href="https://github.com/llm-d/llm-d/releases" rel="noopener" target="_blank">llm-d releases</a></td>
+</tr>
+<tr id="b107">
+<td class="rowhead"><span class="pc pc-con">缺</span></td>
+<td>台灣沒有在地容量；per-user 速度有上限</td>
+<td>AWS Asia Pacific（Taipei）沒有任何加速運算執行個體；NVIDIA 自述約 100 tok/s 是 GPU decode「a reasonable throughput」（2026-03-16）</td>
+<td><span class="g g-c" title="等級 C：廠商宣稱或規格，未揭露方法">C</span></td>
+<td class="src"><a href="https://docs.aws.amazon.com/ec2/latest/instancetypes/ec2-instance-regions.html" rel="noopener" target="_blank">AWS EC2, instance types by Region</a>；<a href="https://www.tomshardware.com/pc-components/gpus/nvidia-groq-3-lpu-and-groq-lpx-racks-join-rubin-platform-at-gtc-sram-packed-accelerator-boosts-every-layer-of-the-ai-model-on-every-token" rel="noopener" target="_blank">Tom's Hardware, 16 Mar 2026</a></td>
+</tr>
+</tbody>
+</table></div></figure>
+<h4 id="b108">Cerebras</h4>
+<figure class="tbl" data-cols="5" data-rows="9"><div aria-label="資料表" class="tbl-scroll" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th scope="col">優 / 缺</th>
+<th class="w1" scope="col">要點</th>
+<th class="w3" scope="col">證據（日期）</th>
+<th scope="col">等級</th>
+<th class="src" scope="col">來源</th>
+</tr>
+</thead>
+<tbody>
+<tr id="b109">
+<td class="rowhead"><span class="pc pc-pro">優</span></td>
+<td>獨立量測中最高的 per-user 速度</td>
+<td>gpt-oss-120b：1,781 t/s、E2E 1.84 s；同表 Amazon Bedrock 為 86 t/s、30.10 s（Artificial Analysis，10K 輸入，P50 / 72 h，2026-10-04）</td>
+<td><span class="g g-a" title="等級 A：獨立第三方量測">A</span></td>
+<td class="src"><a href="https://artificialanalysis.ai/models/gpt-oss-120b/providers" rel="noopener" target="_blank">Artificial Analysis, gpt-oss-120b providers</a></td>
+</tr>
+<tr id="b110">
+<td class="rowhead"><span class="pc pc-pro">優</span></td>
+<td>取用面多</td>
+<td>公開 API、Dedicated endpoint（可放微調權重）、地端系統、AWS Marketplace 等轉售通路</td>
+<td><span class="g g-c" title="等級 C：廠商宣稱或規格，未揭露方法">C</span></td>
+<td class="src"><a href="https://inference-docs.cerebras.ai/dedicated/overview" rel="noopener" target="_blank">Cerebras Dedicated Inference</a>；<a href="https://www.cerebras.ai/pricing" rel="noopener" target="_blank">Cerebras pricing</a>；<a href="https://www.sec.gov/Archives/edgar/data/2021728/000162828026056186/cbrsannouncesfinancialresu.htm" rel="noopener" target="_blank">Cerebras Q2 2026 results, SEC</a></td>
+</tr>
+<tr id="b111">
+<td class="rowhead"><span class="pc pc-pro">優</span></td>
+<td>兆級參數模型在私有端點上維持速度</td>
+<td>Kimi K2.6：981 t/s（Artificial Analysis，2026-05-06，10,000 in / 500 out）；約 20 套 CS-3（單一來源）</td>
+<td><span class="g g-a" title="等級 A：獨立第三方量測">A</span>（端點未公開）</td>
+<td class="src"><a href="https://www.cerebras.ai/blog/cerebras-kimi-k2-Enterprise" rel="noopener" target="_blank">Cerebras blog, 19 May 2026</a>；<a href="https://venturebeat.com/technology/cerebras-says-its-chips-run-a-trillion-parameter-ai-model-nearly-7-times-faster-than-gpu-clouds" rel="noopener" target="_blank">VentureBeat, 20 May 2026</a></td>
+</tr>
+<tr id="b112">
+<td class="rowhead"><span class="pc pc-pro">優</span></td>
+<td>API 相容</td>
+<td>OpenAI 式 Chat Completions；自動 prompt caching、strict structured outputs、parallel tool calling</td>
+<td><span class="g g-c" title="等級 C：廠商宣稱或規格，未揭露方法">C</span></td>
+<td class="src"><a href="https://inference-docs.cerebras.ai/models/overview" rel="noopener" target="_blank">Cerebras model catalog</a>；<a href="https://inference-docs.cerebras.ai/capabilities/prompt-caching" rel="noopener" target="_blank">Cerebras prompt caching</a></td>
+</tr>
+<tr id="b113">
+<td class="rowhead"><span class="pc pc-con">缺</span></td>
+<td>公開目錄只有 2 個模型，context 上限 131K</td>
+<td>Kimi K3、GLM-5.x、DeepSeek V4、Qwen3.8 旗艦都不在公開 API；2025-01 以來 14 次模型 deprecation</td>
+<td><span class="g g-c" title="等級 C：廠商宣稱或規格，未揭露方法">C</span></td>
+<td class="src"><a href="https://inference-docs.cerebras.ai/models/overview" rel="noopener" target="_blank">Cerebras model catalog</a>；<a href="https://inference-docs.cerebras.ai/support/deprecation" rel="noopener" target="_blank">Cerebras deprecations</a></td>
+</tr>
+<tr id="b114">
+<td class="rowhead"><span class="pc pc-con">缺</span></td>
+<td>容量配給</td>
+<td>Developer 層 qwen-3.8-27b 為 150K uncached TPM、300 RPM；Cerebras Code 兩個方案都 sold out；旗艦模型只在企業洽談</td>
+<td><span class="g g-c" title="等級 C：廠商宣稱或規格，未揭露方法">C</span></td>
+<td class="src"><a href="https://inference-docs.cerebras.ai/support/rate-limits" rel="noopener" target="_blank">Cerebras rate limits</a>；<a href="https://www.cerebras.ai/code" rel="noopener" target="_blank">Cerebras Code</a>；<a href="https://venturebeat.com/technology/cerebras-says-its-chips-run-a-trillion-parameter-ai-model-nearly-7-times-faster-than-gpu-clouds" rel="noopener" target="_blank">VentureBeat, 20 May 2026</a></td>
+</tr>
+<tr id="b115">
+<td class="rowhead"><span class="pc pc-con">缺</span></td>
+<td>Bedrock 整合延後</td>
+<td>2026-03-13 稱「in the next couple of months」，2026-08-12 財報改為預期 2027 Q1；AWS 上目前只有 Marketplace 上架</td>
+<td>財報文件</td>
+<td class="src"><a href="https://www.aboutamazon.com/news/aws/aws-cerebras-ai-inference" rel="noopener" target="_blank">About Amazon, 13 Mar 2026</a>；<a href="https://www.sec.gov/Archives/edgar/data/2021728/000162828026056186/cbrsannouncesfinancialresu.htm" rel="noopener" target="_blank">Cerebras Q2 2026 results, SEC</a></td>
+</tr>
+<tr id="b116">
+<td class="rowhead"><span class="pc pc-con">缺</span></td>
+<td>輸入價高，cache 不打折</td>
+<td>gpt-oss-120b 每 1M input tokens $0.35，Groq 與 Bedrock 為 $0.15；cached input「billed at the standard input token rate」</td>
+<td><span class="g g-a" title="等級 A：獨立第三方量測">A</span>（列表價）；<span class="g g-c" title="等級 C：廠商宣稱或規格，未揭露方法">C</span></td>
+<td class="src"><a href="https://openrouter.ai/api/v1/models/openai/gpt-oss-120b/endpoints" rel="noopener" target="_blank">OpenRouter gpt-oss-120b endpoints</a>；<a href="https://inference-docs.cerebras.ai/capabilities/prompt-caching" rel="noopener" target="_blank">Cerebras prompt caching</a></td>
+</tr>
+<tr id="b117">
+<td class="rowhead"><span class="pc pc-con">缺</span></td>
+<td>大模型要很多晶圓</td>
+<td>1.6T 模型在 1M context、256 個同時請求下約 40 套系統、超過 $20M、約 1 MW（2026-08-19）</td>
+<td>分析師</td>
+<td class="src"><a href="https://newsletter.semianalysis.com/p/cerebrass-next-generation-cs-4-fast" rel="noopener" target="_blank">SemiAnalysis, 19 Aug 2026</a></td>
+</tr>
+</tbody>
+</table></div></figure>
+</div></div></div>
+<details class="srcs"><summary>本節來源（132）</summary><ul><li><a href="https://aws.amazon.com/ec2/capacityblocks/pricing/" target="_blank" rel="noopener">AWS Capacity Blocks pricing</a></li><li><a href="https://b0.p.awsstatic.com/pricing/2.0/meteredUnitMaps/ec2/USD/current/ec2-ondemand-without-sec-sel/US%20East%20%28Ohio%29/Linux/index.json" target="_blank" rel="noopener">AWS price list, Ohio</a></li><li><a href="https://github.com/huggingface/optimum-neuron/blob/main/docs/source/containers.mdx" target="_blank" rel="noopener">Optimum Neuron containers doc</a></li><li><a href="https://github.com/deepjavalibrary/djl-serving/pull/2939" target="_blank" rel="noopener">DJL PR #2939</a></li><li><a href="https://awsdocs-neuron.readthedocs-hosted.com/en/latest/about-neuron/announcements/neuron2.x/announce-nxdi-maintenance-support-2-31.html" target="_blank" rel="noopener">NxDI maintenance announcement</a></li><li><a href="https://docs.aws.amazon.com/bedrock/latest/userguide/latency-optimized-inference.html" target="_blank" rel="noopener">Bedrock User Guide, latency-optimized inference</a></li><li><a href="https://www.aboutamazon.com/news/aws/amazon-ai-chips-business-history" target="_blank" rel="noopener">About Amazon, 31 Jul 2026</a></li><li><a href="https://docs.aws.amazon.com/ec2/latest/instancetypes/ec2-instance-regions.html" target="_blank" rel="noopener">AWS EC2, instance types by Region</a></li><li><a href="https://github.com/vllm-project/vllm-neuron/blob/release-0.24.0.1.1.0/README.md" target="_blank" rel="noopener">vLLM Neuron README</a></li><li><a href="https://aws.amazon.com/ec2/instance-types/trn2/" target="_blank" rel="noopener">AWS EC2 Trn2 page</a></li><li><a href="https://www.aboutamazon.com/news/company-news/amazon-ceo-andy-jassy-2025-letter-to-shareholders" target="_blank" rel="noopener">Amazon shareholder letter, 9 Apr 2026</a></li><li><a href="https://www.aboutamazon.com/news/aws/trainium-3-ultraserver-faster-ai-training-lower-cost" target="_blank" rel="noopener">About Amazon, 2 Dec 2025</a></li><li><a href="https://aws.amazon.com/ec2/instance-types/trn3/" target="_blank" rel="noopener">AWS EC2 Trn3 page</a></li><li><a href="https://awsdocs-neuron.readthedocs-hosted.com/en/latest/libraries/nxd-inference/tutorials/trn3-gpt-oss-120b-tutorial.html" target="_blank" rel="noopener">NxDI Trn3 gpt-oss-120b tutorial</a></li><li><a href="https://awsdocs-neuron.readthedocs-hosted.com/en/latest/deploy/eks/ultraserver-operator.html" target="_blank" rel="noopener">Neuron docs, UltraServer operator</a></li><li><a href="https://www.sec.gov/Archives/edgar/data/2021728/000162828026056186/cbrsannouncesfinancialresu.htm" target="_blank" rel="noopener">Cerebras Q2 2026 results, SEC</a></li><li><a href="https://b0.p.awsstatic.com/pricing/2.0/meteredUnitMaps/ec2/USD/current/ec2-ondemand-without-sec-sel/US%20East%20%28N.%20Virginia%29/Linux/index.json" target="_blank" rel="noopener">AWS price list (us-east-1)</a></li><li><a href="https://github.com/huggingface/optimum-neuron/blob/main/docs/source/guides/vllm_on_ie.mdx" target="_blank" rel="noopener">Optimum Neuron Inference Endpoints guide</a></li><li><a href="https://awsdocs-neuron.readthedocs-hosted.com/en/latest/about-neuron/announcements/neuron2.x/announce-maintenance-pytorch-xla-inference.html" target="_blank" rel="noopener">XLA inference maintenance announcement</a></li><li><a href="https://cloud.google.com/blog/products/compute/ironwood-tpus-and-new-axion-based-vms-for-your-ai-workloads" target="_blank" rel="noopener">Google Cloud, 6 Nov 2025</a></li><li><a href="https://cloud.google.com/tpu/pricing" target="_blank" rel="noopener">Cloud TPU pricing</a></li><li><a href="https://docs.cloud.google.com/tpu/docs/all-capacity-overview" target="_blank" rel="noopener">All Capacity mode overview</a></li><li><a href="https://docs.cloud.google.com/gemini-enterprise-agent-platform/machine-learning/predictions/use-tpu" target="_blank" rel="noopener">Use TPUs for online inference</a></li><li><a href="https://docs.cloud.google.com/gemini-enterprise-agent-platform/models/open-models/vllm/use-vllm-tpu" target="_blank" rel="noopener">vLLM TPU (Model Garden)</a></li><li><a href="https://docs.cloud.google.com/tpu/docs/release-notes" target="_blank" rel="noopener">Cloud TPU release notes</a></li><li><a href="https://docs.cloud.google.com/tpu/docs/regions-zones" target="_blank" rel="noopener">TPU regions and zones</a></li><li><a href="https://docs.cloud.google.com/kubernetes-engine/docs/concepts/tpus" target="_blank" rel="noopener">About TPUs in GKE</a></li><li><a href="https://docs.cloud.google.com/kubernetes-engine/docs/concepts/tpu-ironwood" target="_blank" rel="noopener">About Ironwood (TPU7x) in GKE</a></li><li><a href="https://blog.google/innovation-and-ai/infrastructure-and-cloud/google-cloud/eighth-generation-tpu-agentic-era/" target="_blank" rel="noopener">Google, 22 Apr 2026</a></li><li><a href="https://newsletter.semianalysis.com/p/tpuv7-google-takes-a-swing-at-the" target="_blank" rel="noopener">SemiAnalysis, 28 Nov 2025</a></li><li><a href="https://artificialanalysis.ai/leaderboards/providers" target="_blank" rel="noopener">Artificial Analysis provider leaderboard</a></li><li><a href="https://blogs.nvidia.com/blog/inference-open-source-models-blackwell-reduce-cost-per-token" target="_blank" rel="noopener">NVIDIA blog, 12 Feb 2026</a></li><li><a href="https://cloud.google.com/products/compute/pricing/accelerator-optimized" target="_blank" rel="noopener">Google Cloud accelerator-optimized VM pricing</a></li><li><a href="https://aws.amazon.com/blogs/machine-learning/amazon-sagemaker-inference-2026-year-to-date-launches-in-review/" target="_blank" rel="noopener">AWS ML blog, 18 Sep 2026</a></li><li><a href="https://www.coreweave.com/pricing" target="_blank" rel="noopener">CoreWeave pricing</a></li><li><a href="https://www.oracle.com/cloud/compute/pricing/" target="_blank" rel="noopener">Oracle Cloud compute pricing</a></li><li><a href="https://www.coreweave.com/blog/cognition-becomes-first-customer-for-nvidia-vera-rubin-nvl72-on-coreweave-cloud" target="_blank" rel="noopener">CoreWeave blog, 30 Sep 2026</a></li><li><a href="https://nvidianews.nvidia.com/news/nvidia-groq-3-lpx-now-in-full-production-with-world-class-speed-for-agentic-ai" target="_blank" rel="noopener">NVIDIA Newsroom, 24 Aug 2026</a></li><li><a href="https://nebius.com/prices" target="_blank" rel="noopener">Nebius prices</a></li><li><a href="https://www.trendforce.com/news/2026/07/21/news-amds-first-rack-scale-ai-system-helios-challenges-nvidia-with-hbm4-memory-edge-but-reportedly-comes-at-a-higher-price/" target="_blank" rel="noopener">TrendForce, 21 Jul 2026</a></li><li><a href="https://www.zyphra.com/our-work/zyphra-and-amd-partner-to-power-zyphra-cloud-on-amd-instinct-mi355x-gpus" target="_blank" rel="noopener">Zyphra, 4 May 2026</a></li><li><a href="https://moorinsightsstrategy.com/field-notes/amd-advancing-ai-2026-helios-ships-venice-swings-and-the-software-moat-narrows/" target="_blank" rel="noopener">Moor Insights &amp; Strategy, 24 Jul 2026</a></li><li><a href="https://inference-docs.cerebras.ai/models/overview" target="_blank" rel="noopener">Cerebras model catalog</a></li><li><a href="https://www.cerebras.ai/pricing" target="_blank" rel="noopener">Cerebras pricing</a></li><li><a href="https://inference-docs.cerebras.ai/dedicated/overview" target="_blank" rel="noopener">Cerebras Dedicated Inference</a></li><li><a href="https://inference-docs.cerebras.ai/capabilities/service-tiers" target="_blank" rel="noopener">Cerebras service tiers</a></li><li><a href="https://www.cerebras.ai/press-release/cerebras-unveils-cs-4-up-to-30-times-faster-than-gpu-based-solutions-3347356" target="_blank" rel="noopener">Cerebras press release, 18 Aug 2026</a></li><li><a href="https://github.com/llm-d/llm-d/blob/main/guides/pd-disaggregation/README.md" target="_blank" rel="noopener">llm-d P/D guide</a></li><li><a href="https://vllm.ai/blog/2026-09-29-disaggregated-serving-guide" target="_blank" rel="noopener">vLLM blog, 29 Sep 2026</a></li><li><a href="https://docs.nvidia.com/dynamo/v-0-9-1/user-guides/disaggregated-serving" target="_blank" rel="noopener">Dynamo v0.9.1 docs</a></li><li><a href="https://docs.vllm.ai/en/latest/features/disagg_prefill/" target="_blank" rel="noopener">vLLM docs</a></li><li><a href="https://blog.lmcache.ai/en/2026/09/15/lmcache-on-amazon-sagemaker-hyperpod-disaggregated-prefill-and-decode/" target="_blank" rel="noopener">LMCache blog, 15 Sep 2026</a></li><li><a href="https://docs.nvidia.com/dynamo/v1.1.0/user-guides/disaggregated-serving" target="_blank" rel="noopener">Dynamo v1.1.0 docs</a></li><li><a href="https://docs.nvidia.com/dynamo/user-guides/disaggregated-serving" target="_blank" rel="noopener">Dynamo docs</a></li><li><a href="https://nebius.com/blog/posts/nebius-weka-shared-kv-cache-benchmark-hgx-b300" target="_blank" rel="noopener">Nebius blog, 24 Sep 2026</a></li><li><a href="https://cloud.google.com/blog/topics/developers-practitioners/boosting-llm-performance-with-tiered-kv-cache-on-google-kubernetes-engine" target="_blank" rel="noopener">Google Cloud blog, 7 Nov 2025</a></li><li><a href="https://llm-d.ai/blog/serving-glm-5-2-agentic-workloads-on-llm-d" target="_blank" rel="noopener">llm-d blog, 22 Jul 2026</a></li><li><a href="https://llm-d.ai/blog/kvcache-wins-you-can-see" target="_blank" rel="noopener">llm-d blog, 24 Sep 2025</a></li><li><a href="https://inferencex.semianalysis.com/blog/gb200-nvl72-vs-b200-disagg-deepseek-r1-fp4-dynamo-trt" target="_blank" rel="noopener">InferenceX, 23 May 2026</a></li><li><a href="https://inferencex.semianalysis.com/blog/gb300-nvl72-vs-gb200-nvl72-dsv4-pro-vllm-fp4" target="_blank" rel="noopener">InferenceX, 27 May 2026</a></li><li><a href="https://aws.amazon.com/blogs/machine-learning/accelerate-llm-model-loading-and-increase-context-windows-with-gpudirect-on-amazon-fsx-for-lustre-and-turboquant/" target="_blank" rel="noopener">AWS ML blog, 1 Jun 2026</a></li><li><a href="https://aws.amazon.com/blogs/machine-learning/introducing-fast-model-loader-in-sagemaker-inference-accelerate-autoscaling-for-your-large-language-models-llms-part-1" target="_blank" rel="noopener">AWS ML blog, 2 Dec 2024</a></li><li><a href="https://awsdocs-neuron.readthedocs-hosted.com/en/latest/vllm-neuron/docs/tutorials/tutorial-gpt-oss.html" target="_blank" rel="noopener">vLLM Neuron gpt-oss tutorial</a></li><li><a href="https://zenn.dev/exwzd/articles/20250930-inferentia-llama" target="_blank" rel="noopener">Exawizards (Zenn), 30 Sep 2025</a></li><li><a href="https://www.aboutamazon.com/news/aws/aws-cerebras-ai-inference" target="_blank" rel="noopener">About Amazon, 13 Mar 2026</a></li><li><a href="https://www.cerebras.ai/blog/cerebras-is-coming-to-aws" target="_blank" rel="noopener">Cerebras blog, Mar 2026</a></li><li><a href="https://www.tomshardware.com/tech-industry/semiconductors/nvidia-presents-groq-3-lpx-architecture-and-unveils-its-first-third-party-inference-benchmark" target="_blank" rel="noopener">Tom&#x27;s Hardware, 26 Aug 2026</a></li><li><a href="https://investor.nvidia.com/news/press-release-details/2026/NVIDIA-Vera-Rubin-Opens-Agentic-AI-Frontier/default.aspx" target="_blank" rel="noopener">NVIDIA press release, 16 Mar 2026</a></li><li><a href="https://www.theregister.com/special-features/2026/03/19/a-closer-look-at-nvidias-groq-powered-lpx-rack-systems/5223364" target="_blank" rel="noopener">The Register, 19 Mar 2026</a></li><li><a href="https://arxiv.org/html/2606.17104v1" target="_blank" rel="noopener">arXiv 2606.17104</a></li><li><a href="https://github.com/Azure/AzurePublicDataset/blob/master/GitHubCopilotCodingAgentDataset2026.md" target="_blank" rel="noopener">Copilot agent trace</a></li><li><a href="https://platform.claude.com/docs/en/api/rate-limits" target="_blank" rel="noopener">Anthropic rate limits</a></li><li><a href="https://docs.aws.amazon.com/bedrock/latest/userguide/quotas-token-burndown.html" target="_blank" rel="noopener">How tokens are counted in Amazon Bedrock</a></li><li><a href="https://docs.nvidia.com/dynamo/dev/reference/releases/v1-5-0" target="_blank" rel="noopener">Dynamo v1.5.0 notes</a></li><li><a href="https://awsdocs-neuron.readthedocs-hosted.com/en/latest/vllm-neuron/docs/design/vllm/disaggregated-inference.html" target="_blank" rel="noopener">vLLM Neuron DI design</a></li><li><a href="https://awsdocs-neuron.readthedocs-hosted.com/en/latest/libraries/nxd-inference/developer_guides/vllm-user-guide-v1.html" target="_blank" rel="noopener">vLLM guide for NxDI</a></li><li><a href="https://github.com/vllm-project/tpu-inference/tree/main/support_matrices" target="_blank" rel="noopener">tpu-inference support matrices</a></li><li><a href="https://inferencex.semianalysis.com/blog/tpu-inferencex-full-steam" target="_blank" rel="noopener">SemiAnalysis InferenceX, 7 Sep 2026</a></li><li><a href="https://aws.amazon.com/blogs/storage/accelerate-inference-with-kv-cache-tiering-on-aws/" target="_blank" rel="noopener">AWS Storage Blog, 21 Sep 2026</a></li><li><a href="https://docs.nvidia.com/dynamo/dev/reference/releases/deprecations" target="_blank" rel="noopener">Dynamo deprecations</a></li><li><a href="https://github.com/vllm-project/tpu-inference/tree/main/examples/offload/gke/benchmarks" target="_blank" rel="noopener">tpu-inference offload example</a></li><li><a href="https://github.com/google/tpu-sync" target="_blank" rel="noopener">google/tpu-sync</a></li><li><a href="https://llm-d.ai/blog/llm-d-v0.8-from-platform-to-control-plane" target="_blank" rel="noopener">llm-d v0.8 blog</a></li><li><a href="https://docs.nvidia.com/dynamo/knowledge-base/concepts/system-architecture/kv-aware-routing" target="_blank" rel="noopener">Dynamo KV-aware routing docs</a></li><li><a href="https://docs.sglang.io/docs/advanced_features/sgl_model_gateway" target="_blank" rel="noopener">SGLang gateway docs</a></li><li><a href="https://aibrix.readthedocs.io/latest/features/gateway-plugins.html" target="_blank" rel="noopener">AIBrix routing docs</a></li><li><a href="https://awsdocs-neuron.readthedocs-hosted.com/en/latest/vllm-neuron/docs/guides/features-guide.html" target="_blank" rel="noopener">vLLM Neuron features guide</a></li><li><a href="https://docs.cloud.google.com/kubernetes-engine/docs/concepts/about-gke-inference-gateway" target="_blank" rel="noopener">GKE docs</a></li><li><a href="https://inference-docs.cerebras.ai/capabilities/prompt-caching" target="_blank" rel="noopener">Cerebras prompt caching</a></li><li><a href="https://awsdocs-neuron.readthedocs-hosted.com/en/latest/about-neuron/arch/neuron-hardware/trn3-arch.html" target="_blank" rel="noopener">Neuron docs, Trn3 architecture</a></li><li><a href="https://awsdocs-neuron.readthedocs-hosted.com/en/latest/libraries/nxd-inference/developer_guides/feature-guide.html" target="_blank" rel="noopener">NxDI feature guide</a></li><li><a href="https://docs.cloud.google.com/kubernetes-engine/docs/tutorials/serve-vllm-tpu" target="_blank" rel="noopener">GKE vLLM TPU tutorial</a></li><li><a href="https://github.com/sgl-project/sglang-jax/tree/main/docs/cookbook/autoregressive" target="_blank" rel="noopener">sglang-jax cookbook</a></li><li><a href="https://newsletter.semianalysis.com/p/cerebras-faster-tokens-please" target="_blank" rel="noopener">SemiAnalysis, 13 May 2026</a></li><li><a href="https://developer.nvidia.com/blog/nvidia-dynamo-1-production-ready/" target="_blank" rel="noopener">Dynamo 1.0 blog</a></li><li><a href="https://awsdocs-neuron.readthedocs-hosted.com/en/latest/vllm-neuron/docs/model-dev/onboarding-models.html" target="_blank" rel="noopener">vLLM Neuron onboarding guide</a></li><li><a href="https://awsdocs-neuron.readthedocs-hosted.com/en/latest/vllm-neuron/docs/design/compilation/cpu_compilation.html" target="_blank" rel="noopener">vLLM Neuron CPU compilation design</a></li><li><a href="https://awsdocs-neuron.readthedocs-hosted.com/en/latest/vllm-neuron/docs/design/compilation/compilation_cache.html" target="_blank" rel="noopener">vLLM Neuron compilation cache design</a></li><li><a href="https://zenn.dev/exwzd/articles/20250827_inferentia_compile" target="_blank" rel="noopener">Exawizards (Zenn), 28 Aug 2025</a></li><li><a href="https://github.com/vllm-project/tpu-inference/blob/main/.buildkite/benchmark/cases/daily/daily_qwen3_8_2p4t_fp8_tpu7x_32.json" target="_blank" rel="noopener">tpu-inference CI case</a></li><li><a href="https://llm-d.ai/blog/llm-d-v0.5-sustaining-performance-at-scale" target="_blank" rel="noopener">llm-d v0.5 blog</a></li><li><a href="https://kserve.github.io/website/blog/kserve-0.18-release" target="_blank" rel="noopener">KServe v0.18 blog</a></li><li><a href="https://aws.amazon.com/blogs/machine-learning/optimize-your-applications-for-scale-and-reliability-on-amazon-bedrock/" target="_blank" rel="noopener">AWS ML blog, 11 Feb 2026</a></li><li><a href="https://docs.aws.amazon.com/bedrock/latest/userguide/inference-profiles.html" target="_blank" rel="noopener">Bedrock inference profiles</a></li><li><a href="https://github.com/aws-solutions-library-samples/guidance-for-multi-provider-generative-ai-gateway-on-aws" target="_blank" rel="noopener">AWS multi-provider gateway guidance</a></li><li><a href="https://docs.aws.amazon.com/apigateway/latest/developerguide/api-gateway-api-usage-plans.html" target="_blank" rel="noopener">API Gateway usage plans</a></li><li><a href="https://docs.aws.amazon.com/bedrock-agentcore/latest/devguide/bedrock-agentcore-limits.html" target="_blank" rel="noopener">AgentCore quotas</a></li><li><a href="https://helix.ml/blog/the-subtraction-dividend" target="_blank" rel="noopener">HelixML blog, 30 Jun 2026</a></li><li><a href="https://github.com/aws-neuron/neuronx-distributed-inference/blob/main/contrib/models/DeepSeek-V3/README.md" target="_blank" rel="noopener">NxDI contrib, DeepSeek-V3</a></li><li><a href="https://github.com/aws-neuron/neuronx-distributed-inference/blob/main/contrib/models/GLM-5.2/README.md" target="_blank" rel="noopener">NxDI contrib, GLM-5.2</a></li><li><a href="https://github.com/huggingface/optimum-neuron/commits/main" target="_blank" rel="noopener">Optimum Neuron commits</a></li><li><a href="https://github.com/huggingface/optimum-neuron/blob/main/benchmark/vllm/data-parallel/llama3.1-8b/vllm-results-dp3.csv" target="_blank" rel="noopener">Optimum Neuron result CSV</a></li><li><a href="https://aws.amazon.com/ai/machine-learning/inferentia/" target="_blank" rel="noopener">AWS Inferentia</a></li><li><a href="https://b0.p.awsstatic.com/pricing/2.0/meteredUnitMaps/ec2/USD/current/ec2-ondemand-without-sec-sel/Asia%20Pacific%20%28Tokyo%29/Linux/index.json" target="_blank" rel="noopener">AWS price list (Tokyo)</a></li><li><a href="https://github.com/vllm-project/tpu-inference" target="_blank" rel="noopener">tpu-inference README</a></li><li><a href="https://cloud.google.com/blog/products/ai-machine-learning/gke-inference-gateway-and-quickstart-are-ga" target="_blank" rel="noopener">Google Cloud blog, 11 Sep 2025</a></li><li><a href="https://github.com/AI-Hypercomputer/JetStream" target="_blank" rel="noopener">JetStream repo</a></li><li><a href="https://docs.cloud.google.com/gemini-enterprise-agent-platform/models/open-models/use-hex-llm" target="_blank" rel="noopener">Hex-LLM docs</a></li><li><a href="https://github.com/AI-Hypercomputer/tpu-recipes/tree/main/inference/ironwood/vLLM/Qwen3-32B" target="_blank" rel="noopener">tpu-recipes Qwen3-32B</a></li><li><a href="https://github.com/llm-d/llm-d/releases" target="_blank" rel="noopener">llm-d releases</a></li><li><a href="https://www.nvidia.com/en-us/data-center/gb200-nvl72/" target="_blank" rel="noopener">NVIDIA GB200 NVL72 page</a></li><li><a href="https://www.nvidia.com/en-us/data-center/vera-rubin-nvl72/" target="_blank" rel="noopener">NVIDIA Vera Rubin NVL72 page</a></li><li><a href="https://ca.finance.yahoo.com/news/aws-raising-gpu-instance-prices-134610388.html" target="_blank" rel="noopener">Yahoo Finance, 26 Jun 2026</a></li><li><a href="https://www.tomshardware.com/pc-components/gpus/nvidia-groq-3-lpu-and-groq-lpx-racks-join-rubin-platform-at-gtc-sram-packed-accelerator-boosts-every-layer-of-the-ai-model-on-every-token" target="_blank" rel="noopener">Tom&#x27;s Hardware, 16 Mar 2026</a></li><li><a href="https://artificialanalysis.ai/models/gpt-oss-120b/providers" target="_blank" rel="noopener">Artificial Analysis, gpt-oss-120b providers</a></li><li><a href="https://www.cerebras.ai/blog/cerebras-kimi-k2-Enterprise" target="_blank" rel="noopener">Cerebras blog, 19 May 2026</a></li><li><a href="https://venturebeat.com/technology/cerebras-says-its-chips-run-a-trillion-parameter-ai-model-nearly-7-times-faster-than-gpu-clouds" target="_blank" rel="noopener">VentureBeat, 20 May 2026</a></li><li><a href="https://inference-docs.cerebras.ai/support/deprecation" target="_blank" rel="noopener">Cerebras deprecations</a></li><li><a href="https://inference-docs.cerebras.ai/support/rate-limits" target="_blank" rel="noopener">Cerebras rate limits</a></li><li><a href="https://www.cerebras.ai/code" target="_blank" rel="noopener">Cerebras Code</a></li><li><a href="https://openrouter.ai/api/v1/models/openai/gpt-oss-120b/endpoints" target="_blank" rel="noopener">OpenRouter gpt-oss-120b endpoints</a></li><li><a href="https://newsletter.semianalysis.com/p/cerebrass-next-generation-cs-4-fast" target="_blank" rel="noopener">SemiAnalysis, 19 Aug 2026</a></li></ul></details></section>
+<section class="panel" role="tabpanel" id="s3" aria-labelledby="tab-s3"><div class="panel-head"><h2>選型決策樹</h2><div class="sec-lead prose"><p id="b118">5 個問題分出 12 個葉節點：7 個落在受管服務（加速器由平台決定或未揭露）、2 個是 GPU、1 個是 Cerebras、1 個是編譯式 ASIC，另 1 個沒有可行選項。在 AWS 上，開放權重旗艦要取得容量確定性只剩自管 GPU：Kimi K3 的模型卡不支援 Reserved tier，而它只能經 inference profile 呼叫，inference profile 又不支援 Provisioned Throughput（<a href="https://docs.aws.amazon.com/bedrock/latest/userguide/model-card-moonshot-ai-kimi-k3.html" rel="noopener" target="_blank">Bedrock Kimi K3 model card</a>；<a href="https://docs.aws.amazon.com/bedrock/latest/userguide/cross-region-inference.html" rel="noopener" target="_blank">Bedrock cross-Region inference</a>）。</p>
+</div></div>
+<div class="subtabs"><div class="subtablist" role="tablist" aria-label="選型決策樹"><button type="button" class="subtab" role="tab" id="tab-s3-1" aria-controls="s3-1" aria-selected="true">決策樹</button><button type="button" class="subtab" role="tab" id="tab-s3-2" aria-controls="s3-2" aria-selected="false">剪枝規則</button><button type="button" class="subtab" role="tab" id="tab-s3-3" aria-controls="s3-3" aria-selected="false">Q4 的量級參考</button></div><div class="subpanel on" role="tabpanel" id="s3-1" aria-labelledby="tab-s3-1"><div class="prose"><h3 class="ph">決策樹</h3><p id="b119">五個問題依序是：Q1 模型是私有還是開放權重；Q2 資料或運算是否必須留在特定 Region 或地端；Q3 綁定需求是每使用者速度、每 token 成本、長上下文還是容量確定性；Q4 尖峰多大（TPM）；Q5 團隊有沒有編譯式堆疊（Neuron、XLA）的工程師。</p>
+<ol class="tree">
+<li id="b120"><strong>Q1：私有模型</strong>（權重不對外提供：Claude、GPT、Gemini、Nova）
+<ol>
+<li id="b121"><strong>Q2：必須地端</strong> → <strong class="leaf"><span class="leaf-id">L1</span>沒有可行選項</strong>。指定筆記中，私有模型只出現在第一方 API 與 Bedrock、Vertex AI、Azure AI Foundry 的受管端點；Trainium 只透過 EC2 提供，AWS 地端方案沒有資料（<a href="https://www.aboutamazon.com/news/company-news/amazon-ceo-andy-jassy-2025-letter-to-shareholders" rel="noopener" target="_blank">Amazon shareholder letter, 9 Apr 2026</a>）。</li>
+<li id="b122"><strong>Q2：必須留在特定 Region 或地理區</strong> → <strong class="leaf"><span class="leaf-id">L2</span>Bedrock In-Region 或 geographic cross-Region profile（US、EU、APAC）；加速器由 AWS 決定</strong>。單一 Region on-demand 的預設配額是 cross-Region 的一半（Claude Opus 5：15M 對 30M TPM）<span class="g g-b" title="等級 B：廠商或夥伴公布，且揭露方法">B</span>，global profile 不保證處理地點；AWS 稱 Bedrock「runs most of its inference on Trainium」<span class="g g-c" title="等級 C：廠商宣稱或規格，未揭露方法">C</span>，但不揭露單一請求用哪種硬體。Azure 的對應選項是 Data Zone Standard（配額為 Global Standard 的三分之一），Google PT 綁定 project × region × model × version（<a href="https://docs.aws.amazon.com/general/latest/gr/bedrock.html" rel="noopener" target="_blank">Amazon Bedrock endpoints and quotas</a>；<a href="https://docs.aws.amazon.com/bedrock/latest/userguide/cross-region-inference.html" rel="noopener" target="_blank">Bedrock cross-Region inference</a>；<a href="https://www.aboutamazon.com/news/company-news/amazon-ceo-andy-jassy-2025-letter-to-shareholders" rel="noopener" target="_blank">Amazon shareholder letter, 9 Apr 2026</a>；<a href="https://learn.microsoft.com/en-us/azure/foundry/openai/quotas-limits" rel="noopener" target="_blank">Azure OpenAI quotas and limits</a>；<a href="https://docs.cloud.google.com/gemini-enterprise-agent-platform/models/provisioned-throughput/measure-provisioned-throughput" rel="noopener" target="_blank">Calculate Provisioned Throughput requirements</a>）。</li>
+<li id="b123"><strong>Q2：沒有駐留限制</strong>，看 Q3：
+<ol>
+<li id="b124"><strong>容量確定性，或 Q4 尖峰超過預設配額</strong> → <strong class="leaf"><span class="leaf-id">L3</span>Bedrock Reserved tier（其他雲為 Azure PTU、Google PT）；加速器由平台決定</strong>。Opus 5.5 的預設 cross-Region 配額是 30M TPM，輸出 token 以 10× 扣抵 <span class="g g-b" title="等級 B：廠商或夥伴公布，且揭露方法">B</span>；依 Claude Code 建議值，1,000 名開發者約需 10–15M TPM，數萬名使用者超出所有已公布的預設配額 <span class="g g-d" title="等級 D：本文推算，附算式">D</span>。Reserved 最低 100,000 輸入 TPM + 10,000 輸出 TPM，與 on-demand 配額分開計算（<a href="https://docs.aws.amazon.com/general/latest/gr/bedrock.html" rel="noopener" target="_blank">Amazon Bedrock endpoints and quotas</a>；<a href="https://docs.aws.amazon.com/bedrock/latest/userguide/quotas-token-burndown.html" rel="noopener" target="_blank">How tokens are counted in Amazon Bedrock</a>；<a href="https://code.claude.com/docs/en/costs" rel="noopener" target="_blank">Claude Code costs</a>；<a href="https://docs.aws.amazon.com/bedrock/latest/userguide/service-tiers-inference.html" rel="noopener" target="_blank">Bedrock service tiers</a>）。</li>
+<li id="b125"><strong>每使用者速度</strong> → <strong class="leaf"><span class="leaf-id">L4</span>受管快速層；加速器依產品為 Trainium2 或 Cerebras</strong>。Bedrock Priority tier 宣稱輸出速度「up to 25% better」<span class="g g-c" title="等級 C：廠商宣稱或規格，未揭露方法">C</span>；latency-optimized inference（Trainium2）量到 Claude 3.5 Haiku P50 85.9 對 48.4 output tok/s（約 1,600 次呼叫，輸入 100–100,000 tokens，2025-01-28）<span class="g g-b" title="等級 B：廠商或夥伴公布，且揭露方法">B</span>，但至今仍是 Preview。OpenAI 的 GPT-5.6 Sol Ultrafast 在 Cerebras 上宣稱最高 750 tok/s（limited preview，2026-08-13）<span class="g g-c" title="等級 C：廠商宣稱或規格，未揭露方法">C</span>；Bedrock 上的 Cerebras 預期 2027 Q1 才上線（<a href="https://aws.amazon.com/blogs/aws/new-amazon-bedrock-service-tiers-help-you-match-ai-workload-performance-with-cost/" rel="noopener" target="_blank">AWS News blog, 18 Nov 2025</a>；<a href="https://aws.amazon.com/blogs/machine-learning/optimizing-ai-responsiveness-a-practical-guide-to-amazon-bedrock-latency-optimized-inference/" rel="noopener" target="_blank">AWS ML Blog, 28 Jan 2025</a>；<a href="https://docs.aws.amazon.com/bedrock/latest/userguide/latency-optimized-inference.html" rel="noopener" target="_blank">Bedrock User Guide, latency-optimized inference</a>；<a href="https://openai.com/index/previewing-ultrafast/" rel="noopener" target="_blank">OpenAI, 13 Aug 2026</a>；<a href="https://www.sec.gov/Archives/edgar/data/2021728/000162828026056186/cbrsannouncesfinancialresu.htm" rel="noopener" target="_blank">Cerebras Q2 2026 results, SEC</a>）。</li>
+<li id="b126"><strong>每 token 成本或長上下文</strong> → <strong class="leaf"><span class="leaf-id">L5</span>Bedrock on-demand（Standard 或 Flex）加 global cross-Region profile 與 prompt caching；加速器由 AWS 決定</strong>。global profile 約便宜 10%，cache read 不計入 Bedrock 的 TPM 配額；Flex 在 Kimi K3 模型卡上是 Standard 的 0.5×，其他模型的倍率筆記未逐一確認。Claude 的 1M context 自 2026-03-13 在 Bedrock GA，但長上下文變體可能另有較低配額（Claude Sonnet 4.5 的 1M-context 變體：1M TPM、1,000 RPM）<span class="g g-b" title="等級 B：廠商或夥伴公布，且揭露方法">B</span>（<a href="https://docs.aws.amazon.com/bedrock/latest/userguide/cross-region-inference.html" rel="noopener" target="_blank">Bedrock cross-Region inference</a>；<a href="https://docs.aws.amazon.com/bedrock/latest/userguide/quotas-token-burndown.html" rel="noopener" target="_blank">How tokens are counted in Amazon Bedrock</a>；<a href="https://docs.aws.amazon.com/bedrock/latest/userguide/model-card-moonshot-ai-kimi-k3.html" rel="noopener" target="_blank">Bedrock Kimi K3 model card</a>；<a href="https://claude.com/blog/1m-context-ga" rel="noopener" target="_blank">Anthropic, 13 Mar 2026</a>；<a href="https://docs.aws.amazon.com/general/latest/gr/bedrock.html" rel="noopener" target="_blank">Amazon Bedrock endpoints and quotas</a>）。</li>
+</ol>
+</li>
+</ol>
+</li>
+<li id="b127"><strong>Q1：開放權重</strong>（含自行微調的權重）
+<ol>
+<li id="b128"><strong>Q2：必須地端</strong> → <strong class="leaf"><span class="leaf-id">L6</span>地端 GPU 機櫃或 8-GPU 節點，以 llm-d 或 Dynamo 自管</strong>。2.8T 參數模型在 FP8 下放不進任何 8-GPU 節點，NVL72 級機櫃（13.4–20.7 TB HBM）才放得下；FP4 下 8× B300（CoreWeave 列 2,160 GB）放得下：Kimi K3 的 MXFP4 checkpoint 為 1,560.9 GB，剩約 600 GB，比 recipe 的最低 VRAM 1,680 GB 多 480 GB <span class="g g-d" title="等級 D：本文推算，附算式">D</span>。DeepSeek-V4-Pro 只在整櫃 72 GPU 上有獨立量測 <span class="g g-a" title="等級 A：獨立第三方量測">A</span>，開源控制面只對 NVIDIA、AMD、Intel 有實證；Cerebras 地端只適合以速度為價值且 context ≤ 131K 的情境，Trainium 買不到，TPU 的買斷只見於 Anthropic 等級買家（<a href="https://www.nvidia.com/en-us/data-center/gb200-nvl72/" rel="noopener" target="_blank">NVIDIA GB200 NVL72 page</a>；<a href="https://www.nvidia.com/en-us/data-center/vera-rubin-nvl72/" rel="noopener" target="_blank">NVIDIA Vera Rubin NVL72 page</a>；<a href="https://www.coreweave.com/pricing" rel="noopener" target="_blank">CoreWeave pricing</a>；<a href="https://inferencex.semianalysis.com/blog/gb300-nvl72-vs-gb200-nvl72-dsv4-pro-vllm-fp4" rel="noopener" target="_blank">InferenceX, 27 May 2026</a>；<a href="https://llm-d.ai/blog/llm-d-v0.8-from-platform-to-control-plane" rel="noopener" target="_blank">llm-d v0.8 blog</a>；<a href="https://inference-docs.cerebras.ai/models/overview" rel="noopener" target="_blank">Cerebras model catalog</a>；<a href="https://newsletter.semianalysis.com/p/tpuv7-google-takes-a-swing-at-the" rel="noopener" target="_blank">SemiAnalysis, 28 Nov 2025</a>）。</li>
+<li id="b129"><strong>Q2：可用雲端</strong>（有 Region 限制時，只在該 Region 有的選項中選），看 Q3：
+<ol>
+<li id="b130"><strong>每使用者速度（數百 tok/s 以上）</strong> → <strong class="leaf"><span class="leaf-id">L7</span>Cerebras Inference（Shared 或 Dedicated）；加速器為 Cerebras CS-3</strong>。gpt-oss-120b 量到 1,781 t/s，同表 Amazon Bedrock 為 86 t/s（Artificial Analysis，10K 輸入，2026-10-04）<span class="g g-a" title="等級 A：獨立第三方量測">A</span>。前提是模型在其目錄（公開 API 只有 gpt-oss-120b 與 qwen-3.8-27b）、context ≤ 131K，且接受已上線的站點都在美國（加拿大為租用容量，芬蘭 Mikkeli 的 165 MW 於 2026-09 動工）；Developer 層的 3M total TPM 只夠約 28 條全速串流 [<span class="g g-d" title="等級 D：本文推算，附算式">D</span>：3,000,000 ÷（1,781 × 60）]，量產需企業合約（<a href="https://artificialanalysis.ai/models/gpt-oss-120b/providers" rel="noopener" target="_blank">Artificial Analysis, gpt-oss-120b providers</a>；<a href="https://inference-docs.cerebras.ai/models/overview" rel="noopener" target="_blank">Cerebras model catalog</a>；<a href="https://inference-docs.cerebras.ai/support/rate-limits" rel="noopener" target="_blank">Cerebras rate limits</a>；<a href="https://www.datacenterdynamics.com/en/news/cerebras-starts-construction-on-165mw-data-center-in-mikkeli-finland/" rel="noopener" target="_blank">DataCenterDynamics, 2 Sep 2026</a>）。</li>
+<li id="b131"><strong>每 token 成本、長上下文或一般用途，且 Q4 尖峰在受管配額內</strong>：
+<ol>
+<li id="b132"><strong>模型在 Bedrock 目錄</strong> → <strong class="leaf"><span class="leaf-id">L8</span>Bedrock on-demand；硬體未揭露（引擎為 Project Mantle）</strong>。Kimi K3：1M context，預設 10M TPM（可調）、每日 14.4B tokens（不可調），只能走 US 或 global profile，量到 182 t/s、TTFT 1.30 s（10K 輸入，2026-10-04）<span class="g g-a" title="等級 A：獨立第三方量測">A</span>。較舊的模型（Kimi K2.5、GLM 5、DeepSeek V3.2、Qwen3）是 In-Region，配額 100M TPM、10,000 RPM（不可調）<span class="g g-b" title="等級 B：廠商或夥伴公布，且揭露方法">B</span>（<a href="https://docs.aws.amazon.com/bedrock/latest/userguide/model-card-moonshot-ai-kimi-k3.html" rel="noopener" target="_blank">Bedrock Kimi K3 model card</a>；<a href="https://docs.aws.amazon.com/general/latest/gr/bedrock.html" rel="noopener" target="_blank">Amazon Bedrock endpoints and quotas</a>；<a href="https://artificialanalysis.ai/models/kimi-k3/providers" rel="noopener" target="_blank">Artificial Analysis, Kimi K3 providers</a>；<a href="https://aws.amazon.com/about-aws/whats-new/2026/02/amazon-bedrock-adds-support-six-open-weights-models/" rel="noopener" target="_blank">AWS What's New, 10 Feb 2026</a>；<a href="https://docs.aws.amazon.com/bedrock/latest/userguide/model-card-moonshot-ai-kimi-k2-5.html" rel="noopener" target="_blank">Bedrock Kimi K2.5 model card</a>）。</li>
+<li id="b133"><strong>自訂權重，&lt; 200 GB、context &lt; 128K 且架構在支援清單</strong> → <strong class="leaf"><span class="leaf-id">L9</span>Bedrock Custom Model Import；硬體未揭露</strong>。只在 us-east-1、us-east-2、us-west-2、eu-central-1，亞太沒有；超過任一上限者改用 SageMaker endpoints 的 GPU 容器或落到 L11（<a href="https://docs.aws.amazon.com/bedrock/latest/userguide/model-customization-import-model.html" rel="noopener" target="_blank">Bedrock Custom Model Import docs</a>；<a href="https://aws.amazon.com/blogs/machine-learning/amazon-sagemaker-inference-2026-year-to-date-launches-in-review/" rel="noopener" target="_blank">AWS ML blog, 18 Sep 2026</a>）。</li>
+<li id="b134"><strong>其餘</strong>（GLM-5.x、DeepSeek V4.x、Qwen3.8 等不在 Bedrock 目錄的模型）→ <strong class="leaf"><span class="leaf-id">L10</span>Azure AI Foundry、第三方 GPU 託管 API 或原廠 API；GPU 機群或未揭露硬體</strong>。Azure 有 DeepSeek V4 Pro（1M 輸入）與 Kimi K2.5–K2.7 Code，Global Standard 可從 5 個亞太 Region 部署；DeepSeek V4 Pro 的 PTU 起購量為 800 PTU × 100 輸入 TPM = 80,000 輸入 TPM <span class="g g-d" title="等級 D：本文推算，附算式">D</span>。GLM-5.3 在 Artificial Analysis 有 24 個、OpenRouter 有 39 個第三方 GPU 機群端點；Vertex AI 在 2026-10-21 後只剩 Preview 的 GLM 5.2，不宜列入規劃（<a href="https://learn.microsoft.com/en-us/azure/foundry/foundry-models/concepts/models-sold-directly-by-azure" rel="noopener" target="_blank">Foundry Models sold by Azure</a>；<a href="https://learn.microsoft.com/en-us/azure/foundry/foundry-models/concepts/models-sold-directly-by-azure-region-availability" rel="noopener" target="_blank">Azure region availability, 4 Sep 2026</a>；<a href="https://learn.microsoft.com/en-us/azure/foundry/openai/how-to/provisioned-throughput-sizing" rel="noopener" target="_blank">PTU sizing</a>；<a href="https://artificialanalysis.ai/leaderboards/providers" rel="noopener" target="_blank">Artificial Analysis provider leaderboard</a>；<a href="https://openrouter.ai/z-ai/glm-5.3" rel="noopener" target="_blank">OpenRouter glm-5.3</a>；<a href="https://docs.cloud.google.com/gemini-enterprise-agent-platform/models/deprecations/open-models" rel="noopener" target="_blank">Vertex open model deprecations</a>）。</li>
+</ol>
+</li>
+<li id="b135"><strong>容量確定性、Q4 尖峰大到值得包下容量，或受管目錄在所需 Region 沒有此模型</strong>，看 Q5：
+<ol>
+<li id="b136"><strong>沒有編譯式堆疊工程師，或模型不在 Neuron、TPU 的支援清單</strong> → <strong class="leaf"><span class="leaf-id">L11</span>自管 GPU：EKS 或 SageMaker HyperPod 加 llm-d 或 Dynamo，容量用 Capacity Blocks；一般用 8-GPU 節點（P5en、P6），per-user 需要 100 tok/s 以上時用機櫃級（P6e-GB200）</strong>。GLM-5.2 在 64× H200 上量到 6,281 output tok/s 與 431K input tok/s，作者以每 GPU-小時 $2.71 換算為每 1M 輸入 / 輸出 token $0.08 / $1.92，原廠 API 為 $1.40 / $4.40，前提是 24/7 滿載（2026-07-22）<span class="g g-b" title="等級 B：廠商或夥伴公布，且揭露方法">B</span>；改用 AWS P5en Capacity Blocks 的 $6.865 重算是 $0.20 / $4.86 [<span class="g g-d" title="等級 D：本文推算，附算式">D</span>：× 6.865 ÷ 2.71]，輸出單價已高於原廠 API。NVL72 在 100–125 tok/s/user 下的每 GPU 吞吐量是 8-GPU 節點的 2.23–4.39 倍 <span class="g g-a" title="等級 A：獨立第三方量測">A</span>；這條路需要 Kubernetes 與 RDMA（AWS 上為 EFA）的維運人力，沒有的團隊退回 L10（<a href="https://llm-d.ai/blog/serving-glm-5-2-agentic-workloads-on-llm-d" rel="noopener" target="_blank">llm-d blog, 22 Jul 2026</a>；<a href="https://aws.amazon.com/ec2/capacityblocks/pricing/" rel="noopener" target="_blank">AWS Capacity Blocks pricing</a>；<a href="https://inferencex.semianalysis.com/blog/gb200-nvl72-vs-b200-disagg-deepseek-r1-fp4-dynamo-trt" rel="noopener" target="_blank">InferenceX, 23 May 2026</a>；<a href="https://aws.amazon.com/blogs/machine-learning/amazon-sagemaker-inference-2026-year-to-date-launches-in-review/" rel="noopener" target="_blank">AWS ML blog, 18 Sep 2026</a>）。</li>
+<li id="b137"><strong>有，且模型在支援清單</strong> → <strong class="leaf"><span class="leaf-id">L12</span>編譯式 ASIC：Trainium2 Capacity Blocks 加 vLLM Neuron（Beta）；小型 dense 模型用 Inferentia2 on-demand；在 Google Cloud 則是 TPU on GKE 加 vLLM TPU</strong>。Trainium2 每晶片-小時 $2.235，B200 為 $12.355（5.5 倍，只是價格比，不是每美元 token 數）<span class="g g-d" title="等級 D：本文推算，附算式">D</span>；vLLM Neuron 只驗證 Llama 3、gpt-oss、Qwen3-VL、Qwen3-Embedding，Region 限 Ohio、Hyderabad（trn2.3xlarge 另有 Melbourne、São Paulo）。Inferentia2 適合 70B 以下 dense 模型、context 4K–16K 以內的穩定流量（Llama 3.1 8B 約 $2.94 每 1M output tokens）<span class="g g-d" title="等級 D：本文推算，附算式">D</span>；TPU 上以 Qwen 的支援最完整，Kimi K3 與 GLM 5.3 仍在計畫中（<a href="https://aws.amazon.com/ec2/capacityblocks/pricing/" rel="noopener" target="_blank">AWS Capacity Blocks pricing</a>；<a href="https://github.com/vllm-project/vllm-neuron/blob/release-0.24.0.1.1.0/README.md" rel="noopener" target="_blank">vLLM Neuron README</a>；<a href="https://github.com/huggingface/optimum-neuron/blob/main/benchmark/vllm/data-parallel/llama3.1-8b/vllm-results-dp3.csv" rel="noopener" target="_blank">Optimum Neuron result CSV</a>；<a href="https://inferencex.semianalysis.com/blog/tpu-inferencex-full-steam" rel="noopener" target="_blank">SemiAnalysis InferenceX, 7 Sep 2026</a>）。</li>
+</ol>
+</li>
+</ol>
+</li>
+</ol>
+</li>
+</ol>
+</div></div><div class="subpanel" role="tabpanel" id="s3-2" aria-labelledby="tab-s3-2"><div class="prose"><h3>剪枝規則</h3><ul>
+<li id="b138"><strong>context &gt; 131K</strong>：排除 Cerebras 公開 API；Neuron 文件記載的最高 context 為 128K，AWS 自己的 gpt-oss 配方用 16,384；外部 TPU 堆疊的公開組態最高為 40,960（CI）到 98,304 tokens（<a href="https://inference-docs.cerebras.ai/models/overview" rel="noopener" target="_blank">Cerebras model catalog</a>；<a href="https://awsdocs-neuron.readthedocs-hosted.com/en/latest/about-neuron/whats-new.html" rel="noopener" target="_blank">Neuron What's New</a>；<a href="https://awsdocs-neuron.readthedocs-hosted.com/en/latest/vllm-neuron/docs/tutorials/tutorial-gpt-oss.html" rel="noopener" target="_blank">vLLM Neuron gpt-oss tutorial</a>；<a href="https://github.com/vllm-project/tpu-inference" rel="noopener" target="_blank">tpu-inference README</a>）。</li>
+<li id="b139"><strong>模型是 Kimi、GLM-5.x 或 DeepSeek V3 / V4</strong>：排除自管 Trainium 與 Inferentia；vLLM Neuron 沒有 MLA 模型，社群移植停在 512–2,048 tokens（<a href="https://github.com/vllm-project/vllm-neuron/blob/release-0.24.0.1.1.0/README.md" rel="noopener" target="_blank">vLLM Neuron README</a>；<a href="https://github.com/aws-neuron/neuronx-distributed-inference/blob/main/contrib/models/DeepSeek-V3/README.md" rel="noopener" target="_blank">NxDI contrib, DeepSeek-V3</a>；<a href="https://github.com/aws-neuron/neuronx-distributed-inference/blob/main/contrib/models/GLM-5.2/README.md" rel="noopener" target="_blank">NxDI contrib, GLM-5.2</a>）。</li>
+<li id="b140"><strong>亞太駐留</strong>：排除 Bedrock global profile、Bedrock Custom Model Import（沒有亞太 Region）、自管 Trainium（東亞沒有容量）與 Taipei Region 內的任何自管加速器（<a href="https://docs.aws.amazon.com/bedrock/latest/userguide/model-card-moonshot-ai-kimi-k3.html" rel="noopener" target="_blank">Bedrock Kimi K3 model card</a>；<a href="https://docs.aws.amazon.com/bedrock/latest/userguide/model-customization-import-model.html" rel="noopener" target="_blank">Bedrock Custom Model Import docs</a>；<a href="https://docs.aws.amazon.com/ec2/latest/instancetypes/ec2-instance-regions.html" rel="noopener" target="_blank">AWS EC2, instance types by Region</a>）。</li>
+<li id="b141"><strong>尚未能用</strong>：Bedrock 上的 Cerebras、Trn3 自助取得、TPU 8i、三大雲上的 Vera Rubin。</li>
+</ul>
+</div></div><div class="subpanel" role="tabpanel" id="s3-3" aria-labelledby="tab-s3-3"><div class="prose"><h3>Q4 的量級參考</h3><ul>
+<li id="b142"><strong>受管預設配額</strong> <span class="g g-b" title="等級 B：廠商或夥伴公布，且揭露方法">B</span>：Claude Opus 5.5 為 30M TPM、Sonnet 5.5 為 6M TPM（cross-Region）；Kimi K3 為 10M TPM，以 100K-token 的 agentic prompt 計約每分鐘 100 個未命中 cache 的請求 [<span class="g g-d" title="等級 D：本文推算，附算式">D</span>：10,000,000 ÷ 100,000]；較舊的開放權重模型為 100M TPM、10,000 RPM（<a href="https://docs.aws.amazon.com/general/latest/gr/bedrock.html" rel="noopener" target="_blank">Amazon Bedrock endpoints and quotas</a>；<a href="https://docs.aws.amazon.com/bedrock/latest/userguide/model-card-moonshot-ai-kimi-k3.html" rel="noopener" target="_blank">Bedrock Kimi K3 model card</a>）。</li>
+<li id="b143"><strong>自管單位</strong> <span class="g g-d" title="等級 D：本文推算，附算式">D</span>：64× H200 服務 GLM-5.2 約等於 25.9M 輸入 TPM（多為 cache 命中）加 0.38M 輸出 TPM，換算式如下（431K × 60；6,281 × 60）（<a href="https://llm-d.ai/blog/serving-glm-5-2-agentic-workloads-on-llm-d" rel="noopener" target="_blank">llm-d blog, 22 Jul 2026</a>）。</li>
+</ul>
+<div class="formula"><span class="katex-display"><span class="katex"><span class="katex-mathml"><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mrow><mi mathvariant="normal">T</mi><mi mathvariant="normal">P</mi><mi mathvariant="normal">M</mi></mrow><mo>=</mo><mn>60</mn><mo>×</mo><mrow><mi mathvariant="normal">t</mi><mi mathvariant="normal">o</mi><mi mathvariant="normal">k</mi><mi mathvariant="normal">e</mi><mi mathvariant="normal">n</mi><mi mathvariant="normal">s</mi><mi mathvariant="normal">/</mi><mi mathvariant="normal">s</mi></mrow></mrow><annotation encoding="application/x-tex">\mathrm{TPM} = 60 \times \mathrm{tokens/s}</annotation></semantics></math></span><span aria-hidden="true" class="katex-html"><span class="katex-base"><span class="katex-strut" style="height:0.6833em;"></span><span class="mord"><span class="mord mathrm">TPM</span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.7278em;vertical-align:-0.0833em;"></span><span class="mord">60</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord"><span class="mord mathrm">tokens/s</span></span></span></span></span></span></div>
+</div></div></div>
+<details class="srcs"><summary>本節來源（48）</summary><ul><li><a href="https://docs.aws.amazon.com/bedrock/latest/userguide/model-card-moonshot-ai-kimi-k3.html" target="_blank" rel="noopener">Bedrock Kimi K3 model card</a></li><li><a href="https://docs.aws.amazon.com/bedrock/latest/userguide/cross-region-inference.html" target="_blank" rel="noopener">Bedrock cross-Region inference</a></li><li><a href="https://www.aboutamazon.com/news/company-news/amazon-ceo-andy-jassy-2025-letter-to-shareholders" target="_blank" rel="noopener">Amazon shareholder letter, 9 Apr 2026</a></li><li><a href="https://docs.aws.amazon.com/general/latest/gr/bedrock.html" target="_blank" rel="noopener">Amazon Bedrock endpoints and quotas</a></li><li><a href="https://learn.microsoft.com/en-us/azure/foundry/openai/quotas-limits" target="_blank" rel="noopener">Azure OpenAI quotas and limits</a></li><li><a href="https://docs.cloud.google.com/gemini-enterprise-agent-platform/models/provisioned-throughput/measure-provisioned-throughput" target="_blank" rel="noopener">Calculate Provisioned Throughput requirements</a></li><li><a href="https://docs.aws.amazon.com/bedrock/latest/userguide/quotas-token-burndown.html" target="_blank" rel="noopener">How tokens are counted in Amazon Bedrock</a></li><li><a href="https://code.claude.com/docs/en/costs" target="_blank" rel="noopener">Claude Code costs</a></li><li><a href="https://docs.aws.amazon.com/bedrock/latest/userguide/service-tiers-inference.html" target="_blank" rel="noopener">Bedrock service tiers</a></li><li><a href="https://aws.amazon.com/blogs/aws/new-amazon-bedrock-service-tiers-help-you-match-ai-workload-performance-with-cost/" target="_blank" rel="noopener">AWS News blog, 18 Nov 2025</a></li><li><a href="https://aws.amazon.com/blogs/machine-learning/optimizing-ai-responsiveness-a-practical-guide-to-amazon-bedrock-latency-optimized-inference/" target="_blank" rel="noopener">AWS ML Blog, 28 Jan 2025</a></li><li><a href="https://docs.aws.amazon.com/bedrock/latest/userguide/latency-optimized-inference.html" target="_blank" rel="noopener">Bedrock User Guide, latency-optimized inference</a></li><li><a href="https://openai.com/index/previewing-ultrafast/" target="_blank" rel="noopener">OpenAI, 13 Aug 2026</a></li><li><a href="https://www.sec.gov/Archives/edgar/data/2021728/000162828026056186/cbrsannouncesfinancialresu.htm" target="_blank" rel="noopener">Cerebras Q2 2026 results, SEC</a></li><li><a href="https://claude.com/blog/1m-context-ga" target="_blank" rel="noopener">Anthropic, 13 Mar 2026</a></li><li><a href="https://www.nvidia.com/en-us/data-center/gb200-nvl72/" target="_blank" rel="noopener">NVIDIA GB200 NVL72 page</a></li><li><a href="https://www.nvidia.com/en-us/data-center/vera-rubin-nvl72/" target="_blank" rel="noopener">NVIDIA Vera Rubin NVL72 page</a></li><li><a href="https://www.coreweave.com/pricing" target="_blank" rel="noopener">CoreWeave pricing</a></li><li><a href="https://inferencex.semianalysis.com/blog/gb300-nvl72-vs-gb200-nvl72-dsv4-pro-vllm-fp4" target="_blank" rel="noopener">InferenceX, 27 May 2026</a></li><li><a href="https://llm-d.ai/blog/llm-d-v0.8-from-platform-to-control-plane" target="_blank" rel="noopener">llm-d v0.8 blog</a></li><li><a href="https://inference-docs.cerebras.ai/models/overview" target="_blank" rel="noopener">Cerebras model catalog</a></li><li><a href="https://newsletter.semianalysis.com/p/tpuv7-google-takes-a-swing-at-the" target="_blank" rel="noopener">SemiAnalysis, 28 Nov 2025</a></li><li><a href="https://artificialanalysis.ai/models/gpt-oss-120b/providers" target="_blank" rel="noopener">Artificial Analysis, gpt-oss-120b providers</a></li><li><a href="https://inference-docs.cerebras.ai/support/rate-limits" target="_blank" rel="noopener">Cerebras rate limits</a></li><li><a href="https://www.datacenterdynamics.com/en/news/cerebras-starts-construction-on-165mw-data-center-in-mikkeli-finland/" target="_blank" rel="noopener">DataCenterDynamics, 2 Sep 2026</a></li><li><a href="https://artificialanalysis.ai/models/kimi-k3/providers" target="_blank" rel="noopener">Artificial Analysis, Kimi K3 providers</a></li><li><a href="https://aws.amazon.com/about-aws/whats-new/2026/02/amazon-bedrock-adds-support-six-open-weights-models/" target="_blank" rel="noopener">AWS What&#x27;s New, 10 Feb 2026</a></li><li><a href="https://docs.aws.amazon.com/bedrock/latest/userguide/model-card-moonshot-ai-kimi-k2-5.html" target="_blank" rel="noopener">Bedrock Kimi K2.5 model card</a></li><li><a href="https://docs.aws.amazon.com/bedrock/latest/userguide/model-customization-import-model.html" target="_blank" rel="noopener">Bedrock Custom Model Import docs</a></li><li><a href="https://aws.amazon.com/blogs/machine-learning/amazon-sagemaker-inference-2026-year-to-date-launches-in-review/" target="_blank" rel="noopener">AWS ML blog, 18 Sep 2026</a></li><li><a href="https://learn.microsoft.com/en-us/azure/foundry/foundry-models/concepts/models-sold-directly-by-azure" target="_blank" rel="noopener">Foundry Models sold by Azure</a></li><li><a href="https://learn.microsoft.com/en-us/azure/foundry/foundry-models/concepts/models-sold-directly-by-azure-region-availability" target="_blank" rel="noopener">Azure region availability, 4 Sep 2026</a></li><li><a href="https://learn.microsoft.com/en-us/azure/foundry/openai/how-to/provisioned-throughput-sizing" target="_blank" rel="noopener">PTU sizing</a></li><li><a href="https://artificialanalysis.ai/leaderboards/providers" target="_blank" rel="noopener">Artificial Analysis provider leaderboard</a></li><li><a href="https://openrouter.ai/z-ai/glm-5.3" target="_blank" rel="noopener">OpenRouter glm-5.3</a></li><li><a href="https://docs.cloud.google.com/gemini-enterprise-agent-platform/models/deprecations/open-models" target="_blank" rel="noopener">Vertex open model deprecations</a></li><li><a href="https://llm-d.ai/blog/serving-glm-5-2-agentic-workloads-on-llm-d" target="_blank" rel="noopener">llm-d blog, 22 Jul 2026</a></li><li><a href="https://aws.amazon.com/ec2/capacityblocks/pricing/" target="_blank" rel="noopener">AWS Capacity Blocks pricing</a></li><li><a href="https://inferencex.semianalysis.com/blog/gb200-nvl72-vs-b200-disagg-deepseek-r1-fp4-dynamo-trt" target="_blank" rel="noopener">InferenceX, 23 May 2026</a></li><li><a href="https://github.com/vllm-project/vllm-neuron/blob/release-0.24.0.1.1.0/README.md" target="_blank" rel="noopener">vLLM Neuron README</a></li><li><a href="https://github.com/huggingface/optimum-neuron/blob/main/benchmark/vllm/data-parallel/llama3.1-8b/vllm-results-dp3.csv" target="_blank" rel="noopener">Optimum Neuron result CSV</a></li><li><a href="https://inferencex.semianalysis.com/blog/tpu-inferencex-full-steam" target="_blank" rel="noopener">SemiAnalysis InferenceX, 7 Sep 2026</a></li><li><a href="https://awsdocs-neuron.readthedocs-hosted.com/en/latest/about-neuron/whats-new.html" target="_blank" rel="noopener">Neuron What&#x27;s New</a></li><li><a href="https://awsdocs-neuron.readthedocs-hosted.com/en/latest/vllm-neuron/docs/tutorials/tutorial-gpt-oss.html" target="_blank" rel="noopener">vLLM Neuron gpt-oss tutorial</a></li><li><a href="https://github.com/vllm-project/tpu-inference" target="_blank" rel="noopener">tpu-inference README</a></li><li><a href="https://github.com/aws-neuron/neuronx-distributed-inference/blob/main/contrib/models/DeepSeek-V3/README.md" target="_blank" rel="noopener">NxDI contrib, DeepSeek-V3</a></li><li><a href="https://github.com/aws-neuron/neuronx-distributed-inference/blob/main/contrib/models/GLM-5.2/README.md" target="_blank" rel="noopener">NxDI contrib, GLM-5.2</a></li><li><a href="https://docs.aws.amazon.com/ec2/latest/instancetypes/ec2-instance-regions.html" target="_blank" rel="noopener">AWS EC2, instance types by Region</a></li></ul></details></section></div>
+<nav class="pager" aria-label="上一張與下一張"><a href="08-metrics.html"><span>← 08</span>效能與成本</a><a class="nx" href="10-capacity.html"><span>10 →</span>容量計算器</a></nav>
+<footer class="foot"><span>資料截至 2026-10-04；逐項查核於 2026-10-05 完成。模型與價格每週在變，引用前請對照來源。</span><span class="code">IA-09 · REV 2026-10-05</span></footer>
+</main>
+</div>
+<script src="assets/site.js" defer></script>
+</body>
+</html>

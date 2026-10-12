@@ -1,0 +1,15 @@
+[
+ {"url":"08-metrics.html#s3","name":"ch8-score","w":1440,"h":1000},
+ {"url":"07-long-context.html#s3","name":"ch7-ttft","w":1440,"h":1000},
+ {"url":"factcheck.html","name":"fc-top","w":1440,"h":1000,"full":true},
+ {"url":"factcheck.html#s6","name":"fc-corr","w":1440,"h":1000},
+ {"url":"12-sources.html","name":"sources","w":1440,"h":1000},
+ {"url":"search.html?q=MLA%20kernel","name":"search","w":1440,"h":1000},
+ {"url":"09-deployment.html#s3","name":"ch9-tree","w":1440,"h":1000,"full":true},
+ {"url":"10-capacity.html#s4-3","name":"ch10-mix","w":1440,"h":1000},
+ {"url":"04-open-models.html#s1","name":"ch4-specs","w":1440,"h":1000},
+ {"url":"07-long-context.html","name":"ch7-dark","w":1440,"h":1000,"theme":"dark"},
+ {"url":"06-technique-matrix.html","name":"ch6-dark","w":1440,"h":1100,"theme":"dark","click":["[data-row=r25]"]},
+ {"url":"07-long-context.html","name":"ch7-phone","w":390,"h":844,"dpr":2,"full":true},
+ {"url":"10-capacity.html","name":"ch10-phone","w":390,"h":844,"dpr":2,"full":true}
+]

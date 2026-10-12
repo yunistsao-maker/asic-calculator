@@ -1,0 +1,2718 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>效能與成本 · Inference ASIC Atlas</title>
+<meta name="description" content="沒有任何單一 benchmark 同時涵蓋五個家族；同條件的跨硬體比較只有兩組：gpt-oss-120b 上 Cerebras 對最快的非 ASIC 端點為 5.5×，InferenceX 上 Ironwood 對 B200 / B300 為 1.05×（20 tok/s/user）。以牌價換算的每百萬 output tokens 成本，Ironwood 3 年承諾為 $1.44，B200 為 $1.88–4.00。">
+<meta name="color-scheme" content="light dark">
+<link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&amp;display=swap">
+<link rel="stylesheet" href="assets/site.css">
+<link rel="stylesheet" href="assets/katex/katex.min.css">
+<script>(function(){var d=document.documentElement;d.classList.add('js');try{var t=localStorage.getItem('ia-theme');if(t==='light'||t==='dark')d.setAttribute('data-theme',t)}catch(e){}})();</script>
+</head>
+<body><a class="skip" href="#sheet">跳到內容</a><header class="hdr"><div class="hdr-in"><a class="brand" href="index.html"><svg width="32" height="32" viewBox="0 0 32 32" aria-hidden="true"><rect class="k" x="7" y="7" width="18" height="18"></rect><circle cx="11" cy="11" r="1.6" fill="#F2B544"></circle><path class="p" d="M11 2v5M16 2v5M21 2v5M11 25v5M16 25v5M21 25v5M2 11h5M2 16h5M2 21h5M25 11h5M25 16h5M25 21h5" stroke-width="2" fill="none"></path></svg><span class="brand-t"><span class="brand-en">INFERENCE ASIC ATLAS</span><span class="brand-zh">推論晶片圖鑑</span></span></a><button type="button" class="hbtn menu-btn" id="menu-btn" aria-expanded="false" aria-controls="idx"><svg width="18" height="18" viewBox="0 0 18 18" aria-hidden="true"><path d="M2 4.5h14M2 9h14M2 13.5h14" stroke="currentColor" stroke-width="1.8" fill="none"></path></svg><span>章節</span></button><div class="hdr-tools"><span class="rev">REV 2026-10-05 · 12 SHEETS · 777 SOURCES</span><form id="hsearch" class="hsearch" action="search.html" method="get" role="search"><input name="q" type="search" placeholder="搜尋全站" aria-label="搜尋全站"><button type="submit" aria-label="搜尋"><svg width="18" height="18" viewBox="0 0 18 18" aria-hidden="true"><circle cx="7.5" cy="7.5" r="5" fill="none" stroke="currentColor" stroke-width="1.8"></circle><path d="M11.5 11.5L16 16" stroke="currentColor" stroke-width="1.8"></path></svg></button></form><button type="button" class="hbtn" id="theme-btn" aria-label="切換深色模式"><svg width="18" height="18" viewBox="0 0 18 18" aria-hidden="true"><circle cx="9" cy="9" r="7" fill="none" stroke="currentColor" stroke-width="1.6"></circle><path d="M9 2a7 7 0 0 1 0 14z" fill="currentColor"></path></svg></button></div></div></header>
+<div class="wrap">
+<nav class="idx" id="idx" aria-label="章節"><a href="index.html"><span class="n">00</span><span>總覽</span></a><div class="grp"><span class="grp-t">硬體 HARDWARE</span><a href="01-silicon.html"><span class="n">01</span><span>晶片與系統規格</span></a></div><div class="grp"><span class="grp-t">軟體 SOFTWARE</span><a href="02-engines.html"><span class="n">02</span><span>推論引擎</span></a><a href="06-technique-matrix.html"><span class="n">06</span><span>技術支援矩陣</span></a></div><div class="grp"><span class="grp-t">模型 MODELS</span><a href="03-architectures.html"><span class="n">03</span><span>模型架構支援</span></a><a href="04-open-models.html"><span class="n">04</span><span>開源模型效能</span></a><a href="05-proprietary-models.html"><span class="n">05</span><span>私有模型效能</span></a></div><div class="grp"><span class="grp-t">情境 SCENARIOS</span><a href="07-long-context.html"><span class="n">07</span><span>長上下文 200K / 1M</span></a><a href="08-metrics.html" aria-current="page"><span class="n">08</span><span>效能與成本</span></a><a href="09-deployment.html"><span class="n">09</span><span>部署模式</span></a></div><div class="grp"><span class="grp-t">規劃 PLANNING</span><a href="10-capacity.html"><span class="n">10</span><span>容量計算器</span></a><a href="11-evidence.html"><span class="n">11</span><span>估算依據</span></a><a href="12-sources.html"><span class="n">12</span><span>來源</span></a></div><div class="grp"><span class="grp-t">附錄 APPENDIX</span><a href="factcheck.html"><span class="n">A</span><span>查核紀錄</span></a></div></nav>
+<main id="sheet">
+<section class="sheet-head"><span class="sheet-code">SHEET 08 / 12 · PERFORMANCE AND COST</span><h1>效能與成本指標比較</h1><p class="lead">沒有任何單一 benchmark 同時涵蓋五個家族；同條件的跨硬體比較只有兩組：gpt-oss-120b 上 Cerebras 對最快的非 ASIC 端點為 5.5×，InferenceX 上 Ironwood 對 B200 / B300 為 1.05×（20 tok/s/user）。以牌價換算的每百萬 output tokens 成本，Ironwood 3 年承諾為 $1.44，B200 為 $1.88–4.00。</p><div class="conv prose"><p>資料基準日：2026-10-04。等級：<span class="g g-a" title="等級 A：獨立第三方量測">A</span> = 獨立第三方量測；<span class="g g-b" title="等級 B：廠商或夥伴公布，且揭露方法">B</span> = 廠商 / 夥伴公布且揭露方法；<span class="g g-c" title="等級 C：廠商宣稱或規格，未揭露方法">C</span> = 廠商宣稱或規格、未揭露方法；<span class="g g-d" title="等級 D：本文推算，附算式">D</span> = 本文推算（附算式）。</p>
+</div></section>
+<div class="tabs"><div class="tablist" role="tablist" aria-label="本章的小節"><button type="button" class="tab" role="tab" id="tab-s1" aria-controls="s1" aria-selected="true"><span class="n">8.1</span><span>效能</span></button><button type="button" class="tab" role="tab" id="tab-s2" aria-controls="s2" aria-selected="false"><span class="n">8.2</span><span>成本與能效</span></button><button type="button" class="tab" role="tab" id="tab-s3" aria-controls="s3" aria-selected="false"><span class="n">8.3</span><span>評分卡</span></button></div>
+<section class="panel on" role="tabpanel" id="s1" aria-labelledby="tab-s1"><div class="panel-head"><h2>效能總表</h2><div class="sec-lead prose"><p id="b1">沒有任何單一 benchmark 同時涵蓋五個家族，同條件的跨硬體比較只有兩組：gpt-oss-120b 在 Artificial Analysis（AA）上，Cerebras 每串流 1,764 t/s，最快的非 ASIC 端點 320 t/s（5.5×）；InferenceX 上 Ironwood 與 B200 / B300 的每晶片 total 吞吐量為 9,364 對 8,903 / 8,925 tok/s（1.05×，20 tok/s/user）。Trainium、Inferentia2 與 LPX 的數字都出自廠商或夥伴自選的模型與負載，只能在列內閱讀。</p>
+</div></div>
+<div class="widget"><div class="sec-h"><h3 style="font-size:18px">同一份權重、十個端點：gpt-oss-120b 的輸出速度</h3><div class="seg" role="group" aria-label="檢視" data-switch="xhw"><button type="button" data-view="k10" aria-pressed="true">10K 輸入</button><button type="button" data-view="k100" aria-pressed="false">100K 輸入</button><button type="button" data-view="par" aria-pressed="false">10 個並行（1K）</button></div></div><p class="wnote">Artificial Analysis，72 小時 P50，2026-10-04；每次量測為單一請求，各端點的精度與是否使用 spec decode 未揭露 <span class="g g-a" title="等級 A：獨立第三方量測">A</span>。</p><div class="wbox" id="xhw" style="padding:6px 18px 12px"><div data-pane="k10"><h4 class="pane-t">10K 輸入</h4><div class="brow"><span class="lab"><b>Cerebras</b><small class="s">wafer-scale ASIC（WSE-3）</small></span><span class="bar"><i class="k-asic" style="width:70.00%"></i><span>1,764 t/s <small>TTFT 0.42 s</small></span></span></div><div class="brow"><span class="lab"><b>SambaNova</b><small class="s">RDU ASIC</small></span><span class="bar"><i class="k-asic" style="width:28.02%"></i><span>706 t/s <small>TTFT 1.14 s</small></span></span></div><div class="brow"><span class="lab"><b>Groq</b><small class="s">LPU ASIC（第一代）</small></span><span class="bar"><i class="k-asic" style="width:18.77%"></i><span>473 t/s <small>TTFT 0.74 s</small></span></span></div><div class="brow"><span class="lab"><b>Microsoft Azure</b><small class="s">未揭露</small></span><span class="bar"><i class="k-unk" style="width:12.70%"></i><span>320 t/s <small>TTFT 0.74 s</small></span></span></div><div class="brow"><span class="lab"><b>Nebius（Base）</b><small class="s">GPU 雲</small></span><span class="bar"><i class="k-gpu" style="width:11.11%"></i><span>280 t/s <small>TTFT 0.97 s</small></span></span></div><div class="brow"><span class="lab"><b>DeepInfra（Turbo）</b><small class="s">GPU 雲（NVIDIA 稱 Blackwell）</small></span><span class="bar"><i class="k-gpu" style="width:9.84%"></i><span>248 t/s <small>TTFT 0.81 s</small></span></span></div><div class="brow"><span class="lab"><b>Crusoe</b><small class="s">GPU 雲</small></span><span class="bar"><i class="k-gpu" style="width:9.25%"></i><span>233 t/s <small>TTFT 0.41 s</small></span></span></div><div class="brow"><span class="lab"><b>Baseten</b><small class="s">GPU 雲（NVIDIA 稱 Blackwell）</small></span><span class="bar"><i class="k-gpu" style="width:8.77%"></i><span>221 t/s <small>TTFT 0.18 s</small></span></span></div><div class="brow"><span class="lab"><b>Amazon Bedrock</b><small class="s">未揭露</small></span><span class="bar"><i class="k-unk" style="width:3.29%"></i><span>83 t/s <small>TTFT 1.08 s</small></span></span></div><div class="brow"><span class="lab"><b>Google Vertex</b><small class="s">未揭露</small></span><span class="bar"><i class="k-unk" style="width:1.79%"></i><span>45 t/s <small>TTFT 95.92 s</small></span></span></div></div><div data-pane="k100"><h4 class="pane-t">100K 輸入</h4><div class="brow"><span class="lab"><b>Cerebras</b><small class="s">wafer-scale ASIC（WSE-3）</small></span><span class="bar"><i class="k-asic" style="width:70.00%"></i><span>1,225 t/s <small>TTFT 3.44 s</small></span></span></div><div class="brow"><span class="lab"><b>Groq</b><small class="s">LPU ASIC（第一代）</small></span><span class="bar"><i class="k-asic" style="width:27.20%"></i><span>476 t/s <small>TTFT 4.88 s</small></span></span></div><div class="brow"><span class="lab"><b>SambaNova</b><small class="s">RDU ASIC</small></span><span class="bar"><i class="k-asic" style="width:20.57%"></i><span>360 t/s <small>TTFT 6.78 s</small></span></span></div><div class="brow"><span class="lab"><b>Baseten</b><small class="s">GPU 雲（NVIDIA 稱 Blackwell）</small></span><span class="bar"><i class="k-gpu" style="width:18.97%"></i><span>332 t/s <small>TTFT 1.25 s</small></span></span></div><div class="brow"><span class="lab"><b>DeepInfra（Turbo）</b><small class="s">GPU 雲（NVIDIA 稱 Blackwell）</small></span><span class="bar"><i class="k-gpu" style="width:12.46%"></i><span>218 t/s <small>TTFT 2.51 s</small></span></span></div><div class="brow"><span class="lab"><b>Crusoe</b><small class="s">GPU 雲</small></span><span class="bar"><i class="k-gpu" style="width:11.89%"></i><span>208 t/s <small>TTFT 2.11 s</small></span></span></div><div class="brow"><span class="lab"><b>Nebius（Base）</b><small class="s">GPU 雲</small></span><span class="bar"><i class="k-gpu" style="width:10.80%"></i><span>189 t/s <small>TTFT 3.48 s</small></span></span></div><div class="brow"><span class="lab"><b>Microsoft Azure</b><small class="s">未揭露</small></span><span class="bar"><i class="k-unk" style="width:9.14%"></i><span>160 t/s <small>TTFT 4.01 s</small></span></span></div><div class="brow"><span class="lab"><b>Google Vertex</b><small class="s">未揭露</small></span><span class="bar"><i class="k-unk" style="width:4.91%"></i><span>86 t/s <small>TTFT 3.72 s</small></span></span></div><div class="brow"><span class="lab"><b>Amazon Bedrock</b><small class="s">未揭露</small></span><span class="bar"><i class="k-unk" style="width:2.00%"></i><span>35 t/s <small>TTFT 3.74 s</small></span></span></div></div><div data-pane="par"><h4 class="pane-t">10 個並行請求（1K 輸入）</h4><div class="brow"><span class="lab"><b>Cerebras</b><small class="s">wafer-scale ASIC（WSE-3）</small></span><span class="bar"><i class="k-asic" style="width:70.00%"></i><span>1,666 t/s</span></span></div><div class="brow"><span class="lab"><b>SambaNova</b><small class="s">RDU ASIC</small></span><span class="bar"><i class="k-asic" style="width:31.09%"></i><span>740 t/s</span></span></div><div class="brow"><span class="lab"><b>Microsoft Azure</b><small class="s">未揭露</small></span><span class="bar"><i class="k-unk" style="width:23.61%"></i><span>562 t/s</span></span></div><div class="brow"><span class="lab"><b>Groq</b><small class="s">LPU ASIC（第一代）</small></span><span class="bar"><i class="k-asic" style="width:13.15%"></i><span>313 t/s</span></span></div><div class="brow"><span class="lab"><b>DeepInfra（Turbo）</b><small class="s">GPU 雲（NVIDIA 稱 Blackwell）</small></span><span class="bar"><i class="k-gpu" style="width:12.35%"></i><span>294 t/s</span></span></div><div class="brow"><span class="lab"><b>Nebius（Base）</b><small class="s">GPU 雲</small></span><span class="bar"><i class="k-gpu" style="width:10.71%"></i><span>255 t/s</span></span></div><div class="brow"><span class="lab"><b>Crusoe</b><small class="s">GPU 雲</small></span><span class="bar"><i class="k-gpu" style="width:8.99%"></i><span>214 t/s</span></span></div><div class="brow"><span class="lab"><b>Baseten</b><small class="s">GPU 雲（NVIDIA 稱 Blackwell）</small></span><span class="bar"><i class="k-gpu" style="width:8.66%"></i><span>206 t/s</span></span></div><div class="brow"><span class="lab"><b>Amazon Bedrock</b><small class="s">未揭露</small></span><span class="bar"><i class="k-unk" style="width:5.67%"></i><span>135 t/s</span></span></div><div class="brow"><span class="lab"><b>Google Vertex</b><small class="s">未揭露</small></span><span class="bar"><i class="k-unk" style="width:1.39%"></i><span>33 t/s</span></span></div></div><div class="keyrow" style="padding-top:10px;border-top:1px solid var(--rule)"><span><i class="sw teal"></i>ASIC（WSE-3、RDU、LPU）</span><span><i class="sw ink"></i>GPU 雲</span><span><i class="sw hatch"></i>硬體未揭露</span></div></div><p class="wnote">10K 輸入時 Cerebras 是最快的非 ASIC 端點（Azure，硬體未揭露）的 5.5 倍，是十個第三方 GPU 端點中位數的 9.9 倍；100K 輸入時對最快的 GPU 端點縮小到 3.7 倍。TTFT 最低的是 GPU 端點（Baseten 0.18 s、Crusoe 0.41 s），不是 ASIC。Vertex 端點當日 TTFT 96 s、單日 uptime 51%，不能代表 Google 的硬體。資料與硬體類別的標註在「同條件比較」分頁的表 8-6。</p></div>
+<div class="subtabs"><div class="subtablist" role="tablist" aria-label="效能總表"><button type="button" class="subtab" role="tab" id="tab-s1-1" aria-controls="s1-1" aria-selected="true">可比性</button><button type="button" class="subtab" role="tab" id="tab-s1-2" aria-controls="s1-2" aria-selected="false">每使用者體驗</button><button type="button" class="subtab" role="tab" id="tab-s1-3" aria-controls="s1-3" aria-selected="false">系統吞吐量</button><button type="button" class="subtab" role="tab" id="tab-s1-4" aria-controls="s1-4" aria-selected="false">同條件比較</button></div><div class="subpanel on" role="tabpanel" id="s1-1" aria-labelledby="tab-s1-1"><div class="prose"><h3 class="ph">可比性</h3><p id="b2">讀表規則有三條：</p>
+<ul>
+<li id="b3"><strong>每使用者速度</strong>是單一串流的 output tok/s（InferenceX 稱 interactivity，即 1 / TPOT）；<strong>系統吞吐量</strong>是每顆晶片每秒的 output tokens，並附上該點的每使用者速度與 TTFT。兩者分表，不互相換算。</li>
+<li id="b4">InferenceX 的 total tok/s 含輸入；AgentX 的 total 另含跨輪重複使用的 cached input，total ÷ output 約 130–150（<span class="g g-d" title="等級 D：本文推算，附算式">D</span>：19,303 ÷ 136 ≈ 142；定義見 <a href="https://inferencex.semianalysis.com/blog/sparse-savings-persistent-demand-inside-glm53" rel="noopener" target="_blank">InferenceX 2026-09-28</a>）。系統吞吐量一律取 output 欄；固定長度 8K/1K 的 output = total × 1,024 ÷ 9,216。</li>
+<li id="b5">AgentX 的 speculative decoding 以固定的 acceptance 曲線計分（pinned）。Kimi K3 的 DSpark 在實際 trace 上量到 1.18–1.68 個 accepted tokens，設定值是 3.84，所以開啟 spec decode 的每使用者速度是上限（<a href="https://github.com/SemiAnalysisAI/InferenceX/blob/main/inferencex-e2e/docs/MODELS.md" rel="noopener" target="_blank">MODELS.md</a>、<a href="https://github.com/SemiAnalysisAI/InferenceX/blob/main/inferencex-e2e/perf-changelog.yaml" rel="noopener" target="_blank">perf-changelog</a>）。</li>
+</ul>
+
+<figure class="tbl" data-cols="5" data-rows="8" id="t8-1"><figcaption><strong>表 8-1 哪些比較是同條件</strong></figcaption><div aria-label="表 8-1 哪些比較是同條件" class="tbl-scroll" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th class="w2" scope="col">比較組</th>
+<th class="w2" scope="col">相同的條件</th>
+<th class="w2" scope="col">不同的條件</th>
+<th class="w1" scope="col">可以比什麼</th>
+<th class="src" scope="col">來源</th>
+</tr>
+</thead>
+<tbody>
+<tr id="b6">
+<td>gpt-oss-120b：Cerebras、SambaNova、Groq、GPU 雲、三大雲代管</td>
+<td>權重、量測者（AA）、10K 輸入的單一請求、P50 / 72 h</td>
+<td>量化（OpenRouter 標記為 fp16、fp4、bf16 不等）、context 上限、reasoning token 量；硬體類別是筆記依廠商資料所標，AA 不揭露硬體</td>
+<td>每串流 output tok/s、TTFT</td>
+<td class="src"><a href="https://artificialanalysis.ai/models/gpt-oss-120b/providers" rel="noopener" target="_blank">AA</a>、<a href="https://openrouter.ai/openai/gpt-oss-120b" rel="noopener" target="_blank">OpenRouter</a></td>
+</tr>
+<tr id="b7">
+<td class="rowhead">Qwen3.5-397B：Ironwood 對 B200 / B300</td>
+<td>模型、FP8、8K/1K、aggregated、無 MTP、同一套 harness</td>
+<td>引擎（private beta 的 TorchTPU vLLM 對 GPU 引擎）；每 replica 晶片數未公開</td>
+<td>每晶片吞吐量、TTFT；成本另套 TCO 模型</td>
+<td class="src"><a href="https://inferencex.semianalysis.com/blog/tpu-inferencex-full-steam" rel="noopener" target="_blank">InferenceX 2026-09-07</a></td>
+</tr>
+<tr id="b8">
+<td>AgentX：NVIDIA（H100 至 Vera Rubin）對 AMD（MI300X 至 MI355X）</td>
+<td>模型、trace、harness、KV offload 規則</td>
+<td>引擎與 image、Hopper 多用 FP8、spec decode 種類</td>
+<td>每使用者速度、每 GPU output tok/s、TTFT</td>
+<td class="src"><a href="https://github.com/SemiAnalysisAI/InferenceX/blob/main/inferencex-e2e/docs/MODELS.md" rel="noopener" target="_blank">MODELS.md</a></td>
+</tr>
+<tr id="b9">
+<td class="rowhead">Qwen3.8 27B：Cerebras 對 GPU 主機</td>
+<td>權重、量測者（OpenRouter 遙測）</td>
+<td>實際流量，prompt 不受控；Cerebras context 65,536，其餘 262,144 以上</td>
+<td>每串流 tok/s（p50）</td>
+<td class="src"><a href="https://openrouter.ai/qwen/qwen3.8-27b" rel="noopener" target="_blank">OpenRouter</a></td>
+</tr>
+<tr id="b10">
+<td class="rowhead">TPU 的 Google recipes</td>
+<td>client 與 InferenceX 同為 <code>benchmark_serving.py</code></td>
+<td>Google 自跑；模型不同；多為 1K/1K、concurrency 128</td>
+<td>只有 Qwen3.5-397B 8K/1K 一列可與 InferenceX 對照量級</td>
+<td class="src"><a href="https://github.com/AI-Hypercomputer/tpu-recipes/tree/main/inference/ironwood/vLLM" rel="noopener" target="_blank">tpu-recipes</a></td>
+</tr>
+<tr id="b11">
+<td><span class="rh">Trainium</span><span class="rh-sub"><span class="vh">（</span>AWS 教學、Bedrock、Hugging Face<span class="vh">）</span></span></td>
+<td class="muted">無</td>
+<td>模型（Llama 3.x、Claude 3.5 Haiku、gpt-oss-120b、Qwen3）、負載、量測者；多為 concurrency 1</td>
+<td>只能列內閱讀</td>
+<td class="src"><a href="https://aws.amazon.com/blogs/machine-learning/optimizing-ai-responsiveness-a-practical-guide-to-amazon-bedrock-latency-optimized-inference/" rel="noopener" target="_blank">AWS ML Blog</a>、<a href="https://github.com/huggingface/optimum-neuron/tree/main/benchmark/vllm/single-instance" rel="noopener" target="_blank">Optimum Neuron</a></td>
+</tr>
+<tr id="b12">
+<td><span class="rh">Inferentia2</span><span class="rh-sub"><span class="vh">（</span>Hugging Face<span class="vh">）</span></span></td>
+<td class="muted">無</td>
+<td>只有 Llama 3.1 8B</td>
+<td>只能列內閱讀</td>
+<td class="src"><a href="https://github.com/huggingface/optimum-neuron/blob/main/benchmark/vllm/data-parallel/llama3.1-8b/vllm-results-dp3.csv" rel="noopener" target="_blank">Optimum Neuron CSV</a></td>
+</tr>
+<tr id="b13">
+<td class="rowhead">LPX</td>
+<td class="muted">無</td>
+<td>Gemma 4 31B、100K context、私有端點；精度、concurrency、引擎未揭露</td>
+<td class="muted">無</td>
+<td class="src"><a href="https://nvidianews.nvidia.com/news/nvidia-groq-3-lpx-now-in-full-production-with-world-class-speed-for-agentic-ai" rel="noopener" target="_blank">NVIDIA 2026-08-24</a></td>
+</tr>
+</tbody>
+</table></div></figure>
+<ul>
+<li id="b14">不在本調查範圍、但出現在同一個 benchmark 的 ASIC：InferenceX 首頁與硬體登錄檔列有 OpenAI Jalapeño（登錄值為晶片 700 W、all-in 1.125 kW、TCO 每 chip-hour $1.27），首頁連到 DeepSeek R1、8K/1K、FP4 的結果頁；2026-10-05 的公開 API（<code>model=DeepSeek-R1-0528</code>，1,310 列）沒有 Jalapeño 的列，所以本章沒有它的數字。首頁另預告 TPU 8i、SambaNova SN50 與 MI455X（<a href="https://inferencex.semianalysis.com/" rel="noopener" target="_blank">InferenceX</a>；<a href="https://github.com/SemiAnalysisAI/InferenceX-app/blob/main/packages/constants/src/gpu-keys.ts" rel="noopener" target="_blank">InferenceX gpu-keys.ts</a>；<a href="https://inferencex.semianalysis.com/api/v1/benchmarks?model=DeepSeek-R1-0528" rel="noopener" target="_blank">InferenceX API, DeepSeek-R1</a>）。</li>
+</ul>
+</div></div><div class="subpanel" role="tabpanel" id="s1-2" aria-labelledby="tab-s1-2"><div class="prose"><h3>每使用者體驗</h3><p id="b15">Blackwell 級以上的 GPU 在 0.7T–2.8T 旗艦上的單一使用者速度為 216–350 tok/s（8–16 顆 GPU，Vera Rubin 列為 28 顆；spec decode 開啟；TTFT median 0.25–0.85 s）；Hopper 上 DeepSeek-V4-Pro 為 225 tok/s，Kimi K3 需要 32 顆 H200 且只有 5 tok/s。ASIC 端高出一個量級的是 Cerebras（981–1,764 t/s）與 LPX（3,400 t/s，31B 模型、私有端點）；<a class="xref" href="#t8-3">表 8-3</a> 中 TPU、Trainium、Inferentia2 的中位數或單一串流值為 18–144 tok/s。</p>
+
+<figure class="tbl" data-cols="7" data-rows="16" id="t8-2"><figcaption><strong>表 8-2 每使用者體驗：GPU</strong>（等級 <span class="g g-a" title="等級 A：獨立第三方量測">A</span>。AgentX 列取最低 concurrency 點，輸入中位數約 88K–142K tokens；8K/1K 列取每使用者速度最高的點。來源：InferenceX API，2026-10-04 擷取：<a href="https://inferencex.semianalysis.com/api/v1/benchmarks?model=Kimi-K3" rel="noopener" target="_blank">Kimi-K3</a>、<a href="https://inferencex.semianalysis.com/api/v1/benchmarks?model=GLM-5.2" rel="noopener" target="_blank">GLM-5.2</a>、<a href="https://inferencex.semianalysis.com/api/v1/benchmarks?model=DeepSeek-V4-Pro" rel="noopener" target="_blank">DeepSeek-V4-Pro</a>、<a href="https://inferencex.semianalysis.com/api/v1/benchmarks?model=DeepSeek-V4.1-Flash" rel="noopener" target="_blank">DeepSeek-V4.1-Flash</a>、<a href="https://inferencex.semianalysis.com/api/v1/benchmarks?model=Qwen-3.5-397B-A17B" rel="noopener" target="_blank">Qwen-3.5-397B-A17B</a>）</figcaption><div aria-label="表 8-2 每使用者體驗：GPU" class="tbl-scroll" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th class="w2" scope="col">系統（GPU 數、layout）</th>
+<th class="w1" scope="col">模型、精度</th>
+<th scope="col">負載；concurrency</th>
+<th scope="col">spec decode</th>
+<th scope="col">output tok/s 每使用者（median / P90）</th>
+<th scope="col">TTFT，s（median / P90）</th>
+<th scope="col">量測日</th>
+</tr>
+</thead>
+<tbody>
+<tr id="b16">
+<td><span class="rh">GB300 NVL72</span><span class="rh-sub"><span class="vh">（</span>8 GPU，TP8<span class="vh">）</span></span></td>
+<td>Kimi K3，MXFP4</td>
+<td>AgentX；1</td>
+<td>DSpark</td>
+<td class="num">258 / 224</td>
+<td class="num">0.74 / 1.49</td>
+<td class="num">2026-09-15</td>
+</tr>
+<tr id="b17">
+<td><span class="rh">B200</span><span class="rh-sub"><span class="vh">（</span>16 GPU，TP8<span class="vh">）</span></span></td>
+<td>Kimi K3，MXFP4</td>
+<td>AgentX；1</td>
+<td>DSpark</td>
+<td class="num">216 / 193</td>
+<td class="num">0.85 / 1.91</td>
+<td class="num">2026-10-02</td>
+</tr>
+<tr id="b18">
+<td><span class="rh">H200</span><span class="rh-sub"><span class="vh">（</span>32 GPU，TP16 / EP32<span class="vh">）</span></span></td>
+<td>Kimi K3，MXFP4</td>
+<td>AgentX；1</td>
+<td>DSpark</td>
+<td class="num">5 / 5</td>
+<td class="num">3.73 / 5.41</td>
+<td class="num">2026-09-13</td>
+</tr>
+<tr id="b19">
+<td><span class="rh">GB300 NVL72</span><span class="rh-sub"><span class="vh">（</span>8 GPU，TP8<span class="vh">）</span></span></td>
+<td>GLM-5.2，FP4</td>
+<td>AgentX；2</td>
+<td>MTP</td>
+<td class="num">350 / 292</td>
+<td class="num">0.25 / 0.64</td>
+<td class="num">2026-10-02</td>
+</tr>
+<tr id="b20">
+<td><span class="rh">Vera Rubin NVL72</span><span class="rh-sub"><span class="vh">（</span>28 GPU，P/D disagg；pre-release TensorRT-LLM<span class="vh">）</span></span></td>
+<td>DeepSeek-V4-Pro，FP4</td>
+<td>AgentX；6</td>
+<td>MTP</td>
+<td class="num">292 / 276</td>
+<td class="num">0.55 / 1.32</td>
+<td class="num">2026-09-10</td>
+</tr>
+<tr id="b21">
+<td><span class="rh">GB200 NVL72</span><span class="rh-sub"><span class="vh">（</span>8 GPU，TP8<span class="vh">）</span></span></td>
+<td>DeepSeek-V4-Pro，FP4</td>
+<td>AgentX；1</td>
+<td>DSpark</td>
+<td class="num">312 / 286</td>
+<td class="num">0.49 / 2.15</td>
+<td class="num">2026-10-02</td>
+</tr>
+<tr id="b22">
+<td><span class="rh">H200</span><span class="rh-sub"><span class="vh">（</span>8 GPU，TP8<span class="vh">）</span></span></td>
+<td>DeepSeek-V4-Pro，FP8</td>
+<td>AgentX；1</td>
+<td>DSpark</td>
+<td class="num">225 / 187</td>
+<td class="num">0.92 / 2.75</td>
+<td class="num">2026-09-16</td>
+</tr>
+<tr id="b23">
+<td><span class="rh">GB300 NVL72</span><span class="rh-sub"><span class="vh">（</span>4 GPU，TP4<span class="vh">）</span></span></td>
+<td>DeepSeek-V4.1-Flash，FP4</td>
+<td>AgentX；1</td>
+<td>MTP</td>
+<td class="num">621 / 599</td>
+<td class="num">0.17 / 0.27</td>
+<td class="num">2026-10-02</td>
+</tr>
+<tr id="b24">
+<td><span class="rh">B200</span><span class="rh-sub"><span class="vh">（</span>TP8<span class="vh">）</span></span></td>
+<td>Qwen3.5-397B，FP8</td>
+<td class="num">8K/1K；1</td>
+<td class="muted">無</td>
+<td class="num">226（median）</td>
+<td class="num">0.13（median）</td>
+<td class="num">2026-09-18</td>
+</tr>
+<tr id="b25">
+<td><span class="rh">B300</span><span class="rh-sub"><span class="vh">（</span>TP4<span class="vh">）</span></span></td>
+<td>Qwen3.5-397B，FP4</td>
+<td class="num">8K/1K；4</td>
+<td>MTP</td>
+<td class="num">365（median）</td>
+<td class="num">0.19（median）</td>
+<td class="num">2026-09-10</td>
+</tr>
+<tr id="b26">
+<td><span class="rh">GB300 NVL72</span><span class="rh-sub"><span class="vh">（</span>P/D disagg<span class="vh">）</span></span></td>
+<td>Qwen3.5-397B，FP4</td>
+<td class="num">8K/1K；12</td>
+<td>MTP</td>
+<td class="num">608（median）</td>
+<td class="num">3.02（median）</td>
+<td class="num">2026-08-27</td>
+</tr>
+<tr id="b27">
+<td><span class="rh">MI355X</span><span class="rh-sub"><span class="vh">（</span>8 GPU，TP8，vLLM<span class="vh">）</span></span></td>
+<td>Kimi K3，MXFP4</td>
+<td>AgentX；1</td>
+<td>DSpark</td>
+<td class="num">172 / 155</td>
+<td class="num">1.01 / 2.46</td>
+<td class="num">2026-09-30</td>
+</tr>
+<tr id="b28">
+<td><span class="rh">MI355X</span><span class="rh-sub"><span class="vh">（</span>8 GPU，TP8，SGLang<span class="vh">）</span></span></td>
+<td>GLM-5.2，FP4</td>
+<td>AgentX；1</td>
+<td>MTP</td>
+<td class="num">291 / 273</td>
+<td class="num">1.03 / 1.86</td>
+<td class="num">2026-10-03</td>
+</tr>
+<tr id="b29">
+<td><span class="rh">MI355X</span><span class="rh-sub"><span class="vh">（</span>8 GPU，TP8，SGLang<span class="vh">）</span></span></td>
+<td>DeepSeek-V4-Pro，FP4</td>
+<td>AgentX；1</td>
+<td>DSpark</td>
+<td class="num">230 / 216</td>
+<td class="num">0.80 / 1.45</td>
+<td class="num">2026-09-29</td>
+</tr>
+<tr id="b30">
+<td><span class="rh">MI355X</span><span class="rh-sub"><span class="vh">（</span>4 GPU，TP4，vLLM<span class="vh">）</span></span></td>
+<td>DeepSeek-V4.1-Flash，FP4</td>
+<td>AgentX；1</td>
+<td>MTP</td>
+<td class="num">380 / 347</td>
+<td class="num">0.23 / 0.63</td>
+<td class="num">2026-10-02</td>
+</tr>
+<tr id="b31">
+<td><span class="rh">MI355X</span><span class="rh-sub"><span class="vh">（</span>TP4，SGLang<span class="vh">）</span></span></td>
+<td>Qwen3.5-397B，FP4</td>
+<td class="num">8K/1K；4</td>
+<td>MTP</td>
+<td class="num">250（median）</td>
+<td class="num">0.22（median）</td>
+<td class="num">2026-09-29</td>
+</tr>
+</tbody>
+</table></div></figure>
+<ul>
+<li id="b32">同模型、同 trace、concurrency 1–2 時，NVIDIA 最佳點 ÷ MI355X（<span class="g g-d" title="等級 D：本文推算，附算式">D</span>，取 median）：Kimi K3 258 ÷ 172 = 1.50×；GLM-5.2 350 ÷ 291 = 1.20×；DeepSeek-V4-Pro 312 ÷ 230 = 1.36×；DeepSeek-V4.1-Flash 621 ÷ 380 = 1.63×。</li>
+<li id="b33">一次只服務一個請求的 TileRT 把上限再推高：GLM-5.3 FP8 在 16 顆 MI355X（P/D disagg）上為 485 / 469 tok/s/user、TTFT 2.37 / 4.35 s（<span class="g g-a" title="等級 A：獨立第三方量測">A</span>，2026-09-24，<a href="https://inferencex.semianalysis.com/api/v1/benchmarks?model=GLM-5.2" rel="noopener" target="_blank">GLM-5.2 API</a>）；GLM-5.1 FP8 在一台 8× B200 上、8K/1K 為 340 tok/s/user（<span class="g g-a" title="等級 A：獨立第三方量測">A</span>，<a href="https://inferencex.semianalysis.com/blog/ultra-high-interactivity-on-nvidia" rel="noopener" target="_blank">InferenceX 2026-08-10</a>）。</li>
+</ul>
+
+<figure class="tbl" data-cols="8" data-rows="17" id="t8-3"><figcaption><strong>表 8-3 每使用者體驗：TPU、Trainium、Inferentia2、Cerebras、LPX</strong></figcaption><div aria-label="表 8-3 每使用者體驗：TPU、Trainium、Inferentia2、Cerebras、LPX" class="tbl-scroll" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th class="w2" scope="col">加速器（系統）</th>
+<th class="w1" scope="col">模型、精度</th>
+<th class="w1" scope="col">負載；concurrency</th>
+<th scope="col">spec decode</th>
+<th class="w1" scope="col">output tok/s 每串流</th>
+<th class="w1" scope="col">TTFT（s）</th>
+<th class="w1" scope="col">日期；等級</th>
+<th class="src" scope="col">來源</th>
+</tr>
+</thead>
+<tbody>
+<tr id="b34">
+<td><span class="rh">Ironwood</span><span class="rh-sub"><span class="vh">（</span>晶片數未公開<span class="vh">）</span></span></td>
+<td>Qwen3.5-397B，FP8</td>
+<td class="num">8K/1K；256</td>
+<td class="muted">無</td>
+<td>20（InferenceX 的 iso-interactivity 讀數）</td>
+<td>mean 5.41</td>
+<td class="num">2026-09-07；<span class="g g-a" title="等級 A：獨立第三方量測">A</span>（preview）</td>
+<td class="src"><a href="https://inferencex.semianalysis.com/blog/tpu-inferencex-full-steam" rel="noopener" target="_blank">InferenceX</a></td>
+</tr>
+<tr id="b35">
+<td><span class="rh">Ironwood ×4</span><span class="rh-sub"><span class="vh">（</span>TP8<span class="vh">）</span></span></td>
+<td>DeepSeek-V3 671B，FP8 KV、FP4 MoE 權重</td>
+<td class="num">1K/1K；128</td>
+<td class="muted">未載明</td>
+<td class="num">≈18（TPOT 55.07 ms）</td>
+<td>mean 4.94；P99 7.82</td>
+<td>image nightly-20260626；<span class="g g-b" title="等級 B：廠商或夥伴公布，且揭露方法">B</span></td>
+<td class="src"><a href="https://github.com/AI-Hypercomputer/tpu-recipes/tree/main/inference/ironwood/vLLM" rel="noopener" target="_blank">tpu-recipes</a></td>
+</tr>
+<tr id="b36">
+<td><span class="rh">Ironwood ×4</span><span class="rh-sub"><span class="vh">（</span>SGL-JAX，TP8 / EP8<span class="vh">）</span></span></td>
+<td>GLM-4.5-Air，BF16</td>
+<td class="num">1,024 / 1,024；128</td>
+<td class="muted">未載明</td>
+<td class="num">≈35（TPOT 28.84 ms）</td>
+<td>mean 3.13</td>
+<td class="num">2026-10-04 讀取；<span class="g g-b" title="等級 B：廠商或夥伴公布，且揭露方法">B</span></td>
+<td class="src"><a href="https://github.com/sgl-project/sglang-jax/tree/main/docs/cookbook/autoregressive" rel="noopener" target="_blank">sglang-jax</a></td>
+</tr>
+<tr id="b37">
+<td><span class="rh">Trillium ×8</span><span class="rh-sub"><span class="vh">（</span>TP8<span class="vh">）</span></span></td>
+<td>Llama-3.3-70B，精度未載明</td>
+<td class="num">1K/1K；64</td>
+<td class="muted">未載明</td>
+<td class="num">≈39（TPOT 25.35 ms）</td>
+<td>mean 0.25；P99 2.50</td>
+<td class="num">2026-10-04 讀取；<span class="g g-b" title="等級 B：廠商或夥伴公布，且揭露方法">B</span></td>
+<td class="src"><a href="https://github.com/AI-Hypercomputer/tpu-recipes/tree/main/inference/trillium/vLLM/Llama3.x" rel="noopener" target="_blank">tpu-recipes</a></td>
+</tr>
+<tr id="b38">
+<td><span class="rh">Trainium2 ×16</span><span class="rh-sub"><span class="vh">（</span>trn2.48xlarge，TP64<span class="vh">）</span></span></td>
+<td>Llama 3.1 405B，FP8 權重</td>
+<td class="num">10,000 / 1,500；1</td>
+<td>fused spec decode（Llama 3.2 1B draft）</td>
+<td class="num">102.41（BF16、無 spec：25.46）</td>
+<td>P50 2.26（2.44）</td>
+<td>教學未載日期，文件 2026-09-30；<span class="g g-b" title="等級 B：廠商或夥伴公布，且揭露方法">B</span></td>
+<td class="src"><a href="https://awsdocs-neuron.readthedocs-hosted.com/en/latest/libraries/nxd-inference/tutorials/trn2-llama3.1-405b-speculative-tutorial.html" rel="noopener" target="_blank">NxDI 405B</a></td>
+</tr>
+<tr id="b39">
+<td><span class="rh">Trainium2 ×16</span><span class="rh-sub"><span class="vh">（</span>TP64<span class="vh">）</span></span></td>
+<td>Llama 3.3 70B，BF16</td>
+<td class="num">10,000 / 1,500；1</td>
+<td>fused spec decode</td>
+<td class="num">144（無 spec：36）</td>
+<td>P50 0.87（0.81）</td>
+<td>教學未載日期；<span class="g g-b" title="等級 B：廠商或夥伴公布，且揭露方法">B</span></td>
+<td class="src"><a href="https://awsdocs-neuron.readthedocs-hosted.com/en/latest/libraries/nxd-inference/tutorials/trn2-llama3.3-70b-tutorial.html" rel="noopener" target="_blank">NxDI 70B</a></td>
+</tr>
+<tr id="b40">
+<td><span class="rh">Trainium2 ×4</span><span class="rh-sub"><span class="vh">（</span>TP16；以 LNC=2 推算晶片數<span class="vh">）</span></span></td>
+<td>gpt-oss-120b，BF16（MXFP4 於載入時還原）</td>
+<td class="num">512 / 128；1</td>
+<td>EAGLE3</td>
+<td class="num">134.53（無 spec：112.13）</td>
+<td class="num">0.22（0.25）</td>
+<td class="num">2026 年中，Neuron 2.31+；<span class="g g-b" title="等級 B：廠商或夥伴公布，且揭露方法">B</span></td>
+<td class="src"><a href="https://awsdocs-neuron.readthedocs-hosted.com/en/latest/vllm-neuron/docs/tutorials/tutorial-eagle3-speculative-decoding-gpt-oss.html" rel="noopener" target="_blank">vLLM Neuron</a></td>
+</tr>
+<tr id="b41">
+<td><span class="rh">Trainium2</span><span class="rh-sub"><span class="vh">（</span>Bedrock latency-optimized，晶片數未揭露<span class="vh">）</span></span></td>
+<td>Claude 3.5 Haiku</td>
+<td>輸入 100–100,000、輸出 100–1,000；約 1,600 次 API 呼叫</td>
+<td class="muted">未揭露</td>
+<td>P50 85.9、P90 152.0（standard：48.4、67.4）</td>
+<td>P50 0.6、P90 1.4（standard：1.1、2.9）</td>
+<td class="num">2025-01-28；<span class="g g-b" title="等級 B：廠商或夥伴公布，且揭露方法">B</span></td>
+<td class="src"><a href="https://aws.amazon.com/blogs/machine-learning/optimizing-ai-responsiveness-a-practical-guide-to-amazon-bedrock-latency-optimized-inference/" rel="noopener" target="_blank">AWS ML Blog</a></td>
+</tr>
+<tr id="b42">
+<td class="muted rowhead">同上</td>
+<td>Llama 3.1 70B</td>
+<td class="muted">同上</td>
+<td class="muted">未揭露</td>
+<td>P50 137.0、P90 203.7（standard：30.2、32.4）</td>
+<td>P50 0.4、P90 1.2（standard：0.9、42.8）</td>
+<td class="num">2025-01-28；<span class="g g-b" title="等級 B：廠商或夥伴公布，且揭露方法">B</span></td>
+<td class="src muted">同上</td>
+</tr>
+<tr id="b43">
+<td><span class="rh">Inferentia2 ×12</span><span class="rh-sub"><span class="vh">（</span>inf2.48xlarge，3 replicas × TP8<span class="vh">）</span></span></td>
+<td>Llama 3.1 8B，精度未載明</td>
+<td>1,500 ± 150 / 250 ± 20；單一串流</td>
+<td class="muted">未載明</td>
+<td class="num">38.8</td>
+<td class="num">0.33</td>
+<td class="num">2026-08-27；<span class="g g-b" title="等級 B：廠商或夥伴公布，且揭露方法">B</span></td>
+<td class="src"><a href="https://github.com/huggingface/optimum-neuron/blob/main/benchmark/vllm/data-parallel/llama3.1-8b/vllm-results-dp3.csv" rel="noopener" target="_blank">Optimum Neuron CSV</a></td>
+</tr>
+<tr id="b44">
+<td><span class="rh">Inferentia2 ×12</span><span class="rh-sub"><span class="vh">（</span>sequence length 16,512<span class="vh">）</span></span></td>
+<td>Llama 3.1 8B</td>
+<td>約 15,900 / 290；單一串流</td>
+<td class="muted">未載明</td>
+<td class="num">28.4</td>
+<td class="num">1.59</td>
+<td class="num">2025-05-27；<span class="g g-b" title="等級 B：廠商或夥伴公布，且揭露方法">B</span></td>
+<td class="src"><a href="https://builder.aws.com/content/2zruvftx03ZtQFFxyur6kdzfwMv/benchmarking-llm-inference-with-optimum-neuron-on-inferentia2" rel="noopener" target="_blank">AWS Builder Center</a></td>
+</tr>
+<tr id="b45">
+<td><span class="rh">Cerebras Inference</span><span class="rh-sub"><span class="vh">（</span>wafer 數未揭露<span class="vh">）</span></span></td>
+<td>gpt-oss-120b（OpenRouter 標記 fp16）</td>
+<td>AA 10K 輸入；單一請求</td>
+<td class="muted">未揭露</td>
+<td class="num">1,764</td>
+<td class="num">0.42</td>
+<td class="num">2026-10-04；<span class="g g-a" title="等級 A：獨立第三方量測">A</span></td>
+<td class="src"><a href="https://artificialanalysis.ai/models/gpt-oss-120b/providers" rel="noopener" target="_blank">AA</a></td>
+</tr>
+<tr id="b46">
+<td class="muted rowhead">同上</td>
+<td class="muted">同上</td>
+<td>AA 100K 輸入；單一請求</td>
+<td class="muted">未揭露</td>
+<td class="num">1,225</td>
+<td class="num">3.44</td>
+<td class="num">2026-10-04；<span class="g g-a" title="等級 A：獨立第三方量測">A</span></td>
+<td class="src muted">同上</td>
+</tr>
+<tr id="b47">
+<td class="muted rowhead">同上</td>
+<td>Qwen3.8 27B（fp16）</td>
+<td>OpenRouter 實際流量</td>
+<td class="muted">未揭露</td>
+<td>p50 1,025；p90 1,359</td>
+<td>latency p50 0.17</td>
+<td class="num">2026-10-04；<span class="g g-a" title="等級 A：獨立第三方量測">A</span></td>
+<td class="src"><a href="https://openrouter.ai/qwen/qwen3.8-27b" rel="noopener" target="_blank">OpenRouter</a></td>
+</tr>
+<tr id="b48">
+<td class="rowhead">Cerebras 私有 enterprise 端點</td>
+<td>Kimi K2.6（1T，32B active）</td>
+<td>10,000 / 500；單一請求</td>
+<td class="muted">未揭露</td>
+<td class="num">981</td>
+<td>未公布（E2E 5.6 s）</td>
+<td>2026-05-06；<span class="g g-a" title="等級 A：獨立第三方量測">A</span>（端點不公開）</td>
+<td class="src"><a href="https://www.cerebras.ai/blog/cerebras-kimi-k2-Enterprise" rel="noopener" target="_blank">Cerebras</a></td>
+</tr>
+<tr id="b49">
+<td><span class="rh">Groq 3 LPX</span><span class="rh-sub"><span class="vh">（</span>256 顆 LP30，一個機櫃當量<span class="vh">）</span></span></td>
+<td>Gemma 4 31B，精度未揭露</td>
+<td>100,000-token context；concurrency 未揭露</td>
+<td class="muted">未揭露</td>
+<td class="num">3,400</td>
+<td class="muted">未公布</td>
+<td>2026-08-21 量測；<span class="g g-a" title="等級 A：獨立第三方量測">A</span> / <span class="g g-c" title="等級 C：廠商宣稱或規格，未揭露方法">C</span>（AA 量測，經廠商新聞稿轉述）</td>
+<td class="src"><a href="https://nvidianews.nvidia.com/news/nvidia-groq-3-lpx-now-in-full-production-with-world-class-speed-for-agentic-ai" rel="noopener" target="_blank">NVIDIA</a>、<a href="https://www.storagereview.com/news/nvidia-groq-3-lpx-enters-full-production-3400-tokens-per-second-at-100k-context-256-lp30s-per-rack" rel="noopener" target="_blank">StorageReview</a></td>
+</tr>
+<tr id="b50">
+<td><span class="rh">GroqCloud</span><span class="rh-sub"><span class="vh">（</span>第一代 LPU<span class="vh">）</span></span></td>
+<td>gpt-oss-120b</td>
+<td>AA 10K 輸入；單一請求</td>
+<td class="muted">未揭露</td>
+<td class="num">473</td>
+<td class="num">0.74</td>
+<td class="num">2026-10-04；<span class="g g-a" title="等級 A：獨立第三方量測">A</span></td>
+<td class="src"><a href="https://artificialanalysis.ai/models/gpt-oss-120b/providers" rel="noopener" target="_blank">AA</a></td>
+</tr>
+</tbody>
+</table></div></figure>
+<ul>
+<li id="b51">Trainium3 的絕對數字：查無公開資料。AWS 只給相對宣稱（「3x higher throughput per chip … 4x faster response times than Trn2 UltraServers」，GPT-OSS，C，2025-12-02，<a href="https://www.aboutamazon.com/news/aws/trainium-3-ultraserver-faster-ai-training-lower-cost" rel="noopener" target="_blank">About Amazon</a>）。Trainium 不在 InferenceX 的支援硬體清單內（<a href="https://github.com/SemiAnalysisAI/InferenceX" rel="noopener" target="_blank">InferenceX</a>，2026-10-02）。</li>
+<li id="b52">TPU 上高於 100 tok/s 的每串流速度只見於 Google 自家端點：AA 量到 Gemini 3.7 Flash（low reasoning）292.7 t/s、time to first answer token 1.41 s，Gemini 2.5 Flash-Lite（non-reasoning）297.2 t/s、0.33 s（<span class="g g-a" title="等級 A：獨立第三方量測">A</span>，2026-10-04，<a href="https://artificialanalysis.ai/providers/google" rel="noopener" target="_blank">AA</a>）。Google 稱 Gemini 在 TPU 上服務，世代與服務堆疊未揭露。</li>
+<li id="b53">Cerebras 的 1,764 t/s 是 05:46 UTC 的讀數；同日稍早的讀數為 1,781 t/s、TTFT 0.43 s。OpenRouter 實際流量 p50 為 946 t/s（p90 1,748），Cerebras 自述約 3,000 t/s（<span class="g g-c" title="等級 C：廠商宣稱或規格，未揭露方法">C</span>，<a href="https://inference-docs.cerebras.ai/models/overview" rel="noopener" target="_blank">Cerebras docs</a>）。</li>
+</ul>
+</div></div><div class="subpanel" role="tabpanel" id="s1-3" aria-labelledby="tab-s1-3"><div class="prose"><h3>系統吞吐量</h3><p id="b54">在 Blackwell 級以上的 GPU 與 MI355X 上，median TTFT 低於 5 s 時的每 GPU output 吞吐量是 Kimi K3 86–136 tok/s、DeepSeek-V4-Pro 449–1,092 tok/s、DeepSeek-V4.1-Flash 999–3,108 tok/s<span class="g g-a" title="等級 A：獨立第三方量測">A</span>。ASIC 端有對應數字的只有 TPU（Ironwood 在 397B–671B 模型上每晶片 263–1,293 tok/s，B；InferenceX 的同條件點為 1,040 tok/s）與小模型上的 Trainium2、Inferentia2；Cerebras 與 LPX 查無公開的系統吞吐量。</p>
+
+<figure class="tbl" data-cols="7" data-rows="23" id="t8-4"><figcaption><strong>表 8-4 系統吞吐量：GPU</strong>（等級 <span class="g g-a" title="等級 A：獨立第三方量測">A</span>。AgentX 列取 median TTFT &lt; 5 s 的最高吞吐點，沒有合格點時取最高吞吐點；8K/1K 列取每使用者 ≥ 30 tok/s 且 median TTFT ≤ 10 s 的最高吞吐點。來源同<a class="xref" href="#t8-2">表 8-2</a>；MLPerf 列見備註）</figcaption><div aria-label="表 8-4 系統吞吐量：GPU" class="tbl-scroll" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th class="w1" scope="col">系統（GPU 數、模式）</th>
+<th class="w1" scope="col">模型、精度</th>
+<th scope="col">負載；concurrency</th>
+<th scope="col">spec decode</th>
+<th scope="col">output tok/s 每 GPU</th>
+<th class="w1" scope="col">該點的每使用者 tok/s（median / P90）；TTFT，s（median / P90）</th>
+<th scope="col">量測日</th>
+</tr>
+</thead>
+<tbody>
+<tr id="b55">
+<td><span class="rh">Vera Rubin NVL72</span><span class="rh-sub"><span class="vh">（</span>32 GPU，P/D<span class="vh">）</span></span></td>
+<td>DeepSeek-V4-Pro，FP4</td>
+<td>AgentX；934</td>
+<td>MTP</td>
+<td class="num">1,092</td>
+<td class="num">145 / 138；4.22 / 8.05</td>
+<td class="num">2026-09-10</td>
+</tr>
+<tr id="b56">
+<td><span class="rh">GB300 NVL72</span><span class="rh-sub"><span class="vh">（</span>12 GPU，P/D，Dynamo vLLM<span class="vh">）</span></span></td>
+<td>DeepSeek-V4-Pro，FP4</td>
+<td>AgentX；256</td>
+<td>MTP</td>
+<td class="num">603</td>
+<td class="num">61 / 58；4.30 / 9.96</td>
+<td class="num">2026-08-14</td>
+</tr>
+<tr id="b57">
+<td><span class="rh">B300</span><span class="rh-sub"><span class="vh">（</span>8 GPU<span class="vh">）</span></span></td>
+<td>DeepSeek-V4-Pro，FP4</td>
+<td>AgentX；384</td>
+<td>MTP</td>
+<td class="num">739</td>
+<td class="num">37 / 34；2.94 / 12.66</td>
+<td class="num">2026-09-29</td>
+</tr>
+<tr id="b58">
+<td><span class="rh">GB200 NVL72</span><span class="rh-sub"><span class="vh">（</span>28 GPU，P/D<span class="vh">）</span></span></td>
+<td>DeepSeek-V4-Pro，FP4</td>
+<td>AgentX；576</td>
+<td>MTP</td>
+<td class="num">595</td>
+<td class="num">56 / 52；3.16 / 6.34</td>
+<td class="num">2026-08-18</td>
+</tr>
+<tr id="b59">
+<td><span class="rh">B200</span><span class="rh-sub"><span class="vh">（</span>8 GPU<span class="vh">）</span></span></td>
+<td>DeepSeek-V4-Pro，FP4</td>
+<td>AgentX；128</td>
+<td>DSpark</td>
+<td class="num">456</td>
+<td class="num">68 / 58；4.68 / 17.32</td>
+<td class="num">2026-09-19</td>
+</tr>
+<tr id="b60">
+<td><span class="rh">MI355X</span><span class="rh-sub"><span class="vh">（</span>16 GPU，P/D，MoRI SGLang<span class="vh">）</span></span></td>
+<td>DeepSeek-V4-Pro，FP4</td>
+<td>AgentX；256</td>
+<td>DSpark</td>
+<td class="num">449</td>
+<td class="num">75 / 63；4.86 / 15.33</td>
+<td class="num">2026-10-04</td>
+</tr>
+<tr id="b61">
+<td><span class="rh">H200</span><span class="rh-sub"><span class="vh">（</span>8 GPU<span class="vh">）</span></span></td>
+<td>DeepSeek-V4-Pro，FP8</td>
+<td>AgentX；8</td>
+<td>DSpark</td>
+<td class="num">41</td>
+<td class="num">152 / 97；0.94 / 4.85</td>
+<td class="num">2026-09-16</td>
+</tr>
+<tr id="b62">
+<td><span class="rh">GB300 NVL72</span><span class="rh-sub"><span class="vh">（</span>8 GPU<span class="vh">）</span></span></td>
+<td>Kimi K3，MXFP4</td>
+<td>AgentX；48</td>
+<td>DSpark</td>
+<td class="num">136</td>
+<td class="num">38 / 26；1.15 / 2.88</td>
+<td class="num">2026-09-15</td>
+</tr>
+<tr id="b63">
+<td><span class="rh">MI355X</span><span class="rh-sub"><span class="vh">（</span>8 GPU，ATOM<span class="vh">）</span></span></td>
+<td>Kimi K3，MXFP4</td>
+<td>AgentX；72</td>
+<td>DSpark</td>
+<td class="num">104</td>
+<td class="num">13 / 10；2.31 / 6.96</td>
+<td class="num">2026-09-29</td>
+</tr>
+<tr id="b64">
+<td><span class="rh">B300</span><span class="rh-sub"><span class="vh">（</span>8 GPU<span class="vh">）</span></span></td>
+<td>Kimi K3，MXFP4</td>
+<td>AgentX；70</td>
+<td>DSpark</td>
+<td class="num">88</td>
+<td class="num">11 / 8；1.21 / 3.84</td>
+<td class="num">2026-08-16</td>
+</tr>
+<tr id="b65">
+<td><span class="rh">B200</span><span class="rh-sub"><span class="vh">（</span>16 GPU<span class="vh">）</span></span></td>
+<td>Kimi K3，MXFP4</td>
+<td>AgentX；72</td>
+<td>DSpark</td>
+<td class="num">86</td>
+<td class="num">21 / 17；1.01 / 2.62</td>
+<td class="num">2026-10-02</td>
+</tr>
+<tr id="b66">
+<td><span class="rh">MI355X</span><span class="rh-sub"><span class="vh">（</span>4 GPU，ATOM<span class="vh">）</span></span></td>
+<td>GLM-5.2，FP4</td>
+<td>AgentX；48</td>
+<td>MTP</td>
+<td class="num">230</td>
+<td class="num">35 / 19；0.81 / 3.87</td>
+<td class="num">2026-09-22</td>
+</tr>
+<tr id="b67">
+<td><span class="rh">GB300 NVL72</span><span class="rh-sub"><span class="vh">（</span>32 GPU，P/D<span class="vh">）</span></span></td>
+<td>GLM-5.2，FP4</td>
+<td>AgentX；128</td>
+<td>MTP</td>
+<td class="num">149</td>
+<td class="num">101 / 90；2.33 / 5.81</td>
+<td class="num">2026-10-02</td>
+</tr>
+<tr id="b68">
+<td><span class="rh">B200</span><span class="rh-sub"><span class="vh">（</span>16 GPU，P/D<span class="vh">）</span></span></td>
+<td>GLM-5.2，FP4</td>
+<td>AgentX；64</td>
+<td>MTP</td>
+<td class="num">132</td>
+<td class="num">92 / 84；3.88 / 18.23</td>
+<td class="num">2026-10-02</td>
+</tr>
+<tr id="b69">
+<td><span class="rh">GB300 NVL72</span><span class="rh-sub"><span class="vh">（</span>2 GPU<span class="vh">）</span></span></td>
+<td>DeepSeek-V4.1-Flash，FP4</td>
+<td>AgentX；192</td>
+<td>MTP</td>
+<td class="num">3,108</td>
+<td class="num">62 / 44；0.24 / 0.73</td>
+<td class="num">2026-10-02</td>
+</tr>
+<tr id="b70">
+<td><span class="rh">B300</span><span class="rh-sub"><span class="vh">（</span>2 GPU<span class="vh">）</span></span></td>
+<td>DeepSeek-V4.1-Flash，FP4</td>
+<td>AgentX；192</td>
+<td>MTP</td>
+<td class="num">3,059</td>
+<td class="num">60 / 41；0.25 / 0.81</td>
+<td class="num">2026-10-02</td>
+</tr>
+<tr id="b71">
+<td><span class="rh">B200</span><span class="rh-sub"><span class="vh">（</span>4 GPU<span class="vh">）</span></span></td>
+<td>DeepSeek-V4.1-Flash，FP4</td>
+<td>AgentX；128</td>
+<td>MTP</td>
+<td class="num">1,362</td>
+<td class="num">132 / 81；0.16 / 0.44</td>
+<td class="num">2026-10-03</td>
+</tr>
+<tr id="b72">
+<td><span class="rh">MI355X</span><span class="rh-sub"><span class="vh">（</span>2 GPU，vLLM<span class="vh">）</span></span></td>
+<td>DeepSeek-V4.1-Flash，FP4</td>
+<td>AgentX；64</td>
+<td>MTP</td>
+<td class="num">999</td>
+<td class="num">59 / 32；0.40 / 3.31</td>
+<td class="num">2026-10-02</td>
+</tr>
+<tr id="b73">
+<td><span class="rh">H200</span><span class="rh-sub"><span class="vh">（</span>4 GPU<span class="vh">）</span></span></td>
+<td>DeepSeek-V4.1-Flash，FP4</td>
+<td>AgentX；32</td>
+<td>MTP</td>
+<td class="num">231</td>
+<td class="num">71 / 34；0.40 / 2.73</td>
+<td class="num">2026-09-21</td>
+</tr>
+<tr id="b74">
+<td><span class="rh">B200</span><span class="rh-sub"><span class="vh">（</span>TP4<span class="vh">）</span></span></td>
+<td>Qwen3.5-397B，FP8</td>
+<td class="num">8K/1K；128</td>
+<td class="muted">無</td>
+<td class="num">950（total 8,581）</td>
+<td class="num">31（median）；1.18（median）</td>
+<td class="num">2026-09-18</td>
+</tr>
+<tr id="b75">
+<td><span class="rh">B300</span><span class="rh-sub"><span class="vh">（</span>TP4<span class="vh">）</span></span></td>
+<td>Qwen3.5-397B，FP8</td>
+<td class="num">8K/1K；64</td>
+<td class="muted">無</td>
+<td class="num">608（total 5,481）</td>
+<td class="num">39（median）；0.44（median）</td>
+<td class="num">2026-05-21</td>
+</tr>
+<tr id="b76">
+<td><span class="rh">MI355X</span><span class="rh-sub"><span class="vh">（</span>TP4，SGLang<span class="vh">）</span></span></td>
+<td>Qwen3.5-397B，FP8</td>
+<td class="num">8K/1K；64</td>
+<td class="muted">無</td>
+<td class="num">535（total 4,823）</td>
+<td class="num">35（median）；0.97（median）</td>
+<td class="num">2026-09-25</td>
+</tr>
+<tr id="b77">
+<td class="rowhead">MI355X ×512</td>
+<td>DeepSeek-R1</td>
+<td>MLPerf Inference v6.1，Server / Offline</td>
+<td class="muted">未載明</td>
+<td>4,698 / 5,668（<span class="g g-d" title="等級 D：本文推算，附算式">D</span>：2,405,310 ÷ 512；2,901,950 ÷ 512）</td>
+<td>MLPerf 自訂的延遲條件</td>
+<td class="num">2026-09-17</td>
+</tr>
+</tbody>
+</table></div></figure>
+<ul>
+<li id="b78">GB300 上的 Dynamo SGLang（48 GPU，P/D）在 concurrency 1,920 達每 GPU 846 output tok/s，但 median TTFT 為 9.38 s，不符合 5 s 的條件，所以表中 GB300 列取 Dynamo vLLM 的合格點（明細見<a class="xref" href="04-open-models.html#t4-15">表 4-15</a>）。</li>
+<li id="b79">MLPerf 列是 AMD 的 submission，經 <a href="https://rocm.blogs.amd.com/artificial-intelligence/mlperf-inf-v6.1/README.html" rel="noopener" target="_blank">AMD ROCm blog</a> 讀取，與 InferenceX 的負載不同，不可互比。NVIDIA 端只有相對值：Vera Rubin 在 Qwen3-VL 上最高為 GB300 NVL72 的 3.7 倍、DeepSeek-R1 上 2.5 倍（<a href="https://techstrong.ai/articles/mlperf-inference-v6-1-updated-for-rag-agents-and-api-based-serving/" rel="noopener" target="_blank">Techstrong.ai</a>，2026-09-16）。</li>
+<li id="b80">按加速器整理的 MLPerf Inference v6.0 / v6.1 成績表：查無公開資料（結果頁未能讀取）。v6.1 新增的加速器清單沒有 TPU（<a href="https://mlcommons.org/2026/09/mlperf-inference-v6-1-results/" rel="noopener" target="_blank">MLCommons</a>），Trainium 的 submission 未查。</li>
+</ul>
+
+<figure class="tbl" data-cols="7" data-rows="15" id="t8-5"><figcaption><strong>表 8-5 系統吞吐量：TPU、Trainium、Inferentia2</strong>（各列的模型與負載不同，不可跨列比較；Google 與 Hugging Face 的結果都未載明是否使用 spec decode）</figcaption><div aria-label="表 8-5 系統吞吐量：TPU、Trainium、Inferentia2" class="tbl-scroll" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th class="w1" scope="col">加速器（晶片數）</th>
+<th class="w1" scope="col">模型、精度</th>
+<th class="w1" scope="col">負載；concurrency</th>
+<th scope="col">output tok/s 每晶片</th>
+<th class="w2" scope="col">該點的服務水準</th>
+<th class="w1" scope="col">日期；等級</th>
+<th class="src" scope="col">來源</th>
+</tr>
+</thead>
+<tbody>
+<tr id="b81">
+<td><span class="rh">Ironwood</span><span class="rh-sub"><span class="vh">（</span>晶片數未公開<span class="vh">）</span></span></td>
+<td>Qwen3.5-397B，FP8，無 MTP</td>
+<td class="num">8K/1K；256</td>
+<td class="num">1,040（<span class="g g-d" title="等級 D：本文推算，附算式">D</span>：total 9,364 ÷ 9）</td>
+<td>20 tok/s/user；mean TTFT 5.41 s</td>
+<td class="num">2026-09-07；<span class="g g-a" title="等級 A：獨立第三方量測">A</span>（preview）</td>
+<td class="src"><a href="https://inferencex.semianalysis.com/blog/tpu-inferencex-full-steam" rel="noopener" target="_blank">InferenceX</a></td>
+</tr>
+<tr id="b82">
+<td class="rowhead">Ironwood ×4</td>
+<td>Qwen3.5-397B-A17B，FP8</td>
+<td class="num">8K/1K；128</td>
+<td class="num">570</td>
+<td class="muted">未公布</td>
+<td>image nightly-20260626；<span class="g g-b" title="等級 B：廠商或夥伴公布，且揭露方法">B</span></td>
+<td class="src"><a href="https://github.com/AI-Hypercomputer/tpu-recipes/tree/main/inference/ironwood/vLLM" rel="noopener" target="_blank">tpu-recipes</a></td>
+</tr>
+<tr id="b83">
+<td class="rowhead">Ironwood ×4</td>
+<td>Qwen3.5-397B-A17B，FP8</td>
+<td class="num">1K/8K；128</td>
+<td class="num">1,293</td>
+<td class="muted">未公布</td>
+<td>同上；<span class="g g-b" title="等級 B：廠商或夥伴公布，且揭露方法">B</span></td>
+<td class="src muted">同上</td>
+</tr>
+<tr id="b84">
+<td class="rowhead">Ironwood ×4</td>
+<td>DeepSeek-V3 671B</td>
+<td class="num">1K/1K；128</td>
+<td class="num">500</td>
+<td>≈18 tok/s/user；mean TTFT 4.94 s；mean E2E 61.3 s</td>
+<td>同上；<span class="g g-b" title="等級 B：廠商或夥伴公布，且揭露方法">B</span></td>
+<td class="src muted">同上</td>
+</tr>
+<tr id="b85">
+<td class="rowhead">Ironwood ×4</td>
+<td>DeepSeek-R1 671B</td>
+<td>1K/1K；128（512 個請求有 8 個失敗）</td>
+<td class="num">297</td>
+<td>≈12 tok/s/user；mean TTFT 14.34 s</td>
+<td>同上；<span class="g g-b" title="等級 B：廠商或夥伴公布，且揭露方法">B</span></td>
+<td class="src muted">同上</td>
+</tr>
+<tr id="b86">
+<td class="rowhead">Ironwood ×4</td>
+<td>Qwen3-Coder-480B-A35B，FP8</td>
+<td class="num">8K/1K；64</td>
+<td class="num">263</td>
+<td class="muted">未公布</td>
+<td>image nightly-20260624；<span class="g g-b" title="等級 B：廠商或夥伴公布，且揭露方法">B</span></td>
+<td class="src muted">同上</td>
+</tr>
+<tr id="b87">
+<td class="rowhead">Ironwood ×1</td>
+<td>Qwen3-32B，FP8</td>
+<td class="num">1K/1K；320</td>
+<td class="num">7,710</td>
+<td class="muted">未公布</td>
+<td>image nightly-20260914；<span class="g g-b" title="等級 B：廠商或夥伴公布，且揭露方法">B</span></td>
+<td class="src muted">同上</td>
+</tr>
+<tr id="b88">
+<td><span class="rh">Ironwood ×4</span><span class="rh-sub"><span class="vh">（</span>SGL-JAX<span class="vh">）</span></span></td>
+<td>GLM-4.5-Air，BF16</td>
+<td class="num">1,024 / 1,024；128</td>
+<td class="num">1,003</td>
+<td>≈35 tok/s/user；mean TTFT 3.13 s</td>
+<td class="num">2026-10-04 讀取；<span class="g g-b" title="等級 B：廠商或夥伴公布，且揭露方法">B</span></td>
+<td class="src"><a href="https://github.com/sgl-project/sglang-jax/tree/main/docs/cookbook/autoregressive" rel="noopener" target="_blank">sglang-jax</a></td>
+</tr>
+<tr id="b89">
+<td class="rowhead">Trillium ×8</td>
+<td>Llama-3.3-70B</td>
+<td class="num">1K/1K；128</td>
+<td class="num">443</td>
+<td>≈28 tok/s/user；mean TTFT 0.51 s，P99 8.25 s</td>
+<td class="num">2026-10-04 讀取；<span class="g g-b" title="等級 B：廠商或夥伴公布，且揭露方法">B</span></td>
+<td class="src"><a href="https://github.com/AI-Hypercomputer/tpu-recipes/tree/main/inference/trillium/vLLM/Llama3.x" rel="noopener" target="_blank">tpu-recipes</a></td>
+</tr>
+<tr id="b90">
+<td><span class="rh">Trainium2 ×1</span><span class="rh-sub"><span class="vh">（</span>TP4，batch 32<span class="vh">）</span></span></td>
+<td>Llama 3.1 8B</td>
+<td>1,500 / 250；腳本預設最多 128 個使用者</td>
+<td class="num">579</td>
+<td>inter-token 44.5 ms（≈22 tok/s/user）；TTFT 1.25 s</td>
+<td class="num">2025-10；<span class="g g-b" title="等級 B：廠商或夥伴公布，且揭露方法">B</span></td>
+<td class="src"><a href="https://github.com/huggingface/optimum-neuron/tree/main/benchmark/vllm/single-instance" rel="noopener" target="_blank">Optimum Neuron</a></td>
+</tr>
+<tr id="b91">
+<td><span class="rh">Trainium2 ×16</span><span class="rh-sub"><span class="vh">（</span>TP64，batch 8<span class="vh">）</span></span></td>
+<td>Llama 4 Maverick 17B-128E</td>
+<td class="muted">同上</td>
+<td class="num">5.9（93.6 ÷ 16）</td>
+<td>inter-token 56.5 ms；TTFT 3.31 s</td>
+<td class="num">2025-10；<span class="g g-b" title="等級 B：廠商或夥伴公布，且揭露方法">B</span></td>
+<td class="src muted">同上</td>
+</tr>
+<tr id="b92">
+<td><span class="rh">Trainium2 ×16</span><span class="rh-sub"><span class="vh">（</span>TP64，batch 4<span class="vh">）</span></span></td>
+<td>Qwen3-235B-A22B</td>
+<td class="muted">同上</td>
+<td class="num">1.7（27.9 ÷ 16）</td>
+<td>inter-token 69.4 ms；TTFT 5.82 s</td>
+<td class="num">2025-10；<span class="g g-b" title="等級 B：廠商或夥伴公布，且揭露方法">B</span></td>
+<td class="src muted">同上</td>
+</tr>
+<tr id="b93">
+<td><span class="rh">Trainium1 ×16</span><span class="rh-sub"><span class="vh">（</span>trn1.32xlarge，4 replicas × TP8<span class="vh">）</span></span></td>
+<td>Llama 3.1 8B</td>
+<td class="muted">同上</td>
+<td class="num">109（1,744.9 ÷ 16）</td>
+<td class="muted">未載明</td>
+<td class="num">2026-10-04 讀取；<span class="g g-b" title="等級 B：廠商或夥伴公布，且揭露方法">B</span></td>
+<td class="src"><a href="https://github.com/huggingface/optimum-neuron/blob/main/benchmark/vllm/data-parallel/llama3.1-8b/vllm-results-dp4.csv" rel="noopener" target="_blank">Optimum Neuron DP4</a></td>
+</tr>
+<tr id="b94">
+<td><span class="rh">Inferentia2 ×12</span><span class="rh-sub"><span class="vh">（</span>inf2.48xlarge，3 replicas × TP8，batch 32<span class="vh">）</span></span></td>
+<td>Llama 3.1 8B</td>
+<td>1,500 / 250；腳本預設最多 128 個使用者</td>
+<td class="num">102（1,226.8 ÷ 12）</td>
+<td>inter-token 43.2 ms（≈23 tok/s/user）；TTFT 4.47 s</td>
+<td class="num">2026-08-27；<span class="g g-b" title="等級 B：廠商或夥伴公布，且揭露方法">B</span></td>
+<td class="src"><a href="https://github.com/huggingface/optimum-neuron/blob/main/benchmark/vllm/data-parallel/llama3.1-8b/vllm-results-dp3.csv" rel="noopener" target="_blank">Optimum Neuron CSV</a></td>
+</tr>
+<tr id="b95">
+<td><span class="rh">Inferentia2 ×12</span><span class="rh-sub"><span class="vh">（</span>sequence 16,512，batch 8<span class="vh">）</span></span></td>
+<td>Llama 3.1 8B</td>
+<td class="num">約 15,900 / 290</td>
+<td class="num">20.8（249.6 ÷ 12）</td>
+<td>mean TTFT 24.6 s；request latency 43.8 s</td>
+<td class="num">2025-05-27；<span class="g g-b" title="等級 B：廠商或夥伴公布，且揭露方法">B</span></td>
+<td class="src"><a href="https://builder.aws.com/content/2zruvftx03ZtQFFxyur6kdzfwMv/benchmarking-llm-inference-with-optimum-neuron-on-inferentia2" rel="noopener" target="_blank">AWS Builder Center</a></td>
+</tr>
+</tbody>
+</table></div></figure>
+<ul>
+<li id="b96">Trainium 沒有任何 235B 以上模型在高 concurrency 下的吞吐量數字。AWS 的 gpt-oss production recipe（16P1D，decode batch 128 以上）只公布拓樸，沒有結果（<a href="https://awsdocs-neuron.readthedocs-hosted.com/en/latest/vllm-neuron/docs/tutorials/tutorial-gpt-oss.html" rel="noopener" target="_blank">vLLM Neuron</a>，2026-07-15）；Trainium3：查無公開資料。</li>
+<li id="b97">Cerebras：查無公開的系統吞吐量，每條 pipeline 的 concurrency 未揭露。LPX 的 3,400 tok/s 未揭露 concurrency，無法換算成每晶片吞吐量。</li>
+</ul>
+</div></div><div class="subpanel" role="tabpanel" id="s1-4" aria-labelledby="tab-s1-4"><div class="prose"><h3>同條件比較</h3>
+<figure class="tbl" data-cols="7" data-rows="10" id="t8-6"><figcaption><strong>表 8-6 gpt-oss-120b（high reasoning）跨供應商</strong>（等級 <span class="g g-a" title="等級 A：獨立第三方量測">A</span>；AA，P50 / 72 h，2026-10-04 05:46 UTC；每次量測為單一請求，各端點的精度與是否使用 spec decode 未揭露；硬體類別為筆記所標。來源：<a href="https://artificialanalysis.ai/models/gpt-oss-120b/providers" rel="noopener" target="_blank">AA</a>）</figcaption><div aria-label="表 8-6 gpt-oss-120b（high reasoning）跨供應商" class="tbl-scroll" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th scope="col">供應商</th>
+<th class="w1" scope="col">硬體類別</th>
+<th scope="col">10K 輸入：t/s</th>
+<th scope="col">10K 輸入：TTFT（s）</th>
+<th scope="col">100K 輸入：t/s；TTFT（s）</th>
+<th scope="col">10 個並行請求（1K）：t/s</th>
+<th scope="col">10K 速度 ÷ Azure<span class="g g-d" title="等級 D：本文推算，附算式">D</span></th>
+</tr>
+</thead>
+<tbody>
+<tr id="b98">
+<td class="rowhead">Cerebras</td>
+<td>wafer-scale ASIC（WSE-3）</td>
+<td class="num">1,764</td>
+<td class="num">0.42</td>
+<td class="num">1,225；3.44</td>
+<td class="num">1,666</td>
+<td class="num">5.5×</td>
+</tr>
+<tr id="b99">
+<td class="rowhead">SambaNova</td>
+<td>RDU ASIC</td>
+<td class="num">706</td>
+<td class="num">1.14</td>
+<td class="num">360；6.78</td>
+<td class="num">740</td>
+<td class="num">2.2×</td>
+</tr>
+<tr id="b100">
+<td class="rowhead">Groq</td>
+<td>LPU ASIC（第一代）</td>
+<td class="num">473</td>
+<td class="num">0.74</td>
+<td class="num">476；4.88</td>
+<td class="num">313</td>
+<td class="num">1.5×</td>
+</tr>
+<tr id="b101">
+<td class="rowhead">Microsoft Azure</td>
+<td class="muted">未揭露</td>
+<td class="num">320</td>
+<td class="num">0.74</td>
+<td class="num">160；4.01</td>
+<td class="num">562</td>
+<td class="num">1.0×</td>
+</tr>
+<tr id="b102">
+<td><span class="rh">Nebius</span><span class="rh-sub"><span class="vh">（</span>Base<span class="vh">）</span></span></td>
+<td>GPU 雲</td>
+<td class="num">280</td>
+<td class="num">0.97</td>
+<td class="num">189；3.48</td>
+<td class="num">255</td>
+<td class="num">0.88×</td>
+</tr>
+<tr id="b103">
+<td><span class="rh">DeepInfra</span><span class="rh-sub"><span class="vh">（</span>Turbo<span class="vh">）</span></span></td>
+<td>GPU 雲（NVIDIA 稱 Blackwell）</td>
+<td class="num">248</td>
+<td class="num">0.81</td>
+<td class="num">218；2.51</td>
+<td class="num">294</td>
+<td class="num">0.78×</td>
+</tr>
+<tr id="b104">
+<td class="rowhead">Crusoe</td>
+<td>GPU 雲</td>
+<td class="num">233</td>
+<td class="num">0.41</td>
+<td class="num">208；2.11</td>
+<td class="num">214</td>
+<td class="num">0.73×</td>
+</tr>
+<tr id="b105">
+<td class="rowhead">Baseten</td>
+<td>GPU 雲（NVIDIA 稱 Blackwell）</td>
+<td class="num">221</td>
+<td class="num">0.18</td>
+<td class="num">332；1.25</td>
+<td class="num">206</td>
+<td class="num">0.69×</td>
+</tr>
+<tr id="b106">
+<td class="rowhead">Amazon Bedrock</td>
+<td class="muted">未揭露</td>
+<td class="num">83</td>
+<td class="num">1.08</td>
+<td class="num">35；3.74</td>
+<td class="num">135</td>
+<td class="num">0.26×</td>
+</tr>
+<tr id="b107">
+<td class="rowhead">Google Vertex</td>
+<td class="muted">未揭露</td>
+<td class="num">45</td>
+<td class="num">95.92</td>
+<td class="num">86；3.72</td>
+<td class="num">33</td>
+<td class="num">0.14×</td>
+</tr>
+</tbody>
+</table></div></figure>
+<ul>
+<li id="b108">對十個第三方 GPU 端點的中位數 179 t/s，Cerebras 為 9.9×<span class="g g-d" title="等級 D：本文推算，附算式">D</span>。100K 輸入時差距縮小：Cerebras 1,225 ÷ 最快的 GPU 端點 Baseten 332 = 3.7×<span class="g g-d" title="等級 D：本文推算，附算式">D</span>。TTFT 最低的是 GPU 端點（Baseten 0.18 s、Crusoe 0.41 s），不是 ASIC。</li>
+<li id="b109">OpenRouter 的實際流量 p50 較低也較接近：Cerebras 946、SambaNova 374、Groq 355、Bedrock 234、Vertex 100 t/s（<span class="g g-a" title="等級 A：獨立第三方量測">A</span>，<a href="https://openrouter.ai/openai/gpt-oss-120b" rel="noopener" target="_blank">OpenRouter</a>）。Vertex 端點當日 TTFT 96 s、單日 uptime 51%，不能代表 Google 的硬體。</li>
+<li id="b110">速度與端點品質是兩個軸：AA 的 Endpoint Accuracy Index 上，Cerebras 87.3、Groq 86.4 低於參考端點，SambaNova 98.2、Bedrock 100.8 在參考範圍內（<span class="g g-a" title="等級 A：獨立第三方量測">A</span>，<a href="https://artificialanalysis.ai/models/gpt-oss-120b/providers" rel="noopener" target="_blank">AA</a>）。</li>
+</ul>
+
+<figure class="tbl" data-cols="7" data-rows="6" id="t8-7"><figcaption><strong>表 8-7 Ironwood 對 B200 / B300</strong>（InferenceX Official Preview；Qwen3.5-397B、FP8、8K/1K、aggregated、無 MTP；2026-09-07。來源：<a href="https://inferencex.semianalysis.com/blog/tpu-inferencex-full-steam" rel="noopener" target="_blank">InferenceX</a>）</figcaption><div aria-label="表 8-7 Ironwood 對 B200 / B300" class="tbl-scroll" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th class="w1" scope="col">指標</th>
+<th class="w1" scope="col">操作點</th>
+<th scope="col">Ironwood</th>
+<th scope="col">B200</th>
+<th scope="col">B300</th>
+<th scope="col">Ironwood ÷ B200；÷ B300</th>
+<th scope="col">等級</th>
+</tr>
+</thead>
+<tbody>
+<tr id="b111">
+<td class="rowhead">total tok/s 每晶片</td>
+<td>20 tok/s/user（concurrency 256）</td>
+<td class="num">9,364</td>
+<td class="num">8,903</td>
+<td class="num">8,925</td>
+<td class="num">1.05×；1.05×</td>
+<td><span class="g g-a" title="等級 A：獨立第三方量測">A</span></td>
+</tr>
+<tr id="b112">
+<td class="rowhead">output tok/s 每晶片</td>
+<td class="muted">同上</td>
+<td class="num">1,040</td>
+<td class="num">989</td>
+<td class="num">992</td>
+<td class="num">1.05×；1.05×</td>
+<td><span class="g g-d" title="等級 D：本文推算，附算式">D</span>（total ÷ 9）</td>
+</tr>
+<tr id="b113">
+<td class="rowhead">mean TTFT（s）</td>
+<td>concurrency 256</td>
+<td class="num">5.41</td>
+<td class="num">3.75</td>
+<td class="num">2.40</td>
+<td class="num">1.44×；2.25×</td>
+<td><span class="g g-a" title="等級 A：獨立第三方量測">A</span></td>
+</tr>
+<tr id="b114">
+<td class="rowhead">total tok/s 每晶片</td>
+<td class="num">100 tok/s/user</td>
+<td class="num">1,857</td>
+<td class="num">2,165</td>
+<td class="num">2,275</td>
+<td class="num">0.86×；0.82×</td>
+<td><span class="g g-d" title="等級 D：本文推算，附算式">D</span>（由成本反推，見備註）</td>
+</tr>
+<tr id="b115">
+<td class="rowhead">每百萬 total tokens 成本</td>
+<td class="num">100 tok/s/user</td>
+<td class="num">$0.181</td>
+<td class="num">$0.222</td>
+<td class="num">$0.276</td>
+<td class="num">0.82×；0.66×</td>
+<td>吞吐量 <span class="g g-a" title="等級 A：獨立第三方量測">A</span>；成本為 TCO 模型</td>
+</tr>
+<tr id="b116">
+<td class="rowhead">每百萬 total tokens 成本</td>
+<td>median E2E 20 s</td>
+<td class="num">≈$0.098</td>
+<td class="num">$0.106</td>
+<td class="num">$0.132</td>
+<td class="num">0.92×；0.74×</td>
+<td class="muted">同上</td>
+</tr>
+</tbody>
+</table></div></figure>
+<ul>
+<li id="b117">100 tok/s/user 的吞吐量是本文由文章的成本反推：吞吐量 = TCO ÷（成本 × 3,600）× 10^6，TCO 取 InferenceX 的自有成本 $1.21、$1.73、$2.26 每 chip-hour。同一組 TCO 可重現文章的「+50.4%、+96.0% tokens per dollar」（(9,364 ÷ 1.21) ÷ (8,903 ÷ 1.73) = 1.504），所以判定文章的 external TCO 即這組數值<span class="g g-d" title="等級 D：本文推算，附算式">D</span>。</li>
+<li id="b118">SemiAnalysis 的結論是「Across most of the raw-performance curve, TPU does not outperform NVIDIA GPUs」。Ironwood 沒有原生 FP4，對 GPU 的 FP4 落後；對 GB300 NVL72 的 disaggregated serving，在延遲中段約落後 30% perf per dollar。AgentX 上的 TPU 結果尚未公布。</li>
+<li id="b119">這是 2026-09-07 的快照。<a href="https://inferencex.semianalysis.com/api/v1/benchmarks?model=Qwen-3.5-397B-A17B" rel="noopener" target="_blank">InferenceX API</a> 中 2026-09-18 的 B200 FP8 重跑為 31 tok/s/user 時 total 8,581、9 tok/s/user 時 12,951 tok/s/GPU，線性內插到 20 tok/s/user 約 10,800<span class="g g-d" title="等級 D：本文推算，附算式">D</span>，高於文章當時的 8,903。</li>
+</ul>
+
+<figure class="tbl" data-cols="6" data-rows="9" id="t8-8"><figcaption><strong>表 8-8 gpt-oss-120b：同一份權重、不同量測</strong>（負載不同，只能比量級。InferenceX 列取自 <a href="https://inferencex.semianalysis.com/api/v1/benchmarks?model=gpt-oss-120b" rel="noopener" target="_blank">InferenceX API，gpt-oss-120b</a>，2026-10-05 重抓後四列逐一相符，等級 <span class="g g-a" title="等級 A：獨立第三方量測">A</span>）</figcaption><div aria-label="表 8-8 gpt-oss-120b：同一份權重、不同量測" class="tbl-scroll" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th class="w1" scope="col">平台</th>
+<th class="w2" scope="col">設定（精度、晶片、spec decode）</th>
+<th scope="col">負載；concurrency</th>
+<th scope="col">output tok/s 每串流</th>
+<th scope="col">TTFT（s）</th>
+<th class="w1" scope="col">量測者；日期；等級</th>
+</tr>
+</thead>
+<tbody>
+<tr id="b120">
+<td><span class="rh">Cerebras</span><span class="rh-sub"><span class="vh">（</span>API<span class="vh">）</span></span></td>
+<td>fp16 標記</td>
+<td>10K 輸入；單一請求</td>
+<td class="num">1,764</td>
+<td class="num">0.42</td>
+<td>AA；2026-10-04；<span class="g g-a" title="等級 A：獨立第三方量測">A</span></td>
+</tr>
+<tr id="b121">
+<td><span class="rh">SambaNova / Groq</span><span class="rh-sub"><span class="vh">（</span>API<span class="vh">）</span></span></td>
+<td class="muted">未揭露</td>
+<td class="muted">同上</td>
+<td class="num">706 / 473</td>
+<td class="num">1.14 / 0.74</td>
+<td>AA；2026-10-04；<span class="g g-a" title="等級 A：獨立第三方量測">A</span></td>
+</tr>
+<tr id="b122">
+<td><span class="rh">GB200 NVL72</span><span class="rh-sub"><span class="vh">（</span>自架<span class="vh">）</span></span></td>
+<td>FP4；P TP1 + D TP4；Dynamo + TensorRT-LLM；無 spec decode</td>
+<td class="num">1K/1K；1</td>
+<td class="num">527</td>
+<td class="num">0.04</td>
+<td>InferenceX；2026-01-07；<span class="g g-a" title="等級 A：獨立第三方量測">A</span></td>
+</tr>
+<tr id="b123">
+<td><span class="rh">B200</span><span class="rh-sub"><span class="vh">（</span>自架<span class="vh">）</span></span></td>
+<td>FP4；8 GPU，TP8；TensorRT-LLM；無 spec decode</td>
+<td class="num">1K/1K；4</td>
+<td class="num">431</td>
+<td class="num">0.05</td>
+<td>InferenceX；2026-05-18；<span class="g g-a" title="等級 A：獨立第三方量測">A</span></td>
+</tr>
+<tr id="b124">
+<td><span class="rh">MI355X</span><span class="rh-sub"><span class="vh">（</span>自架<span class="vh">）</span></span></td>
+<td>FP4；4 GPU，TP4；vLLM；無 spec decode</td>
+<td class="num">1K/1K；4</td>
+<td class="num">318</td>
+<td class="num">0.03</td>
+<td>InferenceX；2026-06-05；<span class="g g-a" title="等級 A：獨立第三方量測">A</span></td>
+</tr>
+<tr id="b125">
+<td><span class="rh">H200</span><span class="rh-sub"><span class="vh">（</span>自架<span class="vh">）</span></span></td>
+<td>FP4；8 GPU，TP8；vLLM；無 spec decode</td>
+<td class="num">1K/1K；4</td>
+<td class="num">270</td>
+<td class="num">0.03</td>
+<td>InferenceX；2026-05-30；<span class="g g-a" title="等級 A：獨立第三方量測">A</span></td>
+</tr>
+<tr id="b126">
+<td class="rowhead">GPU 雲 API</td>
+<td>各家不一</td>
+<td>10K 輸入；單一請求</td>
+<td>中位數 179；最快 280（Nebius）</td>
+<td class="num">0.97（Nebius）</td>
+<td>AA；2026-10-04；<span class="g g-a" title="等級 A：獨立第三方量測">A</span></td>
+</tr>
+<tr id="b127">
+<td><span class="rh">Trainium2</span><span class="rh-sub"><span class="vh">（</span>自架<span class="vh">）</span></span></td>
+<td>BF16；TP16（4 顆晶片）；EAGLE3</td>
+<td class="num">512 / 128；1</td>
+<td class="num">134.53（無 spec：112.13）</td>
+<td class="num">0.22（0.25）</td>
+<td>AWS；2026 年中；<span class="g g-b" title="等級 B：廠商或夥伴公布，且揭露方法">B</span></td>
+</tr>
+<tr id="b128">
+<td><span class="rh">Amazon Bedrock</span><span class="rh-sub"><span class="vh">（</span>硬體未揭露<span class="vh">）</span></span></td>
+<td class="muted">未揭露</td>
+<td class="num">10K 輸入；OpenRouter p50</td>
+<td class="num">83；234</td>
+<td class="num">1.08；latency 0.55</td>
+<td>AA、OpenRouter；2026-10-04；<span class="g g-a" title="等級 A：獨立第三方量測">A</span></td>
+</tr>
+</tbody>
+</table></div></figure>
+<ul>
+<li id="b129">TPU：Google 的 GPT-OSS recipe 只有方法，結果欄是佔位值，查無公開資料（<a href="https://github.com/AI-Hypercomputer/tpu-recipes/tree/main/inference/ironwood/vLLM" rel="noopener" target="_blank">tpu-recipes</a>）。Inferentia2：gpt-oss 只支援 Trn2 / Trn3（<a href="https://github.com/vllm-project/vllm-neuron/blob/release-0.24.0.1.1.0/README.md" rel="noopener" target="_blank">vLLM Neuron README</a>）。</li>
+<li id="b130">其他同權重比較<span class="g g-d" title="等級 D：本文推算，附算式">D</span>：Qwen3.8 27B 在 OpenRouter 上 Cerebras p50 1,025 t/s，次快端點 113 t/s（9.1×），17 個端點中位數 68 t/s（15×）。Kimi K2.6 的 Cerebras 私有端點 981 t/s（2026-05-06）對 2026-10-04 最快的公開 GPU 端點 Nebius 264 t/s 為 3.7×，同日另一次讀數為 250 t/s（3.9×），Cerebras 與 GPU 兩端非同時量測（<a href="https://artificialanalysis.ai/models/kimi-k2-6/providers" rel="noopener" target="_blank">AA</a>）。</li>
+<li id="b131">GPU 世代之間：GB300 對 GB200（DeepSeek-V4-Pro FP4、8K/1K、P/D disagg、無 spec decode，2026-05-22 執行）在相同 interactivity 下，每 GPU total tok/s 為 1.20×（16 tok/s/user）至 2.83×（27 tok/s/user）（<span class="g g-a" title="等級 A：獨立第三方量測">A</span>，<a href="https://inferencex.semianalysis.com/blog/gb300-nvl72-vs-gb200-nvl72-dsv4-pro-vllm-fp4" rel="noopener" target="_blank">InferenceX 2026-05-27</a>）。</li>
+</ul>
+</div></div></div>
+<details class="srcs"><summary>本節來源（42）</summary><ul><li><a href="https://inferencex.semianalysis.com/blog/sparse-savings-persistent-demand-inside-glm53" target="_blank" rel="noopener">InferenceX 2026-09-28</a></li><li><a href="https://github.com/SemiAnalysisAI/InferenceX/blob/main/inferencex-e2e/docs/MODELS.md" target="_blank" rel="noopener">MODELS.md</a></li><li><a href="https://github.com/SemiAnalysisAI/InferenceX/blob/main/inferencex-e2e/perf-changelog.yaml" target="_blank" rel="noopener">perf-changelog</a></li><li><a href="https://artificialanalysis.ai/models/gpt-oss-120b/providers" target="_blank" rel="noopener">AA</a></li><li><a href="https://openrouter.ai/openai/gpt-oss-120b" target="_blank" rel="noopener">OpenRouter</a></li><li><a href="https://inferencex.semianalysis.com/blog/tpu-inferencex-full-steam" target="_blank" rel="noopener">InferenceX 2026-09-07</a></li><li><a href="https://openrouter.ai/qwen/qwen3.8-27b" target="_blank" rel="noopener">OpenRouter</a></li><li><a href="https://github.com/AI-Hypercomputer/tpu-recipes/tree/main/inference/ironwood/vLLM" target="_blank" rel="noopener">tpu-recipes</a></li><li><a href="https://aws.amazon.com/blogs/machine-learning/optimizing-ai-responsiveness-a-practical-guide-to-amazon-bedrock-latency-optimized-inference/" target="_blank" rel="noopener">AWS ML Blog</a></li><li><a href="https://github.com/huggingface/optimum-neuron/tree/main/benchmark/vllm/single-instance" target="_blank" rel="noopener">Optimum Neuron</a></li><li><a href="https://github.com/huggingface/optimum-neuron/blob/main/benchmark/vllm/data-parallel/llama3.1-8b/vllm-results-dp3.csv" target="_blank" rel="noopener">Optimum Neuron CSV</a></li><li><a href="https://nvidianews.nvidia.com/news/nvidia-groq-3-lpx-now-in-full-production-with-world-class-speed-for-agentic-ai" target="_blank" rel="noopener">NVIDIA 2026-08-24</a></li><li><a href="https://inferencex.semianalysis.com/" target="_blank" rel="noopener">InferenceX</a></li><li><a href="https://github.com/SemiAnalysisAI/InferenceX-app/blob/main/packages/constants/src/gpu-keys.ts" target="_blank" rel="noopener">InferenceX gpu-keys.ts</a></li><li><a href="https://inferencex.semianalysis.com/api/v1/benchmarks?model=DeepSeek-R1-0528" target="_blank" rel="noopener">InferenceX API, DeepSeek-R1</a></li><li><a href="https://inferencex.semianalysis.com/api/v1/benchmarks?model=Kimi-K3" target="_blank" rel="noopener">Kimi-K3</a></li><li><a href="https://inferencex.semianalysis.com/api/v1/benchmarks?model=GLM-5.2" target="_blank" rel="noopener">GLM-5.2</a></li><li><a href="https://inferencex.semianalysis.com/api/v1/benchmarks?model=DeepSeek-V4-Pro" target="_blank" rel="noopener">DeepSeek-V4-Pro</a></li><li><a href="https://inferencex.semianalysis.com/api/v1/benchmarks?model=DeepSeek-V4.1-Flash" target="_blank" rel="noopener">DeepSeek-V4.1-Flash</a></li><li><a href="https://inferencex.semianalysis.com/api/v1/benchmarks?model=Qwen-3.5-397B-A17B" target="_blank" rel="noopener">Qwen-3.5-397B-A17B</a></li><li><a href="https://inferencex.semianalysis.com/blog/ultra-high-interactivity-on-nvidia" target="_blank" rel="noopener">InferenceX 2026-08-10</a></li><li><a href="https://github.com/sgl-project/sglang-jax/tree/main/docs/cookbook/autoregressive" target="_blank" rel="noopener">sglang-jax</a></li><li><a href="https://github.com/AI-Hypercomputer/tpu-recipes/tree/main/inference/trillium/vLLM/Llama3.x" target="_blank" rel="noopener">tpu-recipes</a></li><li><a href="https://awsdocs-neuron.readthedocs-hosted.com/en/latest/libraries/nxd-inference/tutorials/trn2-llama3.1-405b-speculative-tutorial.html" target="_blank" rel="noopener">NxDI 405B</a></li><li><a href="https://awsdocs-neuron.readthedocs-hosted.com/en/latest/libraries/nxd-inference/tutorials/trn2-llama3.3-70b-tutorial.html" target="_blank" rel="noopener">NxDI 70B</a></li><li><a href="https://awsdocs-neuron.readthedocs-hosted.com/en/latest/vllm-neuron/docs/tutorials/tutorial-eagle3-speculative-decoding-gpt-oss.html" target="_blank" rel="noopener">vLLM Neuron</a></li><li><a href="https://builder.aws.com/content/2zruvftx03ZtQFFxyur6kdzfwMv/benchmarking-llm-inference-with-optimum-neuron-on-inferentia2" target="_blank" rel="noopener">AWS Builder Center</a></li><li><a href="https://www.cerebras.ai/blog/cerebras-kimi-k2-Enterprise" target="_blank" rel="noopener">Cerebras</a></li><li><a href="https://www.storagereview.com/news/nvidia-groq-3-lpx-enters-full-production-3400-tokens-per-second-at-100k-context-256-lp30s-per-rack" target="_blank" rel="noopener">StorageReview</a></li><li><a href="https://www.aboutamazon.com/news/aws/trainium-3-ultraserver-faster-ai-training-lower-cost" target="_blank" rel="noopener">About Amazon</a></li><li><a href="https://github.com/SemiAnalysisAI/InferenceX" target="_blank" rel="noopener">InferenceX</a></li><li><a href="https://artificialanalysis.ai/providers/google" target="_blank" rel="noopener">AA</a></li><li><a href="https://inference-docs.cerebras.ai/models/overview" target="_blank" rel="noopener">Cerebras docs</a></li><li><a href="https://rocm.blogs.amd.com/artificial-intelligence/mlperf-inf-v6.1/README.html" target="_blank" rel="noopener">AMD ROCm blog</a></li><li><a href="https://techstrong.ai/articles/mlperf-inference-v6-1-updated-for-rag-agents-and-api-based-serving/" target="_blank" rel="noopener">Techstrong.ai</a></li><li><a href="https://mlcommons.org/2026/09/mlperf-inference-v6-1-results/" target="_blank" rel="noopener">MLCommons</a></li><li><a href="https://github.com/huggingface/optimum-neuron/blob/main/benchmark/vllm/data-parallel/llama3.1-8b/vllm-results-dp4.csv" target="_blank" rel="noopener">Optimum Neuron DP4</a></li><li><a href="https://awsdocs-neuron.readthedocs-hosted.com/en/latest/vllm-neuron/docs/tutorials/tutorial-gpt-oss.html" target="_blank" rel="noopener">vLLM Neuron</a></li><li><a href="https://inferencex.semianalysis.com/api/v1/benchmarks?model=gpt-oss-120b" target="_blank" rel="noopener">InferenceX API，gpt-oss-120b</a></li><li><a href="https://github.com/vllm-project/vllm-neuron/blob/release-0.24.0.1.1.0/README.md" target="_blank" rel="noopener">vLLM Neuron README</a></li><li><a href="https://artificialanalysis.ai/models/kimi-k2-6/providers" target="_blank" rel="noopener">AA</a></li><li><a href="https://inferencex.semianalysis.com/blog/gb300-nvl72-vs-gb200-nvl72-dsv4-pro-vllm-fp4" target="_blank" rel="noopener">InferenceX 2026-05-27</a></li></ul></details></section>
+<section class="panel" role="tabpanel" id="s2" aria-labelledby="tab-s2"><div class="panel-head"><h2>成本與能效</h2><div class="sec-lead prose"><p id="b132">在唯一同條件的操作點（Qwen3.5-397B FP8、8K/1K、20 tok/s/user）上，以牌價換算的每百萬 output tokens 成本是 Ironwood 3 年承諾 $1.44、on-demand $3.20，B200 為 $1.88（Lambda on-demand）至 $4.00（AWS on-demand）<span class="g g-d" title="等級 D：本文推算，附算式">D</span>。換成 SemiAnalysis 的自有 TCO 才是 $0.32 對 $0.49；Trainium2 每 chip-hour $2.235 是同頁 B200 的 18%，但沒有任何量測能把它換成每 token 成本，Cerebras 與 LPX 不以 chip-hour 販售。</p>
+</div></div>
+<div class="subtabs"><div class="subtablist" role="tablist" aria-label="成本與能效"><button type="button" class="subtab" role="tab" id="tab-s2-1" aria-controls="s2-1" aria-selected="true">每 chip-hour 的價格</button><button type="button" class="subtab" role="tab" id="tab-s2-2" aria-controls="s2-2" aria-selected="false">推算：每百萬 output tokens</button><button type="button" class="subtab" role="tab" id="tab-s2-3" aria-controls="s2-3" aria-selected="false">InferenceX 模型化成本</button><button type="button" class="subtab" role="tab" id="tab-s2-4" aria-controls="s2-4" aria-selected="false">代管 API：為速度付出的溢價</button><button type="button" class="subtab" role="tab" id="tab-s2-5" aria-controls="s2-5" aria-selected="false">功耗與實測能耗</button><button type="button" class="subtab" role="tab" id="tab-s2-6" aria-controls="s2-6" aria-selected="false">廠商的經濟性宣稱</button></div><div class="subpanel on" role="tabpanel" id="s2-1" aria-labelledby="tab-s2-1"><div class="prose"><h3>每 chip-hour 的價格</h3>
+<figure class="tbl" data-cols="6" data-rows="19" id="t8-9"><figcaption><strong>表 8-9 每 chip-hour 牌價與購買方式</strong>（供應商自己的價目頁或價目 API，2026-10-04 讀取。牌價的等級依各筆記原標：GPU 為 B，Trainium 為 C，TPU 與 Inferentia2 的價目表未另標等級。分析師估計另行標明）</figcaption><div aria-label="表 8-9 每 chip-hour 牌價與購買方式" class="tbl-scroll" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th scope="col">平台</th>
+<th class="w2" scope="col">晶片（執行個體）</th>
+<th class="w1" scope="col">購買方式</th>
+<th class="w1" scope="col">每 chip-hour（USD）</th>
+<th class="w2" scope="col">Region 與備註</th>
+<th class="src" scope="col">來源</th>
+</tr>
+</thead>
+<tbody>
+<tr id="b133">
+<td class="rowhead">AWS</td>
+<td>Trainium2（trn2.48xlarge 16 顆；trn2.3xlarge 1 顆）</td>
+<td>只有 Capacity Blocks for ML；無 on-demand</td>
+<td class="num">2.235（$35.7608 ÷ 16）</td>
+<td>trn2.48xlarge：Ohio、Hyderabad；trn2.3xlarge：Hyderabad、Melbourne、São Paulo</td>
+<td class="src"><a href="https://aws.amazon.com/ec2/capacityblocks/pricing/" rel="noopener" target="_blank">AWS Capacity Blocks</a></td>
+</tr>
+<tr id="b134">
+<td class="rowhead">AWS</td>
+<td>Trainium1（trn1.32xlarge，16 顆）</td>
+<td>on-demand；Capacity Blocks</td>
+<td class="num">1.344（$21.50 ÷ 16）；0.596</td>
+<td>on-demand 只在 N. Virginia、Ohio、Oregon</td>
+<td class="src"><a href="https://b0.p.awsstatic.com/pricing/2.0/meteredUnitMaps/ec2/USD/current/ec2-ondemand-without-sec-sel/US%20East%20%28Ohio%29/Linux/index.json" rel="noopener" target="_blank">AWS 價目表</a>、<a href="https://aws.amazon.com/ec2/capacityblocks/pricing/" rel="noopener" target="_blank">AWS Capacity Blocks</a></td>
+</tr>
+<tr id="b135">
+<td class="rowhead">AWS</td>
+<td>Trainium3（Trn3 UltraServer）</td>
+<td>無公開價格、無 Capacity Blocks 列、無 Region 清單</td>
+<td class="muted"><span class="chip chip-na">查無公開資料</span></td>
+<td class="num">2025-12-02 宣布 GA</td>
+<td class="src"><a href="https://aws.amazon.com/ec2/instance-types/trn3/" rel="noopener" target="_blank">AWS Trn3</a></td>
+</tr>
+<tr id="b136">
+<td class="rowhead">AWS</td>
+<td>Inferentia2（inf2.xlarge 1 顆；inf2.48xlarge 12 顆）</td>
+<td>on-demand</td>
+<td class="num">0.758；1.082（$12.9813 ÷ 12）</td>
+<td>us-east-1；Tokyo 為 1.137 與 1.623（$19.4719 ÷ 12）；價目表 2026-09-25</td>
+<td class="src"><a href="https://b0.p.awsstatic.com/pricing/2.0/meteredUnitMaps/ec2/USD/current/ec2-ondemand-without-sec-sel/US%20East%20%28N.%20Virginia%29/Linux/index.json" rel="noopener" target="_blank">AWS 價目表</a>、<a href="https://b0.p.awsstatic.com/pricing/2.0/meteredUnitMaps/ec2/USD/current/ec2-ondemand-without-sec-sel/Asia%20Pacific%20%28Tokyo%29/Linux/index.json" rel="noopener" target="_blank">AWS price list (Tokyo)</a></td>
+</tr>
+<tr id="b137">
+<td class="rowhead">Google Cloud</td>
+<td>Ironwood（TPU7x）</td>
+<td>on-demand / DWS Flex-start / 1 年 / 3 年承諾</td>
+<td class="num">12.00 / 6.00 / 8.40 / 5.40</td>
+<td>us-central1；europe-west2 on-demand 13.20；TPU 8i、8t 無價格</td>
+<td class="src"><a href="https://cloud.google.com/tpu/pricing" rel="noopener" target="_blank">Cloud TPU pricing</a></td>
+</tr>
+<tr id="b138">
+<td class="rowhead">Google Cloud</td>
+<td>Trillium（v6e）</td>
+<td class="muted">同上</td>
+<td class="num">2.70 / 1.35 / 1.89 / 1.22</td>
+<td>us-east1、us-east5；Tokyo on-demand 3.24</td>
+<td class="src muted">同上</td>
+</tr>
+<tr id="b139">
+<td><span class="rh">Google</span><span class="rh-sub"><span class="vh">（</span>分析師估計<span class="vh">）</span></span></td>
+<td>Ironwood</td>
+<td>Google 內部 TCO；Anthropic 向 GCP 取得的成本</td>
+<td class="num">1.03；1.60</td>
+<td>SemiAnalysis 模型，非牌價</td>
+<td class="src"><a href="https://inferencex.semianalysis.com/blog/tpu-inferencex-full-steam" rel="noopener" target="_blank">InferenceX</a>、<a href="https://newsletter.semianalysis.com/p/tpuv7-google-takes-a-swing-at-the" rel="noopener" target="_blank">SemiAnalysis</a></td>
+</tr>
+<tr id="b140">
+<td class="rowhead">AWS</td>
+<td>H200（p5en.48xlarge）</td>
+<td>on-demand；Capacity Blocks</td>
+<td class="num">7.91；6.865（2026-10-07 起 7.895）</td>
+<td>Capacity Blocks 為美國 Region 價</td>
+<td class="src"><a href="https://instances.vantage.sh/aws/ec2/p5en.48xlarge" rel="noopener" target="_blank">Vantage</a>、<a href="https://aws.amazon.com/ec2/capacityblocks/pricing" rel="noopener" target="_blank">AWS Capacity Blocks</a></td>
+</tr>
+<tr id="b141">
+<td class="rowhead">AWS</td>
+<td>B200（p6-b200.48xlarge）</td>
+<td>on-demand；Capacity Blocks</td>
+<td>14.24；12.355（2026-10-07 起 14.208）</td>
+<td>Spot 6.44</td>
+<td class="src"><a href="https://instances.vantage.sh/aws/ec2/p6-b200.48xlarge" rel="noopener" target="_blank">Vantage</a>、<a href="https://aws.amazon.com/ec2/capacityblocks/pricing" rel="noopener" target="_blank">AWS Capacity Blocks</a></td>
+</tr>
+<tr id="b142">
+<td class="rowhead">AWS</td>
+<td>B300（p6-b300.48xlarge）</td>
+<td>on-demand；Capacity Blocks</td>
+<td>17.80（二手來源）；14.04（2026-10-07 起 16.146）</td>
+<td>on-demand 價出自第三方部落格</td>
+<td class="src"><a href="https://www.thundercompute.com/blog/ec2-gpu-instances" rel="noopener" target="_blank">Thunder Compute</a>、<a href="https://aws.amazon.com/ec2/capacityblocks/pricing" rel="noopener" target="_blank">AWS Capacity Blocks</a></td>
+</tr>
+<tr id="b143">
+<td class="rowhead">AWS</td>
+<td>GB200（P6e-GB200 UltraServer）</td>
+<td>只有 Capacity Blocks</td>
+<td class="num">10.582</td>
+<td>Dallas Local Zone</td>
+<td class="src"><a href="https://aws.amazon.com/ec2/capacityblocks/pricing" rel="noopener" target="_blank">AWS Capacity Blocks</a></td>
+</tr>
+<tr id="b144">
+<td class="rowhead">Google Cloud</td>
+<td>B200（a4-highgpu-8g）</td>
+<td>無 on-demand；1 年 / 3 年 CUD；Spot</td>
+<td class="num">11.12 / 7.09；4.95</td>
+<td>GB200、GB300 機型不在公開價目頁</td>
+<td class="src"><a href="https://cloud.google.com/products/compute/pricing/accelerator-optimized" rel="noopener" target="_blank">Google Cloud</a></td>
+</tr>
+<tr id="b145">
+<td><span class="rh">Oracle</span><span class="rh-sub"><span class="vh">（</span>OCI<span class="vh">）</span></span></td>
+<td>H200 / B200 / B300 / GB200 / GB300</td>
+<td>on-demand</td>
+<td>10.00 / 14.00 / 15.00 / 16.00 / 18.00</td>
+<td>價目 API 2026-10-01 更新；無 Rubin 項目</td>
+<td class="src"><a href="https://www.oracle.com/cloud/compute/pricing/" rel="noopener" target="_blank">Oracle</a></td>
+</tr>
+<tr id="b146">
+<td class="rowhead">CoreWeave</td>
+<td>H200 / B200 / GB200</td>
+<td>on-demand；承諾用量「up to 60%」折扣</td>
+<td class="num">6.31 / 8.60 / 10.50</td>
+<td>GB300、B300 為 contact sales；Vera Rubin 自 2026-09-30 limited availability，無公開價格</td>
+<td class="src"><a href="https://www.coreweave.com/pricing" rel="noopener" target="_blank">CoreWeave</a>、<a href="https://www.coreweave.com/blog/cognition-becomes-first-customer-for-nvidia-vera-rubin-nvl72-on-coreweave-cloud" rel="noopener" target="_blank">CoreWeave 2026-09-30</a></td>
+</tr>
+<tr id="b147">
+<td class="rowhead">Lambda；Nebius</td>
+<td>B200；H200 / B200 / B300</td>
+<td>on-demand</td>
+<td class="num">6.69；4.50 / 7.15 / 7.85</td>
+<td>Nebius 另有一份「effective October 1, 2026」價目（5.40 / 8.50 / 9.50），適用範圍不明</td>
+<td class="src"><a href="https://lambda.ai/pricing" rel="noopener" target="_blank">Lambda</a>、<a href="https://nebius.com/prices" rel="noopener" target="_blank">Nebius</a></td>
+</tr>
+<tr id="b148">
+<td class="rowhead">Azure</td>
+<td>GB200（Standard_ND128isr_NDR_GB200_v6）</td>
+<td>on-demand</td>
+<td>每 VM-hour 108.16</td>
+<td>每 VM 的 GPU 數未確認，無法換算每 GPU</td>
+<td class="src"><a href="https://prices.azure.com/api/retail/prices?$filter=contains%28armSkuName,%27GB200%27%29" rel="noopener" target="_blank">Azure 價目 API</a></td>
+</tr>
+<tr id="b149">
+<td><span class="rh">Oracle</span><span class="rh-sub"><span class="vh">（</span>OCI<span class="vh">）</span></span></td>
+<td>AMD MI300X / MI355X</td>
+<td>on-demand</td>
+<td class="num">6.00 / 8.60</td>
+<td>Helios、MI455X 沒有任何雲端 SKU 或價格</td>
+<td class="src"><a href="https://www.oracle.com/cloud/compute/pricing/" rel="noopener" target="_blank">Oracle</a>、<a href="https://moorinsightsstrategy.com/field-notes/amd-advancing-ai-2026-helios-ships-venice-swings-and-the-software-moat-narrows/" rel="noopener" target="_blank">Moor Insights</a></td>
+</tr>
+<tr id="b150">
+<td class="rowhead">Cerebras</td>
+<td>WSE-3（CS-3）、WSE-3T（CS-4）</td>
+<td>不以 chip-hour 販售；公開 API 按 token 計價</td>
+<td class="muted"><span class="chip chip-na">查無公開資料</span></td>
+<td>gpt-oss-120b 每百萬 input / output $0.35 / $0.75；Dedicated 價格未公布；CS-3 每機櫃 BoM 約 $450k（分析師估計）</td>
+<td class="src"><a href="https://openrouter.ai/api/v1/models/openai/gpt-oss-120b/endpoints" rel="noopener" target="_blank">OpenRouter</a>、<a href="https://newsletter.semianalysis.com/p/cerebras-faster-tokens-please" rel="noopener" target="_blank">SemiAnalysis</a></td>
+</tr>
+<tr id="b151">
+<td class="rowhead">NVIDIA</td>
+<td>Groq 3 LPX</td>
+<td>無公開 SKU</td>
+<td class="muted"><span class="chip chip-na">查無公開資料</span></td>
+<td>報導的目標價為 premium token「$45 per million tokens」<span class="g g-c" title="等級 C：廠商宣稱或規格，未揭露方法">C</span></td>
+<td class="src"><a href="https://www.tomshardware.com/tech-industry/semiconductors/nvidias-20-billion-groq-deal-produces-its-first-chip" rel="noopener" target="_blank">Tom's Hardware</a></td>
+</tr>
+</tbody>
+</table></div></figure>
+<ul>
+<li id="b152">價格方向是上漲：AWS 於 2026-07-01 把 GPU 的 Capacity Blocks 調漲約 20%，2026-10-07 再把 P6-B300、P6-B200、P5en、P5e、P5 各調漲約 15%（<span class="g g-d" title="等級 D：本文推算，附算式">D</span>：16.146 ÷ 14.04；14.208 ÷ 12.355；7.895 ÷ 6.865；6.866 ÷ 5.97；5.970 ÷ 5.191），同一公告另列 P4de $2.546 與 P4d $1.696；Trainium 的 Capacity Blocks 價格不變（<a href="https://ca.finance.yahoo.com/news/aws-raising-gpu-instance-prices-134610388.html" rel="noopener" target="_blank">Yahoo Finance</a>、<a href="https://aws.amazon.com/ec2/capacityblocks/pricing/" rel="noopener" target="_blank">AWS Capacity Blocks</a>）。</li>
+<li id="b153">同一顆 B200 的 on-demand 價，AWS 與 OCI（$14.00–14.24）是 CoreWeave、Nebius、Lambda（$6.69–8.60）的 1.6–2.1 倍<span class="g g-d" title="等級 D：本文推算，附算式">D</span>。</li>
+</ul>
+</div></div><div class="subpanel" role="tabpanel" id="s2-2" aria-labelledby="tab-s2-2"><div class="prose"><h3>推算：每百萬 output tokens</h3><div class="formula"><span class="katex-display"><span class="katex"><span class="katex-mathml"><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>C</mi><mrow><mi mathvariant="normal">o</mi><mi mathvariant="normal">u</mi><mi mathvariant="normal">t</mi></mrow></msub><mo>=</mo><mfrac><mi>P</mi><mrow><msub><mi>R</mi><mrow><mi mathvariant="normal">o</mi><mi mathvariant="normal">u</mi><mi mathvariant="normal">t</mi></mrow></msub><mo>×</mo><mn>3600</mn></mrow></mfrac><mo>×</mo><msup><mn>10</mn><mn>6</mn></msup></mrow><annotation encoding="application/x-tex">C_{\mathrm{out}} = \frac{P}{R_{\mathrm{out}} \times 3600} \times 10^{6}</annotation></semantics></math></span><span aria-hidden="true" class="katex-html"><span class="katex-base"><span class="katex-strut" style="height:0.8333em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.0715em;">C</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.2806em;"><span style="top:-2.55em;margin-left:-0.0715em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight"><span class="mord mathrm mtight">out</span></span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:2.1963em;vertical-align:-0.836em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.3603em;"><span style="top:-2.314em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord"><span class="mord mathnormal" style="margin-right:0.0077em;">R</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.2806em;"><span style="top:-2.55em;margin-left:-0.0077em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight"><span class="mord mathrm mtight">out</span></span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mord">3600</span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.677em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.1389em;">P</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.836em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.8641em;"></span><span class="mord">1</span><span class="mord"><span class="mord">0</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8641em;"><span style="top:-3.113em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">6</span></span></span></span></span></span></span></span></span></span></span></span></span></div>
+<p id="b154">P 是每 chip-hour 的價格（USD），R_out 是每顆晶片每秒的 output tokens；全部成本都攤給 output tokens，所以輸入越重的負載 C_out 越高。以下皆為等級 <span class="g g-d" title="等級 D：本文推算，附算式">D</span>，假設晶片在計費時間內全程維持該吞吐量。</p>
+
+<figure class="tbl" data-cols="5" data-rows="21" id="t8-10"><figcaption><strong>表 8-10 同條件組：Qwen3.5-397B FP8、8K/1K、20 tok/s/user</strong>（aggregated、無 MTP、concurrency 256；R_out：Ironwood 1,040、B200 989、B300 992 tok/s 每晶片，取自<a class="xref" href="#t8-7">表 8-7</a>；每百萬 total tokens 以 total 吞吐量 9,364、8,903、8,925 計）</figcaption><div aria-label="表 8-10 同條件組：Qwen3.5-397B FP8、8K/1K、20 tok/s/user" class="tbl-scroll" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th scope="col">晶片</th>
+<th class="w1" scope="col">價格來源（購買方式）</th>
+<th scope="col">P（$ / chip-hour）</th>
+<th scope="col">每百萬 output tokens</th>
+<th scope="col">每百萬 total tokens</th>
+</tr>
+</thead>
+<tbody>
+<tr id="b155">
+<td class="rowhead">Ironwood</td>
+<td>Google on-demand</td>
+<td class="num">12.00</td>
+<td class="num">$3.20</td>
+<td class="num">$0.356</td>
+</tr>
+<tr id="b156">
+<td class="rowhead">Ironwood</td>
+<td>Google 1 年承諾</td>
+<td class="num">8.40</td>
+<td class="num">$2.24</td>
+<td class="num">$0.249</td>
+</tr>
+<tr id="b157">
+<td class="rowhead">Ironwood</td>
+<td>Google DWS Flex-start</td>
+<td class="num">6.00</td>
+<td class="num">$1.60</td>
+<td class="num">$0.178</td>
+</tr>
+<tr id="b158">
+<td class="rowhead">Ironwood</td>
+<td>Google 3 年承諾</td>
+<td class="num">5.40</td>
+<td class="num">$1.44</td>
+<td class="num">$0.160</td>
+</tr>
+<tr id="b159">
+<td class="rowhead">Ironwood</td>
+<td>SemiAnalysis 估計的 Anthropic 取得成本</td>
+<td class="num">1.60</td>
+<td class="num">$0.427</td>
+<td class="num">$0.047</td>
+</tr>
+<tr id="b160">
+<td class="rowhead">Ironwood</td>
+<td>InferenceX 自有 TCO</td>
+<td class="num">1.21</td>
+<td class="num">$0.323</td>
+<td class="num">$0.036</td>
+</tr>
+<tr id="b161">
+<td class="rowhead">Ironwood</td>
+<td>SemiAnalysis 估計的 Google 內部 TCO</td>
+<td class="num">1.03</td>
+<td class="num">$0.275</td>
+<td class="num">$0.031</td>
+</tr>
+<tr id="b162">
+<td class="rowhead">B200</td>
+<td>AWS on-demand</td>
+<td class="num">14.24</td>
+<td class="num">$4.00</td>
+<td class="num">$0.444</td>
+</tr>
+<tr id="b163">
+<td class="rowhead">B200</td>
+<td>OCI on-demand</td>
+<td class="num">14.00</td>
+<td class="num">$3.93</td>
+<td class="num">$0.437</td>
+</tr>
+<tr id="b164">
+<td class="rowhead">B200</td>
+<td>AWS Capacity Blocks（2026-10-07 起 14.208）</td>
+<td class="num">12.355</td>
+<td class="num">$3.47（$3.99）</td>
+<td class="num">$0.385（$0.443）</td>
+</tr>
+<tr id="b165">
+<td class="rowhead">B200</td>
+<td>Google 1 年 CUD</td>
+<td class="num">11.12</td>
+<td class="num">$3.12</td>
+<td class="num">$0.347</td>
+</tr>
+<tr id="b166">
+<td class="rowhead">B200</td>
+<td>CoreWeave on-demand</td>
+<td class="num">8.60</td>
+<td class="num">$2.41</td>
+<td class="num">$0.268</td>
+</tr>
+<tr id="b167">
+<td class="rowhead">B200</td>
+<td>Nebius on-demand</td>
+<td class="num">7.15</td>
+<td class="num">$2.01</td>
+<td class="num">$0.223</td>
+</tr>
+<tr id="b168">
+<td class="rowhead">B200</td>
+<td>Google 3 年 CUD</td>
+<td class="num">7.09</td>
+<td class="num">$1.99</td>
+<td class="num">$0.221</td>
+</tr>
+<tr id="b169">
+<td class="rowhead">B200</td>
+<td>Lambda on-demand</td>
+<td class="num">6.69</td>
+<td class="num">$1.88</td>
+<td class="num">$0.209</td>
+</tr>
+<tr id="b170">
+<td class="rowhead">B200</td>
+<td>InferenceX 自有 TCO</td>
+<td class="num">1.73</td>
+<td class="num">$0.486</td>
+<td class="num">$0.054</td>
+</tr>
+<tr id="b171">
+<td class="rowhead">B300</td>
+<td>AWS on-demand（二手來源）</td>
+<td class="num">17.80</td>
+<td class="num">$4.99</td>
+<td class="num">$0.554</td>
+</tr>
+<tr id="b172">
+<td class="rowhead">B300</td>
+<td>OCI on-demand</td>
+<td class="num">15.00</td>
+<td class="num">$4.20</td>
+<td class="num">$0.467</td>
+</tr>
+<tr id="b173">
+<td class="rowhead">B300</td>
+<td>AWS Capacity Blocks（2026-10-07 起 16.146）</td>
+<td class="num">14.04</td>
+<td class="num">$3.93（$4.52）</td>
+<td class="num">$0.437（$0.503）</td>
+</tr>
+<tr id="b174">
+<td class="rowhead">B300</td>
+<td>Nebius on-demand</td>
+<td class="num">7.85</td>
+<td class="num">$2.20</td>
+<td class="num">$0.244</td>
+</tr>
+<tr id="b175">
+<td class="rowhead">B300</td>
+<td>InferenceX 自有 TCO</td>
+<td class="num">2.26</td>
+<td class="num">$0.633</td>
+<td class="num">$0.070</td>
+</tr>
+</tbody>
+</table></div></figure>
+<ul>
+<li id="b176">這一組可比：模型、精度、負載、harness 與每使用者速度都相同，三者的吞吐量只差 5%，成本差距幾乎全部來自 P。同一購買方式下，Google 的 3 年承諾價 Ironwood $1.44 對 B200 $1.99（低 28%）；on-demand 則是 Ironwood $3.20 對 neocloud 的 B200 $1.88–2.41。</li>
+<li id="b177">限制有三：Ironwood 該點的 mean TTFT 是 5.41 s，B200 為 3.75 s；GPU 一旦改用 FP4、MTP 與 disaggregated serving，吞吐量遠高於此組（<a class="xref" href="#t8-14">表 8-14</a>）；B200 在 2026-09-18 的重跑於 31 tok/s/user 時為 950 output tok/s 每 GPU，Lambda on-demand 換算 $1.96。</li>
+</ul>
+
+<figure class="tbl" data-cols="5" data-rows="18" id="t8-11"><figcaption><strong>表 8-11 GPU：AgentX 高吞吐點與其他量測</strong>（R_out 取自<a class="xref" href="#t8-4">表 8-4</a>；NVIDIA 與 AMD 各列用同一套 harness，可互比。AgentX 每個 output token 伴隨約 130–150 個 input 與 cached tokens，所以 C_out 不可與<a class="xref" href="#t8-10">表 8-10</a>、<a class="xref" href="#t8-12">表 8-12</a> 比較）</figcaption><div aria-label="表 8-11 GPU：AgentX 高吞吐點與其他量測" class="tbl-scroll" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th scope="col">加速器</th>
+<th class="w1" scope="col">模型；concurrency</th>
+<th scope="col">R_out（output tok/s 每 GPU）</th>
+<th class="w2" scope="col">P（$ / GPU-hour，來源）</th>
+<th scope="col">每百萬 output tokens</th>
+</tr>
+</thead>
+<tbody>
+<tr id="b178">
+<td class="rowhead">GB300 NVL72</td>
+<td>Kimi K3；48</td>
+<td class="num">136</td>
+<td class="num">18.00（OCI）</td>
+<td class="num">$36.76</td>
+</tr>
+<tr id="b179">
+<td class="rowhead">B200</td>
+<td>Kimi K3；72</td>
+<td class="num">86</td>
+<td>6.69（Lambda）；8.60（CoreWeave）；12.355（AWS Capacity Blocks）</td>
+<td class="num">$21.61；$27.78；$39.91</td>
+</tr>
+<tr id="b180">
+<td class="rowhead">MI355X</td>
+<td>Kimi K3；72</td>
+<td class="num">104</td>
+<td class="num">8.60（OCI）</td>
+<td class="num">$22.97</td>
+</tr>
+<tr id="b181">
+<td class="rowhead">GB300 NVL72</td>
+<td>GLM-5.2；128</td>
+<td class="num">149</td>
+<td class="num">18.00（OCI）</td>
+<td class="num">$33.56</td>
+</tr>
+<tr id="b182">
+<td class="rowhead">B200</td>
+<td>GLM-5.2；64</td>
+<td class="num">132</td>
+<td class="num">6.69；8.60；12.355</td>
+<td class="num">$14.08；$18.10；$26.00</td>
+</tr>
+<tr id="b183">
+<td class="rowhead">MI355X</td>
+<td>GLM-5.2；48</td>
+<td class="num">230</td>
+<td class="num">8.60（OCI）</td>
+<td class="num">$10.39</td>
+</tr>
+<tr id="b184">
+<td class="rowhead">GB300 NVL72</td>
+<td>DeepSeek-V4-Pro；256</td>
+<td class="num">603</td>
+<td class="num">18.00（OCI）</td>
+<td class="num">$8.29</td>
+</tr>
+<tr id="b185">
+<td class="rowhead">GB200 NVL72</td>
+<td>DeepSeek-V4-Pro；576</td>
+<td class="num">595</td>
+<td>10.50（CoreWeave）；10.582（AWS Capacity Blocks）；16.00（OCI）</td>
+<td class="num">$4.90；$4.94；$7.47</td>
+</tr>
+<tr id="b186">
+<td class="rowhead">B300</td>
+<td>DeepSeek-V4-Pro；384</td>
+<td class="num">739</td>
+<td>7.85（Nebius）；14.04（AWS Capacity Blocks）</td>
+<td class="num">$2.95；$5.28</td>
+</tr>
+<tr id="b187">
+<td class="rowhead">B200</td>
+<td>DeepSeek-V4-Pro；128</td>
+<td class="num">456</td>
+<td class="num">6.69；8.60；12.355</td>
+<td class="num">$4.08；$5.24；$7.53</td>
+</tr>
+<tr id="b188">
+<td class="rowhead">MI355X</td>
+<td>DeepSeek-V4-Pro；256</td>
+<td class="num">449</td>
+<td class="num">8.60（OCI）</td>
+<td class="num">$5.32</td>
+</tr>
+<tr id="b189">
+<td class="rowhead">H200</td>
+<td>DeepSeek-V4-Pro（FP8）；8</td>
+<td class="num">41</td>
+<td>4.50（Nebius）；6.31（CoreWeave）；6.865（AWS Capacity Blocks）</td>
+<td class="num">$30.49；$42.75；$46.51</td>
+</tr>
+<tr id="b190">
+<td class="rowhead">GB300 NVL72</td>
+<td>DeepSeek-V4.1-Flash；192</td>
+<td class="num">3,108</td>
+<td class="num">18.00（OCI）</td>
+<td class="num">$1.61</td>
+</tr>
+<tr id="b191">
+<td class="rowhead">B300</td>
+<td>DeepSeek-V4.1-Flash；192</td>
+<td class="num">3,059</td>
+<td>7.85（Nebius）；14.04（AWS Capacity Blocks）</td>
+<td class="num">$0.71；$1.27</td>
+</tr>
+<tr id="b192">
+<td class="rowhead">B200</td>
+<td>DeepSeek-V4.1-Flash；128</td>
+<td class="num">1,362</td>
+<td class="num">6.69；8.60；12.355</td>
+<td class="num">$1.36；$1.75；$2.52</td>
+</tr>
+<tr id="b193">
+<td class="rowhead">MI355X</td>
+<td>DeepSeek-V4.1-Flash；64</td>
+<td class="num">999</td>
+<td class="num">8.60（OCI）</td>
+<td class="num">$2.39</td>
+</tr>
+<tr id="b194">
+<td class="rowhead">MI355X ×512</td>
+<td>DeepSeek-R1；MLPerf v6.1 Server</td>
+<td class="num">4,698</td>
+<td class="num">8.60（OCI）</td>
+<td class="num">$0.51</td>
+</tr>
+<tr id="b195">
+<td class="rowhead">B200</td>
+<td>gpt-oss-120b（FP4，1K/1K，無 spec decode）；256</td>
+<td class="num">14,725</td>
+<td>6.69（Lambda）；12.355（AWS Capacity Blocks）</td>
+<td class="num">$0.13；$0.23</td>
+</tr>
+</tbody>
+</table></div></figure>
+<ul>
+<li id="b196">Vera Rubin NVL72 沒有公開價格，無法推算。gpt-oss-120b 列的吞吐量來自 <a href="https://inferencex.semianalysis.com/api/v1/benchmarks?model=gpt-oss-120b" rel="noopener" target="_blank">InferenceX API，gpt-oss-120b</a>（run 412112：TensorRT-LLM，59 tok/s/user、TTFT 0.07 s，2026-05-18），可對照代管 API 的 output 牌價 $0.17–0.75。</li>
+<li id="b197">同一模型內，C_out 的排序由價格決定的程度不亞於硬體：DeepSeek-V4.1-Flash 在 B300 上的 R_out 與 GB300 幾乎相同（3,059 對 3,108），但 Nebius 的 B300 每 GPU-hour 比 OCI 的 GB300 便宜 56%。</li>
+</ul>
+
+<figure class="tbl" data-cols="5" data-rows="15" id="t8-12"><figcaption><strong>表 8-12 廠商 recipe：TPU、Trainium、Inferentia2</strong>（R_out 取自<a class="xref" href="#t8-5">表 8-5</a> 與<a class="xref" href="#t8-3">表 8-3</a>。各列的模型、負載與 concurrency 都不同，彼此不可比，也不可與 GPU 列比；Trainium2 的單一串流列是功能示範，不是量產經濟性）</figcaption><div aria-label="表 8-12 廠商 recipe：TPU、Trainium、Inferentia2" class="tbl-scroll" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th scope="col">加速器</th>
+<th class="w2" scope="col">模型；負載；concurrency</th>
+<th scope="col">R_out（output tok/s 每晶片）</th>
+<th class="w1" scope="col">P（$ / chip-hour）</th>
+<th scope="col">每百萬 output tokens</th>
+</tr>
+</thead>
+<tbody>
+<tr id="b198">
+<td class="rowhead">Ironwood</td>
+<td>Qwen3.5-397B FP8；8K/1K；128</td>
+<td class="num">570.2</td>
+<td class="num">12.00 on-demand；5.40 3 年承諾</td>
+<td class="num">$5.85；$2.63</td>
+</tr>
+<tr id="b199">
+<td class="rowhead">Ironwood</td>
+<td>Qwen3.5-397B FP8；1K/8K；128</td>
+<td class="num">1,293.0</td>
+<td class="muted">同上</td>
+<td class="num">$2.58；$1.16</td>
+</tr>
+<tr id="b200">
+<td class="rowhead">Ironwood</td>
+<td>DeepSeek-V3；1K/1K；128</td>
+<td class="num">499.9</td>
+<td class="muted">同上</td>
+<td class="num">$6.67；$3.00</td>
+</tr>
+<tr id="b201">
+<td class="rowhead">Ironwood</td>
+<td>Qwen3-Coder-480B；8K/1K；64</td>
+<td class="num">263.3</td>
+<td class="muted">同上</td>
+<td class="num">$12.66；$5.70</td>
+</tr>
+<tr id="b202">
+<td class="rowhead">Ironwood</td>
+<td>GLM-4.5-Air（SGL-JAX）；1K/1K；128</td>
+<td class="num">1,003.4</td>
+<td class="muted">同上</td>
+<td class="num">$3.32；$1.49</td>
+</tr>
+<tr id="b203">
+<td class="rowhead">Ironwood</td>
+<td>Qwen3-32B；1K/1K；320</td>
+<td class="num">7,709.6</td>
+<td class="muted">同上</td>
+<td class="num">$0.43；$0.19</td>
+</tr>
+<tr id="b204">
+<td class="rowhead">Trillium</td>
+<td>Llama-3.3-70B；1K/1K；128</td>
+<td class="num">443.1</td>
+<td class="num">2.70 on-demand；1.22 3 年承諾</td>
+<td class="num">$1.69；$0.76</td>
+</tr>
+<tr id="b205">
+<td class="rowhead">Trainium2</td>
+<td>Llama 3.1 8B；1,500 / 250；batch 32</td>
+<td class="num">578.8</td>
+<td>2.235（Capacity Blocks）</td>
+<td class="num">$1.07</td>
+</tr>
+<tr id="b206">
+<td class="rowhead">Trainium2</td>
+<td>gpt-oss-120b；512 / 128；1；EAGLE3</td>
+<td class="num">33.6（134.53 ÷ 4）</td>
+<td class="muted">同上</td>
+<td class="num">$18.46</td>
+</tr>
+<tr id="b207">
+<td class="rowhead">Trainium2</td>
+<td>Llama 3.3 70B；10,000 / 1,500；1；spec decode</td>
+<td class="num">9.0（144 ÷ 16）</td>
+<td class="muted">同上</td>
+<td class="num">$68.98</td>
+</tr>
+<tr id="b208">
+<td class="rowhead">Trainium2</td>
+<td>Llama 3.1 405B FP8；10,000 / 1,500；1；spec decode</td>
+<td class="num">6.4（102.41 ÷ 16）</td>
+<td class="muted">同上</td>
+<td class="num">$97.00</td>
+</tr>
+<tr id="b209">
+<td class="rowhead">Trainium2</td>
+<td>Qwen3-235B-A22B；1,500 / 250；batch 4</td>
+<td class="num">1.74（27.9 ÷ 16）</td>
+<td class="muted">同上</td>
+<td class="num">$356</td>
+</tr>
+<tr id="b210">
+<td class="rowhead">Trainium1</td>
+<td>Llama 3.1 8B；1,500 / 250；4 replicas</td>
+<td class="num">109.1（1,744.9 ÷ 16）</td>
+<td>1.344 on-demand；0.596 Capacity Blocks</td>
+<td class="num">$3.42；$1.52</td>
+</tr>
+<tr id="b211">
+<td class="rowhead">Inferentia2</td>
+<td>Llama 3.1 8B；1,500 / 250；batch 32 × 3</td>
+<td class="num">102.2（1,226.8 ÷ 12）</td>
+<td class="num">1.082 us-east-1；1.623 Tokyo</td>
+<td class="num">$2.94；$4.41</td>
+</tr>
+<tr id="b212">
+<td class="rowhead">Inferentia2</td>
+<td>Llama 3.1 8B；約 15,900 / 290；batch 8 × 3</td>
+<td class="num">20.8（249.6 ÷ 12）</td>
+<td class="num">1.082 us-east-1</td>
+<td class="num">$14.45</td>
+</tr>
+</tbody>
+</table></div></figure>
+<ul>
+<li id="b213">Bedrock 曾以每百萬 output tokens $5 販售 Trainium2 上的 latency-optimized Claude 3.5 Haiku，遠低於上表 Trainium2 大模型列的 $18–356，可見 AWS 內部服務堆疊的 batch 遠高於公開教學（<a href="https://claude.com/blog/trainium2-and-distillation" rel="noopener" target="_blank">Anthropic</a>）。</li>
+<li id="b214">Cerebras 與 LPX 沒有 chip-hour 價格，也沒有公開的系統吞吐量，C_out 無法計算；InferenceX 的 TCO 表也沒有 Trainium、Inferentia、Cerebras 與 LPX。</li>
+</ul>
+</div></div><div class="subpanel" role="tabpanel" id="s2-3" aria-labelledby="tab-s2-3"><div class="prose"><h3>InferenceX 的模型化成本與每 MW token</h3><p id="b215">InferenceX 的成本 = 自有 TCO ÷（每晶片 tok/s × 3,600）× 10^6，每 MW token = 每晶片 tok/s ÷ all-in kW × 1,000；兩個輸入都是 SemiAnalysis 的模型值，不是量測。本文以計算器輸出驗算，兩式逐列吻合（例：Vera Rubin 195,949 total tok/s 每 GPU → $0.0051、59.4M tok/s per MW；output 成本欄因顯示的 output 速率取整數，第二位小數會有出入）。</p>
+
+<figure class="tbl" data-cols="5" data-rows="11" id="t8-13"><figcaption><strong>表 8-13 InferenceX 的 TCO 與功耗假設</strong>（等級 <span class="g g-b" title="等級 B：廠商或夥伴公布，且揭露方法">B</span>。InferenceX-app 儲存庫的 <a href="https://github.com/SemiAnalysisAI/InferenceX-app/blob/main/packages/constants/src/gpu-keys.ts" rel="noopener" target="_blank">gpu-keys.ts</a>（2026-10-05 重讀，11 列數值全部相符）；同目錄的 <a href="https://github.com/SemiAnalysisAI/InferenceX-app/blob/main/packages/constants/src/tco.ts" rel="noopener" target="_blank">tco.ts</a> 註明出處為「SemiAnalysis Market July 2026 Pricing Surveys &amp; AI Cloud TCO Model」）</figcaption><div aria-label="表 8-13 InferenceX 的 TCO 與功耗假設" class="tbl-scroll" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th scope="col">加速器</th>
+<th scope="col">TDP（W）</th>
+<th scope="col">all-in 功耗（kW / 晶片）</th>
+<th scope="col">自有 TCO（$ / chip-hour）</th>
+<th scope="col">3 年租用（$ / chip-hour）</th>
+</tr>
+</thead>
+<tbody>
+<tr id="b216">
+<td class="rowhead">Vera Rubin NVL72</td>
+<td class="num">1,800</td>
+<td class="num">3.30</td>
+<td class="num">3.61</td>
+<td class="num">8.50</td>
+</tr>
+<tr id="b217">
+<td class="rowhead">GB300 NVL72</td>
+<td class="num">1,400</td>
+<td class="num">2.12</td>
+<td class="num">2.31</td>
+<td class="num">5.00</td>
+</tr>
+<tr id="b218">
+<td class="rowhead">GB200 NVL72</td>
+<td class="num">1,200</td>
+<td class="num">1.87</td>
+<td class="num">1.86</td>
+<td class="num">4.00</td>
+</tr>
+<tr id="b219">
+<td class="rowhead">B300</td>
+<td class="num">1,200</td>
+<td class="num">1.90</td>
+<td class="num">2.26</td>
+<td class="num">4.25</td>
+</tr>
+<tr id="b220">
+<td class="rowhead">B200</td>
+<td class="num">1,000</td>
+<td class="num">1.71</td>
+<td class="num">1.73</td>
+<td class="num">3.70</td>
+</tr>
+<tr id="b221">
+<td class="rowhead">H200</td>
+<td class="num">700</td>
+<td class="num">1.37</td>
+<td class="num">1.22</td>
+<td class="num">2.90</td>
+</tr>
+<tr id="b222">
+<td class="rowhead">H100</td>
+<td class="num">700</td>
+<td class="num">1.37</td>
+<td class="num">1.17</td>
+<td class="num">2.00</td>
+</tr>
+<tr id="b223">
+<td class="rowhead">MI355X</td>
+<td class="num">1,400</td>
+<td class="num">2.09</td>
+<td class="num">1.50</td>
+<td class="num">2.90</td>
+</tr>
+<tr id="b224">
+<td class="rowhead">MI325X</td>
+<td class="num">1,000</td>
+<td class="num">1.69</td>
+<td class="num">1.10</td>
+<td class="num">1.60</td>
+</tr>
+<tr id="b225">
+<td class="rowhead">MI300X</td>
+<td class="num">750</td>
+<td class="num">1.39</td>
+<td class="num">0.95</td>
+<td class="num">1.30</td>
+</tr>
+<tr id="b226">
+<td class="rowhead">TPU7x Ironwood</td>
+<td class="num">980</td>
+<td class="num">1.207</td>
+<td class="num">1.21</td>
+<td class="num">2.00</td>
+</tr>
+</tbody>
+</table></div></figure>
+<ul>
+<li id="b227">自有 TCO 是以 hyperscaler 的採購與融資條件，把伺服器與網路的資本支出、colocation、電力與資金成本攤入每 GPU-hour；3 年租用是 SemiAnalysis 租金調查的 3 年承諾市價（<a href="https://inferencex.semianalysis.com/blog/vera-rubin-nvl72-agentic-inference" rel="noopener" target="_blank">InferenceX 2026-09-14</a>）。all-in 功耗在檔內定義為晶片加上主機與 NIC 的每 GPU 分攤。</li>
+<li id="b228">各篇文章用的 TCO 不一致：2026-05-27 的文章用 GB200 $2.21、GB300 $2.65，2026-09-28 的文章與儲存庫是 $1.86、$2.31（<a href="https://inferencex.semianalysis.com/blog/gb300-nvl72-vs-gb200-nvl72-dsv4-pro-vllm-fp4" rel="noopener" target="_blank">InferenceX 2026-05-27</a>、<a href="https://inferencex.semianalysis.com/blog/sparse-savings-persistent-demand-inside-glm53" rel="noopener" target="_blank">InferenceX 2026-09-28</a>）。Ironwood 在儲存庫的 3 年租用值 $2.00 遠低於 Google 的 3 年承諾牌價 $5.40，內部 TCO 在文章中是 $1.03、儲存庫是 $1.21。</li>
+</ul>
+
+<figure class="tbl" data-cols="9" data-rows="22" id="t8-14"><figcaption><strong>表 8-14 InferenceX 模型化結果：AgentX、P90 interactivity 100 tok/s/user</strong>（吞吐量 A；成本與每 MW 為模型值。每個硬體取 total 吞吐量最高的引擎；concurrency 是內插點；各列都開啟 spec decode（MTP 或 DSpark，pinned acceptance）。前六個數值欄是 InferenceX 計算器的輸出，自有 TCO，本文於 2026-10-02 與 2026-10-03 讀取，該頁沒有可連結的固定網址。最後一欄是查核：本文以公開 API（2026-10-05 重抓）重算同一操作點，做法是對每組「硬體 × 引擎 × 精度」取 Pareto frontier，再在 P90 interactivity = 100 的兩側量測點之間線性內插，等級 <span class="g g-d" title="等級 D：本文推算，附算式">D</span>；括號為相對計算器讀數的差異。22 列中 15 列在 ±2.5% 內、20 列在 ±7% 內；差異最大的兩列，兩側量測點相距很遠（B300 vLLM 為 concurrency 8 與 64）。MI355X MoRI SGLang 在 2026-10-04 重跑過。）</figcaption><div aria-label="表 8-14 InferenceX 模型化結果：AgentX、P90 interactivity 100 tok/s/user" class="tbl-scroll" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th class="w1" scope="col">模型</th>
+<th class="w1" scope="col">硬體（引擎）</th>
+<th scope="col">concurrency</th>
+<th scope="col">total tok/s 每 GPU</th>
+<th scope="col">output tok/s 每 GPU</th>
+<th scope="col">每百萬 total tokens</th>
+<th scope="col">每百萬 output tokens</th>
+<th scope="col">total tok/s per MW</th>
+<th class="w1" scope="col">查核：API 重算的 total tok/s 每 GPU</th>
+</tr>
+</thead>
+<tbody>
+<tr id="b229">
+<td class="rowhead">DeepSeek-V4-Pro，FP4</td>
+<td>Vera Rubin NVL72（TensorRT-LLM）</td>
+<td class="num">1,803</td>
+<td class="num">195,949</td>
+<td class="num">1,447</td>
+<td class="num">$0.0051</td>
+<td class="num">$0.69</td>
+<td class="num">59.4M</td>
+<td class="num">186,246（−5.0%）</td>
+</tr>
+<tr id="b230">
+<td class="rowhead">DeepSeek-V4-Pro，FP4</td>
+<td>GB300 NVL72（Dynamo SGLang）</td>
+<td class="num">451</td>
+<td class="num">60,567</td>
+<td class="num">479</td>
+<td class="num">$0.0106</td>
+<td class="num">$1.34</td>
+<td class="num">28.6M</td>
+<td class="num">60,341（−0.4%）</td>
+</tr>
+<tr id="b231">
+<td class="rowhead">DeepSeek-V4-Pro，FP4</td>
+<td>B200（Dynamo SGLang）</td>
+<td class="num">146</td>
+<td class="num">40,156</td>
+<td class="num">317</td>
+<td class="num">$0.0120</td>
+<td class="num">$1.51</td>
+<td class="num">23.5M</td>
+<td class="num">39,612（−1.4%）</td>
+</tr>
+<tr id="b232">
+<td class="rowhead">DeepSeek-V4-Pro，FP4</td>
+<td>GB200 NVL72（Dynamo SGLang）</td>
+<td class="num">428</td>
+<td class="num">34,754</td>
+<td class="num">243</td>
+<td class="num">$0.0149</td>
+<td class="num">$2.13</td>
+<td class="num">18.6M</td>
+<td class="num">36,791（+5.9%）</td>
+</tr>
+<tr id="b233">
+<td class="rowhead">DeepSeek-V4-Pro，FP4</td>
+<td>MI355X（MoRI SGLang）</td>
+<td class="num">52</td>
+<td class="num">22,470</td>
+<td class="num">152</td>
+<td class="num">$0.0185</td>
+<td class="num">$2.74</td>
+<td class="num">10.8M</td>
+<td class="num">21,634（−3.7%）</td>
+</tr>
+<tr id="b234">
+<td class="rowhead">DeepSeek-V4-Pro，FP4</td>
+<td>B300（vLLM）</td>
+<td class="num">20</td>
+<td class="num">18,463</td>
+<td class="num">140</td>
+<td class="num">$0.0340</td>
+<td class="num">$4.49</td>
+<td class="num">9.7M</td>
+<td class="num">21,870（+18.5%）</td>
+</tr>
+<tr id="b235">
+<td class="rowhead">DeepSeek-V4-Pro，FP8</td>
+<td>H200（Dynamo SGLang）</td>
+<td class="num">8</td>
+<td class="num">5,139</td>
+<td class="num">40</td>
+<td class="num">$0.0659</td>
+<td class="num">$8.41</td>
+<td class="num">3.8M</td>
+<td class="num">5,097（−0.8%）</td>
+</tr>
+<tr id="b236">
+<td class="rowhead">Kimi K3，MXFP4</td>
+<td>GB300 NVL72（Dynamo vLLM）</td>
+<td class="num">48</td>
+<td class="num">9,600</td>
+<td class="num">64</td>
+<td class="num">$0.0668</td>
+<td class="num">$10.06</td>
+<td class="num">4.5M</td>
+<td class="num">9,748（+1.5%）</td>
+</tr>
+<tr id="b237">
+<td class="rowhead">Kimi K3，MXFP4</td>
+<td>MI355X（ATOM）</td>
+<td class="num">7</td>
+<td class="num">4,132</td>
+<td class="num">33</td>
+<td class="num">$0.1008</td>
+<td class="num">$12.50</td>
+<td class="num">2.0M</td>
+<td class="num">4,611（+11.6%）</td>
+</tr>
+<tr id="b238">
+<td class="rowhead">Kimi K3，MXFP4</td>
+<td>B300（vLLM）</td>
+<td class="num">6</td>
+<td class="num">4,051</td>
+<td class="num">30</td>
+<td class="num">$0.1550</td>
+<td class="num">$21.04</td>
+<td class="num">2.1M</td>
+<td class="num">3,879（−4.2%）</td>
+</tr>
+<tr id="b239">
+<td class="rowhead">Kimi K3，MXFP4</td>
+<td>B200（Dynamo vLLM）</td>
+<td class="num">8</td>
+<td class="num">2,958</td>
+<td class="num">23</td>
+<td class="num">$0.1625</td>
+<td class="num">$21.28</td>
+<td class="num">1.7M</td>
+<td class="num">2,976（+0.6%）</td>
+</tr>
+<tr id="b240">
+<td class="rowhead">Kimi K3，MXFP4</td>
+<td>GB200 NVL72（Dynamo vLLM）</td>
+<td class="num">16</td>
+<td class="num">2,395</td>
+<td class="num">15</td>
+<td class="num">$0.2157</td>
+<td class="num">$34.34</td>
+<td class="num">1.3M</td>
+<td class="num">2,420（+1.1%）</td>
+</tr>
+<tr id="b241">
+<td class="rowhead">GLM-5.2，FP4</td>
+<td>MI355X（ATOM）</td>
+<td class="num">10</td>
+<td class="num">14,799</td>
+<td class="num">111</td>
+<td class="num">$0.0282</td>
+<td class="num">$3.75</td>
+<td class="num">7.1M</td>
+<td class="num">14,684（−0.8%）</td>
+</tr>
+<tr id="b242">
+<td class="rowhead">GLM-5.2，FP4</td>
+<td>B200（Dynamo SGLang）</td>
+<td class="num">62</td>
+<td class="num">15,292</td>
+<td class="num">120</td>
+<td class="num">$0.0314</td>
+<td class="num">$3.99</td>
+<td class="num">8.9M</td>
+<td class="num">14,935（−2.3%）</td>
+</tr>
+<tr id="b243">
+<td class="rowhead">GLM-5.2，FP4</td>
+<td>GB200 NVL72（Dynamo SGLang）</td>
+<td class="num">116</td>
+<td class="num">15,900</td>
+<td class="num">130</td>
+<td class="num">$0.0325</td>
+<td class="num">$3.98</td>
+<td class="num">8.5M</td>
+<td class="num">15,934（+0.2%）</td>
+</tr>
+<tr id="b244">
+<td class="rowhead">GLM-5.2，FP4</td>
+<td>GB300 NVL72（Dynamo SGLang）</td>
+<td class="num">91</td>
+<td class="num">18,162</td>
+<td class="num">140</td>
+<td class="num">$0.0353</td>
+<td class="num">$4.60</td>
+<td class="num">8.6M</td>
+<td class="num">18,262（+0.6%）</td>
+</tr>
+<tr id="b245">
+<td class="rowhead">DeepSeek-V4.1-Flash，FP4</td>
+<td>GB300 NVL72（vLLM）</td>
+<td class="num">72</td>
+<td class="num">232,066</td>
+<td class="num">1,666</td>
+<td class="num">$0.0028</td>
+<td class="num">$0.39</td>
+<td class="num">109.5M</td>
+<td class="num">234,609（+1.1%）</td>
+</tr>
+<tr id="b246">
+<td class="rowhead">DeepSeek-V4.1-Flash，FP4</td>
+<td>B300（vLLM）</td>
+<td class="num">64</td>
+<td class="num">214,417</td>
+<td class="num">1,527</td>
+<td class="num">$0.0029</td>
+<td class="num">$0.41</td>
+<td class="num">112.9M</td>
+<td class="num">214,436（+0.0%）</td>
+</tr>
+<tr id="b247">
+<td class="rowhead">DeepSeek-V4.1-Flash，FP4</td>
+<td>B200（vLLM）</td>
+<td class="num">89</td>
+<td class="num">157,803</td>
+<td class="num">1,152</td>
+<td class="num">$0.0030</td>
+<td class="num">$0.42</td>
+<td class="num">92.3M</td>
+<td class="num">157,953（+0.1%）</td>
+</tr>
+<tr id="b248">
+<td class="rowhead">DeepSeek-V4.1-Flash，FP4</td>
+<td>MI355X（vLLM）</td>
+<td class="num">32</td>
+<td class="num">77,236</td>
+<td class="num">393</td>
+<td class="num">$0.0054</td>
+<td class="num">$1.06</td>
+<td class="num">37.0M</td>
+<td class="num">75,905（−1.7%）</td>
+</tr>
+<tr id="b249">
+<td class="rowhead">DeepSeek-V4.1-Flash，FP4</td>
+<td>GB200 NVL72（vLLM）</td>
+<td class="num">29</td>
+<td class="num">55,813</td>
+<td class="num">329</td>
+<td class="num">$0.0093</td>
+<td class="num">$1.57</td>
+<td class="num">29.9M</td>
+<td class="num">56,002（+0.3%）</td>
+</tr>
+<tr id="b250">
+<td class="rowhead">DeepSeek-V4.1-Flash，FP4</td>
+<td>H200（vLLM）</td>
+<td class="num">11</td>
+<td class="num">16,626</td>
+<td class="num">121</td>
+<td class="num">$0.0204</td>
+<td class="num">$2.80</td>
+<td class="num">12.1M</td>
+<td class="num">17,747（+6.7%）</td>
+</tr>
+</tbody>
+</table></div></figure>
+<ul>
+<li id="b251">total 含 cached input，每百萬 total tokens 的成本因此比 output 口徑低約兩個量級；跨模型或與 8K/1K 比較時只能用 output 欄。固定長度的 disaggregated 結果另有一個陷阱：計算器的 output 吞吐量是除以 decode GPU 數，不是全部 GPU（Qwen3.5-397B 8K/1K 的 GB300 Dynamo TensorRT-LLM 列顯示 10,977，整體口徑是 37,956 ÷ 9 = 4,217，<span class="g g-d" title="等級 D：本文推算，附算式">D</span>）。</li>
+<li id="b252">文章快照與三週後的計算器差距很大。<a href="https://inferencex.semianalysis.com/blog/vera-rubin-nvl72-agentic-inference" rel="noopener" target="_blank">InferenceX 2026-09-14</a> 的文章在同一操作點列出 Rubin 59.4M、GB300 Dynamo SGLang 28.5M、B200 SGLang 6.95M、B300 vLLM 5.56M、H200（FP8）2.26M、MI355X SGLang 2.01M total tok/s per MW；10 月初 B200 與 MI355X 已換成新引擎的 23.5M 與 10.8M，Rubin 對 MI355X 由 29.5× 降為 5.5×<span class="g g-d" title="等級 D：本文推算，附算式">D</span>。</li>
+<li id="b253">其他已公布的模型化結果：GLM-5.3 在 150 tok/s/user（P90）下 GB200 約 $0.044、MI355X ATOM $0.049 每百萬 total tokens，只計 output 為 $5.92 對 $6.68；加上 P90 TTFT ≤ 2 s 的條件後變成 MI355X ATOM $0.0607 對 B200 $0.0666（<a href="https://inferencex.semianalysis.com/blog/sparse-savings-persistent-demand-inside-glm53" rel="noopener" target="_blank">InferenceX 2026-09-28</a>）。DeepSeek-V4-Pro 8K/1K 上，GB300 加 MTP 在 50 tok/s/user 時為每百萬 output tokens $0.156（<a href="https://inferencex.semianalysis.com/blog/deepseekv4-16t-day-0-to-day-43-performance" rel="noopener" target="_blank">InferenceX 2026-06-09</a>）。</li>
+</ul>
+</div></div><div class="subpanel" role="tabpanel" id="s2-4" aria-labelledby="tab-s2-4"><div class="prose"><h3>代管 API：為速度付出的溢價</h3><p id="b254">同一個 gpt-oss-120b，Cerebras 一次 10K 輸入、500 輸出的請求成本是 Groq、Azure、Nebius 的 2.2 倍，換到 3.7–6.3 倍的每串流速度；對最便宜的 GPU 端點則是 8.5–10 倍的價格換 37–40 倍的速度<span class="g g-d" title="等級 D：本文推算，附算式">D</span>。</p>
+
+<figure class="tbl" data-cols="7" data-rows="11" id="t8-15"><figcaption><strong>表 8-15 gpt-oss-120b：牌價對量測速度</strong>（價格與速度取自 AA，2026-10-04；單次成本 = 10,000 × input 價 + 500 × output 價，D。來源：<a href="https://artificialanalysis.ai/models/gpt-oss-120b/providers" rel="noopener" target="_blank">AA</a>）</figcaption><div aria-label="表 8-15 gpt-oss-120b：牌價對量測速度" class="tbl-scroll" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th scope="col">供應商</th>
+<th scope="col">硬體類別</th>
+<th class="w1" scope="col">每百萬 input / output（USD）</th>
+<th scope="col">AA 10K：t/s</th>
+<th scope="col">單次請求成本（10K + 500）</th>
+<th scope="col">Cerebras 成本 ÷ 本列</th>
+<th scope="col">Cerebras 速度 ÷ 本列</th>
+</tr>
+</thead>
+<tbody>
+<tr id="b255">
+<td class="rowhead">Cerebras</td>
+<td>wafer-scale ASIC</td>
+<td class="num">0.35 / 0.75</td>
+<td class="num">1,764</td>
+<td class="num">$0.00388</td>
+<td class="num">1.0×</td>
+<td class="num">1.0×</td>
+</tr>
+<tr id="b256">
+<td class="rowhead">SambaNova</td>
+<td>RDU ASIC</td>
+<td>0.22 / 0.59（OpenRouter：0.14 / 0.95）</td>
+<td class="num">706</td>
+<td class="num">$0.00250（$0.00188）</td>
+<td class="num">1.6×（2.1×）</td>
+<td class="num">2.5×</td>
+</tr>
+<tr id="b257">
+<td class="rowhead">Groq</td>
+<td>LPU ASIC</td>
+<td class="num">0.15 / 0.60</td>
+<td class="num">473</td>
+<td class="num">$0.00180</td>
+<td class="num">2.2×</td>
+<td class="num">3.7×</td>
+</tr>
+<tr id="b258">
+<td class="rowhead">Microsoft Azure</td>
+<td class="muted">未揭露</td>
+<td class="num">0.15 / 0.60</td>
+<td class="num">320</td>
+<td class="num">$0.00180</td>
+<td class="num">2.2×</td>
+<td class="num">5.5×</td>
+</tr>
+<tr id="b259">
+<td><span class="rh">Nebius</span><span class="rh-sub"><span class="vh">（</span>Base<span class="vh">）</span></span></td>
+<td>GPU 雲</td>
+<td class="num">0.15 / 0.60</td>
+<td class="num">280</td>
+<td class="num">$0.00180</td>
+<td class="num">2.2×</td>
+<td class="num">6.3×</td>
+</tr>
+<tr id="b260">
+<td><span class="rh">DeepInfra</span><span class="rh-sub"><span class="vh">（</span>Turbo<span class="vh">）</span></span></td>
+<td>GPU 雲</td>
+<td class="num">0.15 / 0.60</td>
+<td class="num">248</td>
+<td class="num">$0.00180</td>
+<td class="num">2.2×</td>
+<td class="num">7.1×</td>
+</tr>
+<tr id="b261">
+<td class="rowhead">Crusoe</td>
+<td>GPU 雲</td>
+<td class="num">0.05 / 0.20</td>
+<td class="num">233</td>
+<td class="num">$0.00060</td>
+<td class="num">6.5×</td>
+<td class="num">7.6×</td>
+</tr>
+<tr id="b262">
+<td class="rowhead">Baseten</td>
+<td>GPU 雲</td>
+<td class="num">0.10 / 0.50</td>
+<td class="num">221</td>
+<td class="num">$0.00125</td>
+<td class="num">3.1×</td>
+<td class="num">8.0×</td>
+</tr>
+<tr id="b263">
+<td class="rowhead">Amazon Bedrock</td>
+<td class="muted">未揭露</td>
+<td class="num">0.15 / 0.60</td>
+<td class="num">83</td>
+<td class="num">$0.00180</td>
+<td class="num">2.2×</td>
+<td class="num">21×</td>
+</tr>
+<tr id="b264">
+<td><span class="rh">DeepInfra</span><span class="rh-sub"><span class="vh">（</span>標準<span class="vh">）</span></span></td>
+<td>GPU 雲</td>
+<td class="num">0.037 / 0.17</td>
+<td class="num">48</td>
+<td class="num">$0.00046</td>
+<td class="num">8.5×</td>
+<td class="num">37×</td>
+</tr>
+<tr id="b265">
+<td class="rowhead">CoreWeave</td>
+<td>GPU 雲</td>
+<td class="num">0.03 / 0.17</td>
+<td class="num">44</td>
+<td class="num">$0.00038</td>
+<td class="num">10×</td>
+<td class="num">40×</td>
+</tr>
+</tbody>
+</table></div></figure>
+<ul>
+<li id="b266">Cerebras 的溢價集中在 input，而且快取命中不打折：gpt-oss-120b 的 input 價是 21 個 OpenRouter 端點中最高，Qwen3.8 27B 為 $0.99 / $1.49，input 是 17 個端點中最高、output 最低，cache read 仍收 $0.99（<a href="https://openrouter.ai/api/v1/models/openai/gpt-oss-120b/endpoints" rel="noopener" target="_blank">OpenRouter gpt-oss-120b</a>、<a href="https://openrouter.ai/api/v1/models/qwen/qwen3.8-27b/endpoints" rel="noopener" target="_blank">OpenRouter Qwen3.8 27B</a>）。Qwen3.8 27B 同樣的 10K + 500 請求，Cerebras $0.0106、Parasail $0.0035（3.0×），速度是 1,025 對 83 t/s（12×，<span class="g g-d" title="等級 D：本文推算，附算式">D</span>）。</li>
+<li id="b267">Trainium2 的溢價是 25%：Bedrock latency-optimized 的 Claude 3.5 Haiku 為 $1 / $5，standard 為 $0.80 / $4，P50 output 速度 85.9 對 48.4 tok/s（1.8×）（<a href="https://claude.com/blog/trainium2-and-distillation" rel="noopener" target="_blank">Anthropic</a>、<a href="https://aws.amazon.com/blogs/machine-learning/optimizing-ai-responsiveness-a-practical-guide-to-amazon-bedrock-latency-optimized-inference/" rel="noopener" target="_blank">AWS ML Blog</a>）。</li>
+<li id="b268">GPU 上的快速層不一定比較貴：Kimi K3 在 LithosAI ULTRA CHAT（320 t/s）為 $5.60 / $28、Inco FAST（282 t/s）為 $6 / $30，牌價是 $3 / $15；但 LithosAI 的標準 GLM-5.3 端點（474 t/s）為 $1.05 / $3.30，低於牌價 $1.40 / $4.40（<span class="g g-a" title="等級 A：獨立第三方量測">A</span>，2026-10-04，<a href="https://artificialanalysis.ai/models/kimi-k3/providers" rel="noopener" target="_blank">AA Kimi K3</a>、<a href="https://artificialanalysis.ai/models/glm-5-3/providers" rel="noopener" target="_blank">AA GLM-5.3</a>）。</li>
+</ul>
+</div></div><div class="subpanel" role="tabpanel" id="s2-5" aria-labelledby="tab-s2-5"><div class="prose"><h3>功耗與實測能耗</h3><p id="b269">功耗的公開數字只有三類：路線圖報導的 Rubin GPU 1,800 W、Google 的 Ironwood pod「nearly 10 MW」（9,216 顆）、分析師估計的 Cerebras CS-3 每系統約 25 kW。NVL72 級機櫃、LPX、Helios、Trainium 與 Inferentia2 的功耗都查無公開資料。</p>
+
+<figure class="tbl" data-cols="5" data-rows="11" id="t8-16"><figcaption><strong>表 8-16 每晶片與每機櫃功耗</strong></figcaption><div aria-label="表 8-16 每晶片與每機櫃功耗" class="tbl-scroll" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th class="w1" scope="col">系統</th>
+<th class="w2" scope="col">晶片功耗</th>
+<th class="w2" scope="col">機櫃或系統功耗</th>
+<th scope="col">等級</th>
+<th class="w1" scope="col">來源</th>
+</tr>
+</thead>
+<tbody>
+<tr id="b270">
+<td class="rowhead">Trainium1 / 2 / 3</td>
+<td><span class="chip chip-na">查無公開資料</span><span class="chip-note">AWS 未揭露任何一代的晶片功耗</span></td>
+<td class="muted"><span class="chip chip-na">查無公開資料</span></td>
+<td class="muted">無</td>
+<td><a href="https://newsletter.semianalysis.com/p/aws-trainium3-deep-dive-a-potential" rel="noopener" target="_blank">SemiAnalysis</a></td>
+</tr>
+<tr id="b271">
+<td class="rowhead">Inferentia2</td>
+<td class="muted"><span class="chip chip-na">查無公開資料</span></td>
+<td class="muted"><span class="chip chip-na">查無公開資料</span></td>
+<td class="muted">無</td>
+<td><a href="https://aws.amazon.com/blogs/aws/amazon-ec2-inf2-instances-for-low-cost-high-performance-generative-ai-inference-are-now-generally-available/" rel="noopener" target="_blank">AWS News Blog</a></td>
+</tr>
+<tr id="b272">
+<td class="rowhead">TPU Ironwood</td>
+<td>Google 未公布 TDP；InferenceX 假設 980 W、all-in 1.207 kW（<a class="xref" href="#t8-13">表 8-13</a>）</td>
+<td>9,216 顆的 pod「nearly 10 MW」，約 1.09 kW / 晶片（<span class="g g-d" title="等級 D：本文推算，附算式">D</span>：10 MW ÷ 9,216）</td>
+<td><span class="g g-c" title="等級 C：廠商宣稱或規格，未揭露方法">C</span>；<span class="g g-d" title="等級 D：本文推算，附算式">D</span>；<span class="g g-b" title="等級 B：廠商或夥伴公布，且揭露方法">B</span></td>
+<td><a href="https://blog.google/innovation-and-ai/infrastructure-and-cloud/google-cloud/ironwood-tpu-age-of-inference/" rel="noopener" target="_blank">Google</a></td>
+</tr>
+<tr id="b273">
+<td class="rowhead">H100、H200、B200、B300</td>
+<td>InferenceX 假設 TDP 700、700、1,000、1,200 W（<a class="xref" href="#t8-13">表 8-13</a>）；NVIDIA 產品頁數值未取得</td>
+<td>8-GPU 節點功耗：查無公開資料</td>
+<td><span class="g g-b" title="等級 B：廠商或夥伴公布，且揭露方法">B</span></td>
+<td><a class="xref" href="#t8-13">表 8-13</a></td>
+</tr>
+<tr id="b274">
+<td class="rowhead">GB200 NVL72、GB300 NVL72</td>
+<td>InferenceX 假設 1,200、1,400 W</td>
+<td><span class="chip chip-na">查無公開資料</span><span class="chip-note">NVIDIA 產品頁未載</span></td>
+<td><span class="g g-b" title="等級 B：廠商或夥伴公布，且揭露方法">B</span>；無</td>
+<td><a href="https://www.nvidia.com/en-us/data-center/gb200-nvl72/" rel="noopener" target="_blank">GB200</a>、<a href="https://www.nvidia.com/en-us/data-center/gb300-nvl72/" rel="noopener" target="_blank">GB300</a></td>
+</tr>
+<tr id="b275">
+<td class="rowhead">Vera Rubin NVL72</td>
+<td>Rubin GPU 1,800 W（2025-08 的路線圖報導，上市前）</td>
+<td><span class="chip chip-na">查無公開資料</span> ；全液冷、45 °C 進水、約 4,000 lb</td>
+<td><span class="g g-c" title="等級 C：廠商宣稱或規格，未揭露方法">C</span></td>
+<td><a href="https://www.tomshardware.com/tech-industry/semiconductors/nvidia-enterprise-roadmap-rubin-rubin-ultra-feynman-and-silicon-photonics" rel="noopener" target="_blank">Tom's Hardware</a>、<a href="https://developer.nvidia.com/blog/nvidia-vera-rubin-pod-seven-chips-five-rack-scale-systems-one-ai-supercomputer/" rel="noopener" target="_blank">NVIDIA</a></td>
+</tr>
+<tr id="b276">
+<td><span class="rh">Rubin Ultra</span><span class="rh-sub"><span class="vh">（</span>Kyber，2027 下半年<span class="vh">）</span></span></td>
+<td class="num">3,600 W / package</td>
+<td class="num">600 kW（2025-03 報導）</td>
+<td><span class="g g-c" title="等級 C：廠商宣稱或規格，未揭露方法">C</span></td>
+<td><a href="https://www.tomshardware.com/tech-industry/semiconductors/nvidia-enterprise-roadmap-rubin-rubin-ultra-feynman-and-silicon-photonics" rel="noopener" target="_blank">Tom's Hardware</a>、<a href="https://www.datacenterdynamics.com/en/news/nvidias-rubin-ultra-nvl576-rack-expected-to-be-600kw-coming-second-half-of-2027/" rel="noopener" target="_blank">DCD</a></td>
+</tr>
+<tr id="b277">
+<td class="rowhead">Groq 3 LPX</td>
+<td class="muted">未揭露</td>
+<td class="muted">未揭露</td>
+<td class="muted">無</td>
+<td><a href="https://www.storagereview.com/news/nvidia-groq-3-lpx-enters-full-production-3400-tokens-per-second-at-100k-context-256-lp30s-per-rack" rel="noopener" target="_blank">StorageReview</a></td>
+</tr>
+<tr id="b278">
+<td class="rowhead">AMD MI355X；Helios</td>
+<td>InferenceX 假設 1,400 W、all-in 2.09 kW</td>
+<td>Helios：查無公開資料</td>
+<td><span class="g g-b" title="等級 B：廠商或夥伴公布，且揭露方法">B</span>；無</td>
+<td><a href="https://www.amd.com/en/products/accelerators/instinct/mi400.html" rel="noopener" target="_blank">AMD</a></td>
+</tr>
+<tr id="b279">
+<td class="rowhead">Cerebras CS-3</td>
+<td>不適用（一片 WSE-3）</td>
+<td>約 25 kW / 系統；冷卻流量約 4 LPM/kW，NVL72 參考值約 1.5</td>
+<td>分析師估計</td>
+<td><a href="https://newsletter.semianalysis.com/p/cerebras-faster-tokens-please" rel="noopener" target="_blank">SemiAnalysis</a></td>
+</tr>
+<tr id="b280">
+<td class="rowhead">Cerebras CS-4</td>
+<td>不適用（三片 WSE-3T）</td>
+<td>120–140 kW / 機櫃，或「125–135 kW TDP」</td>
+<td>分析師估計</td>
+<td><a href="https://futurumgroup.com/insights/cerebras-cs-4-makes-the-rack-the-new-chip-by-doubling-power-and-tripling-wafers/" rel="noopener" target="_blank">Futurum</a>、<a href="https://newsletter.semianalysis.com/p/cerebrass-next-generation-cs-4-fast" rel="noopener" target="_blank">SemiAnalysis</a></td>
+</tr>
+</tbody>
+</table></div></figure>
+<ul>
+<li id="b281">筆記由 NVIDIA 的「100 MW AI factory」數字推得 Vera Rubin NVL72 每機櫃約 172–180 kW（含 NVIDIA 假設的 overhead，<span class="g g-d" title="等級 D：本文推算，附算式">D</span>），72 顆 GPU 以 1,800 W 計為 130 kW；兩者都是估計，不是機櫃規格（<a href="https://www.nvidia.com/en-us/data-center/vera-rubin-nvl72/" rel="noopener" target="_blank">NVIDIA</a>）。</li>
+<li id="b282">Cerebras 的大模型功耗只有分析師估計：1.6T 模型、1M context、256 個並行請求約需 40 套系統、約 1 MW（<a href="https://newsletter.semianalysis.com/p/cerebrass-next-generation-cs-4-fast" rel="noopener" target="_blank">SemiAnalysis</a>）。</li>
+</ul>
+
+<figure class="tbl" data-cols="7" data-rows="16" id="t8-17"><figcaption><strong>表 8-17 InferenceX 實測的 GPU 功耗與每 output token 能耗</strong>（等級 <span class="g g-a" title="等級 A：獨立第三方量測">A</span>。只含 GPU 本體的平均功耗，不含主機、網路與散熱；只取通過 InferenceX power 驗證的列。J / output token = 平均功耗 ÷ 每 GPU output tok/s。來源：InferenceX API，2026-10-04 擷取，連結同<a class="xref" href="#t8-2">表 8-2</a>）</figcaption><div aria-label="表 8-17 InferenceX 實測的 GPU 功耗與每 output token 能耗" class="tbl-scroll" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th class="w1" scope="col">模型（負載）</th>
+<th class="w1" scope="col">硬體（引擎）</th>
+<th scope="col">concurrency</th>
+<th scope="col">output tok/s 每 GPU</th>
+<th scope="col">GPU 平均功耗（W）</th>
+<th scope="col">J / output token</th>
+<th scope="col">量測日</th>
+</tr>
+</thead>
+<tbody>
+<tr id="b283">
+<td><span class="rh">DeepSeek-V4.1-Flash，FP4，MTP</span><span class="rh-sub"><span class="vh">（</span>AgentX<span class="vh">）</span></span></td>
+<td>GB300 NVL72（vLLM）</td>
+<td class="num">192</td>
+<td class="num">3,108</td>
+<td class="num">904</td>
+<td class="num">0.29</td>
+<td class="num">2026-10-02</td>
+</tr>
+<tr id="b284">
+<td class="muted rowhead">同上</td>
+<td>B300（vLLM）</td>
+<td class="num">192</td>
+<td class="num">3,059</td>
+<td class="num">948</td>
+<td class="num">0.31</td>
+<td class="num">2026-10-02</td>
+</tr>
+<tr id="b285">
+<td class="muted rowhead">同上</td>
+<td>B200（vLLM）</td>
+<td class="num">128</td>
+<td class="num">1,362</td>
+<td class="num">861</td>
+<td class="num">0.63</td>
+<td class="num">2026-10-03</td>
+</tr>
+<tr id="b286">
+<td class="muted rowhead">同上</td>
+<td>MI355X（vLLM）</td>
+<td class="num">64</td>
+<td class="num">999</td>
+<td class="num">910</td>
+<td class="num">0.91</td>
+<td class="num">2026-10-02</td>
+</tr>
+<tr id="b287">
+<td class="muted rowhead">同上</td>
+<td>GB200 NVL72（vLLM）</td>
+<td class="num">64</td>
+<td class="num">615</td>
+<td class="num">805</td>
+<td class="num">1.31</td>
+<td class="num">2026-09-21</td>
+</tr>
+<tr id="b288">
+<td class="muted rowhead">同上</td>
+<td>H200（vLLM）</td>
+<td class="num">32</td>
+<td class="num">231</td>
+<td class="num">600</td>
+<td class="num">2.61</td>
+<td class="num">2026-09-21</td>
+</tr>
+<tr id="b289">
+<td class="muted rowhead">同上</td>
+<td>H100（vLLM）</td>
+<td class="num">20</td>
+<td class="num">90</td>
+<td class="num">493</td>
+<td class="num">5.54</td>
+<td class="num">2026-09-18</td>
+</tr>
+<tr id="b290">
+<td><span class="rh">DeepSeek-V4-Pro，FP4</span><span class="rh-sub"><span class="vh">（</span>AgentX<span class="vh">）</span></span></td>
+<td>B300（SGLang，MTP）</td>
+<td class="num">384</td>
+<td class="num">739</td>
+<td class="num">866</td>
+<td class="num">1.18</td>
+<td class="num">2026-09-29</td>
+</tr>
+<tr id="b291">
+<td class="muted rowhead">同上</td>
+<td>B200（vLLM，DSpark）</td>
+<td class="num">128</td>
+<td class="num">456</td>
+<td class="num">734</td>
+<td class="num">1.62</td>
+<td class="num">2026-09-19</td>
+</tr>
+<tr id="b292">
+<td class="muted rowhead">同上</td>
+<td>MI355X（SGLang，DSpark）</td>
+<td class="num">128</td>
+<td class="num">362</td>
+<td class="num">719</td>
+<td class="num">1.99</td>
+<td class="num">2026-09-29</td>
+</tr>
+<tr id="b293">
+<td><span class="rh">DeepSeek-V4-Pro，FP8</span><span class="rh-sub"><span class="vh">（</span>AgentX<span class="vh">）</span></span></td>
+<td>H200（Dynamo SGLang，DSpark）</td>
+<td class="num">8</td>
+<td class="num">41</td>
+<td class="num">475</td>
+<td class="num">11.5</td>
+<td class="num">2026-09-16</td>
+</tr>
+<tr id="b294">
+<td><span class="rh">Kimi K3，MXFP4，DSpark</span><span class="rh-sub"><span class="vh">（</span>AgentX<span class="vh">）</span></span></td>
+<td>GB300 NVL72（Dynamo vLLM）</td>
+<td class="num">48</td>
+<td class="num">136</td>
+<td class="num">983</td>
+<td class="num">7.27</td>
+<td class="num">2026-09-15</td>
+</tr>
+<tr id="b295">
+<td class="muted rowhead">同上</td>
+<td>B200（Dynamo vLLM）</td>
+<td class="num">72</td>
+<td class="num">86</td>
+<td class="num">767</td>
+<td class="num">8.96</td>
+<td class="num">2026-10-02</td>
+</tr>
+<tr id="b296">
+<td class="muted rowhead">同上</td>
+<td>MI355X（ATOM）</td>
+<td class="num">72</td>
+<td class="num">104</td>
+<td class="num">941</td>
+<td class="num">9.11</td>
+<td class="num">2026-09-29</td>
+</tr>
+<tr id="b297">
+<td><span class="rh">Qwen3.5-397B，FP8，無 spec decode</span><span class="rh-sub"><span class="vh">（</span>8K/1K<span class="vh">）</span></span></td>
+<td>B200（SGLang）</td>
+<td class="num">128</td>
+<td class="num">950</td>
+<td class="num">948</td>
+<td class="num">1.00</td>
+<td class="num">2026-09-18</td>
+</tr>
+<tr id="b298">
+<td class="muted rowhead">同上</td>
+<td>MI355X（SGLang）</td>
+<td class="num">64</td>
+<td class="num">535</td>
+<td class="num">861</td>
+<td class="num">1.61</td>
+<td class="num">2026-09-25</td>
+</tr>
+</tbody>
+</table></div></figure>
+<ul>
+<li id="b299">同模型、同 trace 下，每 output token 的能耗 MI355X 是 B200 的 1.4 倍（0.91 ÷ 0.63）、Kimi K3 上與 B200 相當（9.11 對 8.96）；Hopper 是 Blackwell Ultra 的 9–19 倍（2.61 ÷ 0.29；5.54 ÷ 0.29）<span class="g g-d" title="等級 D：本文推算，附算式">D</span>。</li>
+<li id="b300">P/D disaggregated 的列與 Vera Rubin 在快取中沒有通過驗證的功耗紀錄。TPU、Trainium、Inferentia2、Cerebras 與 LPX 沒有任何對應的獨立量測：查無公開資料。</li>
+</ul>
+</div></div><div class="subpanel" role="tabpanel" id="s2-6" aria-labelledby="tab-s2-6"><div class="prose"><h3>廠商的經濟性宣稱</h3><p id="b301">以下全部是等級 <span class="g g-c" title="等級 C：廠商宣稱或規格，未揭露方法">C</span>：比值而非絕對值，條件多半未揭露。唯一可對照的客戶數字是 Cognition 的 4.8×，低於 NVIDIA 的 10×。</p>
+
+<figure class="tbl" data-cols="6" data-rows="15" id="t8-18"><figcaption><strong>表 8-18 廠商的成本與能效宣稱</strong>（等級 <span class="g g-c" title="等級 C：廠商宣稱或規格，未揭露方法">C</span>）</figcaption><div aria-label="表 8-18 廠商的成本與能效宣稱" class="tbl-scroll" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th class="w1" scope="col">廠商；產品</th>
+<th class="w2" scope="col">宣稱</th>
+<th class="w1" scope="col">基準</th>
+<th class="w2" scope="col">已揭露的條件</th>
+<th class="w1" scope="col">日期</th>
+<th class="src" scope="col">來源</th>
+</tr>
+</thead>
+<tbody>
+<tr id="b302">
+<td class="rowhead">AWS；Trainium2</td>
+<td>「30-40% better price performance」</td>
+<td>P5e、P5en（H200）執行個體</td>
+<td>workload 與指標未載；早於 2026-07 與 2026-10 的 GPU Capacity Blocks 調漲</td>
+<td class="num">2024-12</td>
+<td class="src"><a href="https://aws.amazon.com/ec2/instance-types/trn2/" rel="noopener" target="_blank">AWS Trn2</a></td>
+</tr>
+<tr id="b303">
+<td class="rowhead">AWS；Trainium</td>
+<td>「about 30% better price-performance than comparable GPUs」</td>
+<td>comparable GPUs</td>
+<td class="muted">無</td>
+<td class="num">2026-04-09</td>
+<td class="src"><a href="https://www.aboutamazon.com/news/company-news/amazon-ceo-andy-jassy-2025-letter-to-shareholders" rel="noopener" target="_blank">股東信</a></td>
+</tr>
+<tr id="b304">
+<td class="rowhead">AWS；Trainium3</td>
+<td>「up to 40% better price-performance」；股東信為 30–40%</td>
+<td>Trainium2</td>
+<td class="muted">無</td>
+<td class="num">2026-07-31；2026-04-09</td>
+<td class="src"><a href="https://www.aboutamazon.com/news/aws/amazon-ai-chips-business-history" rel="noopener" target="_blank">About Amazon</a>、<a href="https://www.aboutamazon.com/news/company-news/amazon-ceo-andy-jassy-2025-letter-to-shareholders" rel="noopener" target="_blank">股東信</a></td>
+</tr>
+<tr id="b305">
+<td class="rowhead">AWS；Trainium3</td>
+<td>「up to 3× faster」「over 5× higher output tokens per megawatt at similar latency per user」</td>
+<td>Trainium2</td>
+<td>在 Bedrock 上；模型未載，AWS Japan 的摘要指為 GPT-OSS-120B</td>
+<td class="num">2025-12-02</td>
+<td class="src"><a href="https://aws.amazon.com/about-aws/whats-new/2025/12/amazon-ec2-trn3-ultraservers/" rel="noopener" target="_blank">AWS What's New</a></td>
+</tr>
+<tr id="b306">
+<td class="rowhead">AWS；Trn3 UltraServer</td>
+<td>「up to 4.4x higher performance … 4x better performance/watt」</td>
+<td>Trn2 UltraServer</td>
+<td>UltraServer 對 UltraServer；無 workload</td>
+<td class="num">2025-12-02</td>
+<td class="src"><a href="https://aws.amazon.com/ec2/instance-types/trn3/" rel="noopener" target="_blank">AWS Trn3</a></td>
+</tr>
+<tr id="b307">
+<td class="rowhead">AWS；Inferentia2</td>
+<td>「up to 50 percent better performance per watt」</td>
+<td>其他可比的 EC2 執行個體</td>
+<td>2023 年上市時的說法；無功耗數字</td>
+<td class="num">2023-04-13</td>
+<td class="src"><a href="https://aws.amazon.com/blogs/aws/amazon-ec2-inf2-instances-for-low-cost-high-performance-generative-ai-inference-are-now-generally-available/" rel="noopener" target="_blank">AWS News Blog</a></td>
+</tr>
+<tr id="b308">
+<td class="rowhead">Google；Ironwood</td>
+<td>perf/W「2x relative to Trillium」</td>
+<td>Trillium</td>
+<td class="muted">無</td>
+<td class="num">2025-04-09</td>
+<td class="src"><a href="https://blog.google/innovation-and-ai/infrastructure-and-cloud/google-cloud/ironwood-tpu-age-of-inference/" rel="noopener" target="_blank">Google</a></td>
+</tr>
+<tr id="b309">
+<td class="rowhead">Google；TPU 8i</td>
+<td>「up to 80% performance-per-dollar improvement over Ironwood TPU, particularly at low-latency targets for large MoE models」；「up to 2x better performance-per-watt」</td>
+<td>Ironwood</td>
+<td>無絕對值；TPU 8i 尚無價格與文件頁（已宣布未出貨）</td>
+<td class="num">2026-04-22</td>
+<td class="src"><a href="https://cloud.google.com/blog/products/compute/tpu-8t-and-tpu-8i-technical-deep-dive" rel="noopener" target="_blank">Google Cloud</a></td>
+</tr>
+<tr id="b310">
+<td class="rowhead">NVIDIA；Vera Rubin NVL72</td>
+<td>「one-tenth the cost per million tokens」；「up to 10x more tokens per megawatt」</td>
+<td>GB200 NVL72</td>
+<td>Kimi-K2-Thinking、32K / 8K ISL / OSL；精度、引擎、concurrency、成本模型未載</td>
+<td class="num">2026-01-05</td>
+<td class="src"><a href="https://www.nvidia.com/en-us/data-center/vera-rubin-nvl72/" rel="noopener" target="_blank">NVIDIA</a></td>
+</tr>
+<tr id="b311">
+<td class="rowhead">NVIDIA；Vera Rubin NVL72</td>
+<td>tokens per MW「up to 30x」</td>
+<td>GB300 NVL72</td>
+<td>140K context 的 agentic coding；DeepSeek-V4-Pro 上 110、130、160 tok/s/user 分別為 2×、10×、30×</td>
+<td class="num">2026-08-24</td>
+<td class="src"><a href="https://www.storagereview.com/news/nvidia-groq-3-lpx-enters-full-production-3400-tokens-per-second-at-100k-context-256-lp30s-per-rack" rel="noopener" target="_blank">StorageReview</a>、<a href="https://developer.nvidia.com/blog/nvidia-vera-rubin-and-blackwell-set-a-new-standard-for-agentic-ai-performance-per-watt/" rel="noopener" target="_blank">NVIDIA</a></td>
+</tr>
+<tr id="b312">
+<td class="rowhead">NVIDIA；Rubin + LPX</td>
+<td>「up to 35x higher inference throughput per megawatt」；「up to 10x more revenue opportunity」</td>
+<td>Blackwell</td>
+<td>「for trillion-parameter models」；模型、精度、context、concurrency、機櫃功耗皆未載</td>
+<td class="num">2026-03-16</td>
+<td class="src"><a href="https://nvidianews.nvidia.com/news/nvidia-vera-rubin-platform" rel="noopener" target="_blank">NVIDIA</a></td>
+</tr>
+<tr id="b313">
+<td><span class="rh">CoreWeave；Cognition</span><span class="rh-sub"><span class="vh">（</span>客戶數字<span class="vh">）</span></span></td>
+<td>「4.8x increase in total token throughput」</td>
+<td>GB200 NVL72</td>
+<td>Cognition SWE-2、matched interactivity；同文的「45x lower token cost vs Blackwell」筆記標為待查證</td>
+<td class="num">2026-09-30</td>
+<td class="src"><a href="https://www.coreweave.com/blog/cognition-becomes-first-customer-for-nvidia-vera-rubin-nvl72-on-coreweave-cloud" rel="noopener" target="_blank">CoreWeave</a></td>
+</tr>
+<tr id="b314">
+<td class="rowhead">Cerebras；CS-4</td>
+<td>「up to 10 times more throughput per watt than CS-3」；比 GPU 方案快「up to 30 times」</td>
+<td>CS-3；GPU</td>
+<td>wafer 數、batch、context、concurrency 未載；SemiAnalysis 認為 perf/W「at best a slight improvement」</td>
+<td class="num">2026-08-18</td>
+<td class="src"><a href="https://www.cerebras.ai/blog/introducing-cerebras-cs-4" rel="noopener" target="_blank">Cerebras</a>、<a href="https://www.cerebras.ai/press-release/cerebras-unveils-cs-4-up-to-30-times-faster-than-gpu-based-solutions-3347356" rel="noopener" target="_blank">Cerebras 新聞稿</a>、<a href="https://newsletter.semianalysis.com/p/cerebrass-next-generation-cs-4-fast" rel="noopener" target="_blank">SemiAnalysis</a></td>
+</tr>
+<tr id="b315">
+<td class="rowhead">Cerebras + AMD Helios</td>
+<td>「up to five times more tokens per second per watt」</td>
+<td>只用 Cerebras 的配置</td>
+<td>內部模型推估（Kimi K2.6）；Cerebras 稱 AMD 方案 2026 Q4 進入量產</td>
+<td>2026-07-23 宣布（eWeek 報導 2026-07-26）</td>
+<td class="src"><a href="https://www.eweek.com/news/amd-cerebras-disaggregated-inference/" rel="noopener" target="_blank">eWeek</a>；<a href="https://www.sec.gov/Archives/edgar/data/2021728/000162828026056186/cbrsannouncesfinancialresu.htm" rel="noopener" target="_blank">Cerebras Q2 2026 results</a></td>
+</tr>
+<tr id="b316">
+<td><span class="rh">AMD；Helios</span><span class="rh-sub"><span class="vh">（</span>MI455X<span class="vh">）</span></span></td>
+<td>「up to 30% more tokens per dollar」</td>
+<td>Vera Rubin</td>
+<td>以預估售價計；無 workload</td>
+<td class="num">2026-07-24</td>
+<td class="src"><a href="https://moorinsightsstrategy.com/field-notes/amd-advancing-ai-2026-helios-ships-venice-swings-and-the-software-moat-narrows/" rel="noopener" target="_blank">Moor Insights</a></td>
+</tr>
+</tbody>
+</table></div></figure>
+<ul>
+<li id="b317">Trainium2 的「30–40%」約等於當時牌價本身的差距：trn2.48xlarge 的 Capacity Blocks 價比 p5e.48xlarge 低 25%、比 p5en.48xlarge 低 35%<span class="g g-d" title="等級 D：本文推算，附算式">D</span>，等同宣稱 16 顆 Trn2 的吞吐量與一台 8× H200 相當，不是對 Blackwell 的宣稱。</li>
+<li id="b318">NVIDIA 的倍數隨 context 與 interactivity 目標升高（32K / 8K 為 10×，140K 為 30×，加 LPX 為 35×）；InferenceX 在 DeepSeek-V4-Pro AgentX 量到的 Rubin 對 GB300 是 100 tok/s/user 時 2.1×、150 tok/s/user 時 7.2×（<span class="g g-a" title="等級 A：獨立第三方量測">A</span>，<a href="https://inferencex.semianalysis.com/blog/vera-rubin-nvl72-agentic-inference" rel="noopener" target="_blank">InferenceX 2026-09-14</a>）。</li>
+</ul>
+</div></div></div>
+<details class="srcs"><summary>本節來源（61）</summary><ul><li><a href="https://aws.amazon.com/ec2/capacityblocks/pricing/" target="_blank" rel="noopener">AWS Capacity Blocks</a></li><li><a href="https://b0.p.awsstatic.com/pricing/2.0/meteredUnitMaps/ec2/USD/current/ec2-ondemand-without-sec-sel/US%20East%20%28Ohio%29/Linux/index.json" target="_blank" rel="noopener">AWS 價目表</a></li><li><a href="https://aws.amazon.com/ec2/instance-types/trn3/" target="_blank" rel="noopener">AWS Trn3</a></li><li><a href="https://b0.p.awsstatic.com/pricing/2.0/meteredUnitMaps/ec2/USD/current/ec2-ondemand-without-sec-sel/US%20East%20%28N.%20Virginia%29/Linux/index.json" target="_blank" rel="noopener">AWS 價目表</a></li><li><a href="https://b0.p.awsstatic.com/pricing/2.0/meteredUnitMaps/ec2/USD/current/ec2-ondemand-without-sec-sel/Asia%20Pacific%20%28Tokyo%29/Linux/index.json" target="_blank" rel="noopener">AWS price list (Tokyo)</a></li><li><a href="https://cloud.google.com/tpu/pricing" target="_blank" rel="noopener">Cloud TPU pricing</a></li><li><a href="https://inferencex.semianalysis.com/blog/tpu-inferencex-full-steam" target="_blank" rel="noopener">InferenceX</a></li><li><a href="https://newsletter.semianalysis.com/p/tpuv7-google-takes-a-swing-at-the" target="_blank" rel="noopener">SemiAnalysis</a></li><li><a href="https://instances.vantage.sh/aws/ec2/p5en.48xlarge" target="_blank" rel="noopener">Vantage</a></li><li><a href="https://aws.amazon.com/ec2/capacityblocks/pricing" target="_blank" rel="noopener">AWS Capacity Blocks</a></li><li><a href="https://instances.vantage.sh/aws/ec2/p6-b200.48xlarge" target="_blank" rel="noopener">Vantage</a></li><li><a href="https://www.thundercompute.com/blog/ec2-gpu-instances" target="_blank" rel="noopener">Thunder Compute</a></li><li><a href="https://cloud.google.com/products/compute/pricing/accelerator-optimized" target="_blank" rel="noopener">Google Cloud</a></li><li><a href="https://www.oracle.com/cloud/compute/pricing/" target="_blank" rel="noopener">Oracle</a></li><li><a href="https://www.coreweave.com/pricing" target="_blank" rel="noopener">CoreWeave</a></li><li><a href="https://www.coreweave.com/blog/cognition-becomes-first-customer-for-nvidia-vera-rubin-nvl72-on-coreweave-cloud" target="_blank" rel="noopener">CoreWeave 2026-09-30</a></li><li><a href="https://lambda.ai/pricing" target="_blank" rel="noopener">Lambda</a></li><li><a href="https://nebius.com/prices" target="_blank" rel="noopener">Nebius</a></li><li><a href="https://prices.azure.com/api/retail/prices?$filter=contains%28armSkuName,%27GB200%27%29" target="_blank" rel="noopener">Azure 價目 API</a></li><li><a href="https://moorinsightsstrategy.com/field-notes/amd-advancing-ai-2026-helios-ships-venice-swings-and-the-software-moat-narrows/" target="_blank" rel="noopener">Moor Insights</a></li><li><a href="https://openrouter.ai/api/v1/models/openai/gpt-oss-120b/endpoints" target="_blank" rel="noopener">OpenRouter</a></li><li><a href="https://newsletter.semianalysis.com/p/cerebras-faster-tokens-please" target="_blank" rel="noopener">SemiAnalysis</a></li><li><a href="https://www.tomshardware.com/tech-industry/semiconductors/nvidias-20-billion-groq-deal-produces-its-first-chip" target="_blank" rel="noopener">Tom&#x27;s Hardware</a></li><li><a href="https://ca.finance.yahoo.com/news/aws-raising-gpu-instance-prices-134610388.html" target="_blank" rel="noopener">Yahoo Finance</a></li><li><a href="https://inferencex.semianalysis.com/api/v1/benchmarks?model=gpt-oss-120b" target="_blank" rel="noopener">InferenceX API，gpt-oss-120b</a></li><li><a href="https://claude.com/blog/trainium2-and-distillation" target="_blank" rel="noopener">Anthropic</a></li><li><a href="https://github.com/SemiAnalysisAI/InferenceX-app/blob/main/packages/constants/src/gpu-keys.ts" target="_blank" rel="noopener">gpu-keys.ts</a></li><li><a href="https://github.com/SemiAnalysisAI/InferenceX-app/blob/main/packages/constants/src/tco.ts" target="_blank" rel="noopener">tco.ts</a></li><li><a href="https://inferencex.semianalysis.com/blog/vera-rubin-nvl72-agentic-inference" target="_blank" rel="noopener">InferenceX 2026-09-14</a></li><li><a href="https://inferencex.semianalysis.com/blog/gb300-nvl72-vs-gb200-nvl72-dsv4-pro-vllm-fp4" target="_blank" rel="noopener">InferenceX 2026-05-27</a></li><li><a href="https://inferencex.semianalysis.com/blog/sparse-savings-persistent-demand-inside-glm53" target="_blank" rel="noopener">InferenceX 2026-09-28</a></li><li><a href="https://inferencex.semianalysis.com/blog/deepseekv4-16t-day-0-to-day-43-performance" target="_blank" rel="noopener">InferenceX 2026-06-09</a></li><li><a href="https://artificialanalysis.ai/models/gpt-oss-120b/providers" target="_blank" rel="noopener">AA</a></li><li><a href="https://openrouter.ai/api/v1/models/qwen/qwen3.8-27b/endpoints" target="_blank" rel="noopener">OpenRouter Qwen3.8 27B</a></li><li><a href="https://aws.amazon.com/blogs/machine-learning/optimizing-ai-responsiveness-a-practical-guide-to-amazon-bedrock-latency-optimized-inference/" target="_blank" rel="noopener">AWS ML Blog</a></li><li><a href="https://artificialanalysis.ai/models/kimi-k3/providers" target="_blank" rel="noopener">AA Kimi K3</a></li><li><a href="https://artificialanalysis.ai/models/glm-5-3/providers" target="_blank" rel="noopener">AA GLM-5.3</a></li><li><a href="https://newsletter.semianalysis.com/p/aws-trainium3-deep-dive-a-potential" target="_blank" rel="noopener">SemiAnalysis</a></li><li><a href="https://aws.amazon.com/blogs/aws/amazon-ec2-inf2-instances-for-low-cost-high-performance-generative-ai-inference-are-now-generally-available/" target="_blank" rel="noopener">AWS News Blog</a></li><li><a href="https://blog.google/innovation-and-ai/infrastructure-and-cloud/google-cloud/ironwood-tpu-age-of-inference/" target="_blank" rel="noopener">Google</a></li><li><a href="https://www.nvidia.com/en-us/data-center/gb200-nvl72/" target="_blank" rel="noopener">GB200</a></li><li><a href="https://www.nvidia.com/en-us/data-center/gb300-nvl72/" target="_blank" rel="noopener">GB300</a></li><li><a href="https://www.tomshardware.com/tech-industry/semiconductors/nvidia-enterprise-roadmap-rubin-rubin-ultra-feynman-and-silicon-photonics" target="_blank" rel="noopener">Tom&#x27;s Hardware</a></li><li><a href="https://developer.nvidia.com/blog/nvidia-vera-rubin-pod-seven-chips-five-rack-scale-systems-one-ai-supercomputer/" target="_blank" rel="noopener">NVIDIA</a></li><li><a href="https://www.datacenterdynamics.com/en/news/nvidias-rubin-ultra-nvl576-rack-expected-to-be-600kw-coming-second-half-of-2027/" target="_blank" rel="noopener">DCD</a></li><li><a href="https://www.storagereview.com/news/nvidia-groq-3-lpx-enters-full-production-3400-tokens-per-second-at-100k-context-256-lp30s-per-rack" target="_blank" rel="noopener">StorageReview</a></li><li><a href="https://www.amd.com/en/products/accelerators/instinct/mi400.html" target="_blank" rel="noopener">AMD</a></li><li><a href="https://futurumgroup.com/insights/cerebras-cs-4-makes-the-rack-the-new-chip-by-doubling-power-and-tripling-wafers/" target="_blank" rel="noopener">Futurum</a></li><li><a href="https://newsletter.semianalysis.com/p/cerebrass-next-generation-cs-4-fast" target="_blank" rel="noopener">SemiAnalysis</a></li><li><a href="https://www.nvidia.com/en-us/data-center/vera-rubin-nvl72/" target="_blank" rel="noopener">NVIDIA</a></li><li><a href="https://aws.amazon.com/ec2/instance-types/trn2/" target="_blank" rel="noopener">AWS Trn2</a></li><li><a href="https://www.aboutamazon.com/news/company-news/amazon-ceo-andy-jassy-2025-letter-to-shareholders" target="_blank" rel="noopener">股東信</a></li><li><a href="https://www.aboutamazon.com/news/aws/amazon-ai-chips-business-history" target="_blank" rel="noopener">About Amazon</a></li><li><a href="https://aws.amazon.com/about-aws/whats-new/2025/12/amazon-ec2-trn3-ultraservers/" target="_blank" rel="noopener">AWS What&#x27;s New</a></li><li><a href="https://cloud.google.com/blog/products/compute/tpu-8t-and-tpu-8i-technical-deep-dive" target="_blank" rel="noopener">Google Cloud</a></li><li><a href="https://developer.nvidia.com/blog/nvidia-vera-rubin-and-blackwell-set-a-new-standard-for-agentic-ai-performance-per-watt/" target="_blank" rel="noopener">NVIDIA</a></li><li><a href="https://nvidianews.nvidia.com/news/nvidia-vera-rubin-platform" target="_blank" rel="noopener">NVIDIA</a></li><li><a href="https://www.cerebras.ai/blog/introducing-cerebras-cs-4" target="_blank" rel="noopener">Cerebras</a></li><li><a href="https://www.cerebras.ai/press-release/cerebras-unveils-cs-4-up-to-30-times-faster-than-gpu-based-solutions-3347356" target="_blank" rel="noopener">Cerebras 新聞稿</a></li><li><a href="https://www.eweek.com/news/amd-cerebras-disaggregated-inference/" target="_blank" rel="noopener">eWeek</a></li><li><a href="https://www.sec.gov/Archives/edgar/data/2021728/000162828026056186/cbrsannouncesfinancialresu.htm" target="_blank" rel="noopener">Cerebras Q2 2026 results</a></li></ul></details></section>
+<section class="panel" role="tabpanel" id="s3" aria-labelledby="tab-s3"><div class="panel-head"><h2>各晶片的適用情境評分</h2><div class="sec-lead prose"><p id="b319">七項準則、六個平台共 42 格：NVIDIA GPU 有 4 格為「高」、沒有低於「中高」的格子；Cerebras 只有「每使用者速度」為「高」，另有 3 格為「低」；Inferentia2 有 4 格為「低」。評等是本文依前兩節證據所做的判斷（等級 <span class="g g-d" title="等級 D：本文推算，附算式">D</span>），不是量測；標 † 的 4 格沒有任何量測可依，只反映廠商宣稱或資料缺口。</p>
+</div></div>
+<div class="prose"><p id="b320">評等的尺度：<strong>高</strong> = 有獨立量測支持，且為六者中最佳或並列最佳；<strong>中高</strong>、<strong>中</strong>、<strong>中低</strong> = 依與最佳者的差距遞減；<strong>低</strong> = 有證據顯示明顯受限。每格只列一項最關鍵的事實，完整數字見<a class="xref" href="#t8-2">表 8-2</a> 至<a class="xref" href="#t8-17">表 8-17</a>。</p>
+
+<figure class="tbl" data-cols="7" data-rows="7" id="t8-19"><figcaption><strong>表 8-19 適用情境評分卡</strong>（等級 <span class="g g-d" title="等級 D：本文推算，附算式">D</span>；資料基準日 2026-10-04）</figcaption><div aria-label="表 8-19 適用情境評分卡" class="tbl-scroll" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th class="w1" scope="col">準則</th>
+<th class="w3" scope="col">Trainium</th>
+<th class="w3" scope="col">Inferentia2</th>
+<th class="w3" scope="col">TPU</th>
+<th class="w3" scope="col">NVIDIA GPU</th>
+<th class="w3" scope="col">AMD GPU</th>
+<th class="w3" scope="col">Cerebras</th>
+</tr>
+</thead>
+<tbody>
+<tr id="b321">
+<td class="rowhead">每使用者速度</td>
+<td><span class="rate rate-3">中</span> 一台 16 顆 Trainium2 加 spec decode 的單一串流為 102–144 tok/s<span class="g g-b" title="等級 B：廠商或夥伴公布，且揭露方法">B</span><a href="https://awsdocs-neuron.readthedocs-hosted.com/en/latest/libraries/nxd-inference/tutorials/trn2-llama3.1-405b-speculative-tutorial.html" rel="noopener" target="_blank">NxDI 405B</a></td>
+<td><span class="rate rate-1">低</span> Llama 3.1 8B 單一串流 38.8 tok/s<span class="g g-b" title="等級 B：廠商或夥伴公布，且揭露方法">B</span><a href="https://github.com/huggingface/optimum-neuron/blob/main/benchmark/vllm/data-parallel/llama3.1-8b/vllm-results-dp3.csv" rel="noopener" target="_blank">Optimum Neuron CSV</a></td>
+<td><span class="rate rate-3">中</span> Ironwood 在 100 tok/s/user 的每晶片吞吐量是 B200 的 0.86×，concurrency 256 的 TTFT 5.41 s 對 3.75 s（<span class="g g-a" title="等級 A：獨立第三方量測">A</span>；<span class="g g-d" title="等級 D：本文推算，附算式">D</span>）<a href="https://inferencex.semianalysis.com/blog/tpu-inferencex-full-steam" rel="noopener" target="_blank">InferenceX</a></td>
+<td><span class="rate rate-4">中高</span> 旗艦模型 concurrency 1–2 為 216–350 tok/s，Flash 級 621 tok/s<span class="g g-a" title="等級 A：獨立第三方量測">A</span><a href="https://inferencex.semianalysis.com/api/v1/benchmarks?model=Kimi-K3" rel="noopener" target="_blank">InferenceX API</a></td>
+<td><span class="rate rate-3">中</span> MI355X 同條件為 NVIDIA 最佳點的 0.61–0.83×（Kimi K3 172 對 258 tok/s）<span class="g g-a" title="等級 A：獨立第三方量測">A</span><a href="https://inferencex.semianalysis.com/api/v1/benchmarks?model=Kimi-K3" rel="noopener" target="_blank">InferenceX API</a></td>
+<td><span class="rate rate-5">高</span> gpt-oss-120b 1,764 t/s，是最快非 ASIC 端點的 5.5×<span class="g g-a" title="等級 A：獨立第三方量測">A</span><a href="https://artificialanalysis.ai/models/gpt-oss-120b/providers" rel="noopener" target="_blank">AA</a></td>
+</tr>
+<tr id="b322">
+<td class="rowhead">每 token 成本</td>
+<td><span class="rate rate-3">中</span> † 每 chip-hour $2.235 是 B200 的 18%，但沒有量測的每 token 成本；AWS 自稱比 H200 執行個體好 30–40%<span class="g g-c" title="等級 C：廠商宣稱或規格，未揭露方法">C</span><a href="https://aws.amazon.com/ec2/instance-types/trn2/" rel="noopener" target="_blank">AWS Trn2</a></td>
+<td><span class="rate rate-2">中低</span> Llama 3.1 8B 每百萬 output tokens $2.94（us-east-1 on-demand，<span class="g g-d" title="等級 D：本文推算，附算式">D</span>）<a href="https://github.com/huggingface/optimum-neuron/blob/main/benchmark/vllm/data-parallel/llama3.1-8b/vllm-results-dp3.csv" rel="noopener" target="_blank">Optimum Neuron CSV</a></td>
+<td><span class="rate rate-3">中</span> 同條件點 3 年承諾 $1.44，Google 的 B200 3 年 CUD $1.99；on-demand $3.20 高於 neocloud 的 B200 $1.88–2.41<span class="g g-d" title="等級 D：本文推算，附算式">D</span><a href="https://cloud.google.com/tpu/pricing" rel="noopener" target="_blank">Cloud TPU pricing</a></td>
+<td><span class="rate rate-4">中高</span> 同一 AgentX 操作點的模型化成本最低（DeepSeek-V4-Pro：Rubin $0.69、GB300 $1.34 每百萬 output tokens），但 AWS 的 B200 Capacity Blocks 到 2026-10-07 將在三個月內累計上漲約 38%（<a class="xref" href="#t8-14">表 8-14</a>；D：1.20 × 1.15）<a href="https://aws.amazon.com/ec2/capacityblocks/pricing" rel="noopener" target="_blank">AWS Capacity Blocks</a></td>
+<td><span class="rate rate-3">中</span> 隨模型而異；GLM-5.2 上 MI355X $3.75 低於 B200 $3.99，DeepSeek-V4-Pro 上 $2.74 高於 GB300 $1.34（<a class="xref" href="#t8-14">表 8-14</a>）</td>
+<td><span class="rate rate-2">中低</span> gpt-oss-120b 單次請求成本是 Groq、Azure 的 2.2 倍，快取命中不打折<span class="g g-d" title="等級 D：本文推算，附算式">D</span><a href="https://openrouter.ai/api/v1/models/openai/gpt-oss-120b/endpoints" rel="noopener" target="_blank">OpenRouter</a></td>
+</tr>
+<tr id="b323">
+<td class="rowhead">長上下文</td>
+<td><span class="rate rate-2">中低</span> 公開 recipe 最長 16,384 tokens；Bedrock latency-optimized 的 Llama 3.1 405B 上限 11K <a href="https://awsdocs-neuron.readthedocs-hosted.com/en/latest/vllm-neuron/docs/tutorials/tutorial-gpt-oss.html" rel="noopener" target="_blank">vLLM Neuron</a>、<a href="https://docs.aws.amazon.com/bedrock/latest/userguide/latency-optimized-inference.html" rel="noopener" target="_blank">Bedrock User Guide</a></td>
+<td><span class="rate rate-1">低</span> 實測可服務的最大 context 為 32,768（6 顆晶片、11B 模型），單晶片機型為 1,024<span class="g g-a" title="等級 A：獨立第三方量測">A</span><a href="https://zenn.dev/exwzd/articles/20250930-inferentia-llama" rel="noopener" target="_blank">Exawizards</a></td>
+<td><span class="rate rate-3">中</span> Gemini 的 1M context 在 TPU 上服務，但開源模型的公開 recipe 為 9,216–32,768 tokens，8K 輸入以上沒有獨立量測 <a href="https://github.com/AI-Hypercomputer/tpu-recipes/tree/main/inference/ironwood/vLLM" rel="noopener" target="_blank">tpu-recipes</a></td>
+<td><span class="rate rate-5">高</span> AgentX 重播的輸入 p99 為 675K tokens、p50 為 88K<span class="g g-a" title="等級 A：獨立第三方量測">A</span><a href="https://inferencex.semianalysis.com/blog/deepseek-v4-pro-agentx-mi355x-vs-b200-august" rel="noopener" target="_blank">InferenceX 2026-08-25</a></td>
+<td><span class="rate rate-4">中高</span> MI355X 跑同一組 AgentX trace；AMD 自己的 Kimi K3 recipe 預設 <code>--max-model-len 16384</code><span class="g g-c" title="等級 C：廠商宣稱或規格，未揭露方法">C</span><a href="https://www.amd.com/en/developer/resources/technical-articles/2026/kimi-k3-on-amd-instinct-gpus.html" rel="noopener" target="_blank">AMD</a></td>
+<td><span class="rate rate-1">低</span> 公開 API 上限 131K；Qwen3.8 27B 在 OpenRouter 為 65,536，他處為 262,144 以上 <a href="https://inference-docs.cerebras.ai/models/overview" rel="noopener" target="_blank">Cerebras docs</a></td>
+</tr>
+<tr id="b324">
+<td class="rowhead">開源旗艦模型的可用性</td>
+<td><span class="rate rate-1">低</span> AWS 沒有 Kimi、GLM、DeepSeek 的第一方 recipe；社群移植的 GLM-5.2 為 2.96 tok/s、sequence 2,048<span class="g g-b" title="等級 B：廠商或夥伴公布，且揭露方法">B</span><a href="https://github.com/aws-neuron/neuronx-distributed-inference/blob/main/contrib/models/GLM-5.2/README.md" rel="noopener" target="_blank">NxDI contrib</a></td>
+<td><span class="rate rate-1">低</span> 沒有任何一個目標模型；gpt-oss 等新模型只支援 Trn2 / Trn3 <a href="https://github.com/vllm-project/vllm-neuron/blob/release-0.24.0.1.1.0/README.md" rel="noopener" target="_blank">vLLM Neuron README</a></td>
+<td><span class="rate rate-2">中低</span> Kimi K3、GLM-5.1 至 5.3、DeepSeek V4 Pro、Qwen3.8 都不在 support matrix；Qwen3.5-397B 與 DeepSeek V3 / R1 有 recipe <a href="https://github.com/vllm-project/tpu-inference/tree/main/support_matrices" rel="noopener" target="_blank">support matrices</a></td>
+<td><span class="rate rate-5">高</span> DeepSeek-V4.1-Flash day 0 即在 H100、H200、B200、B300、GB200、GB300 六種 SKU 上執行<span class="g g-a" title="等級 A：獨立第三方量測">A</span><a href="https://inferencex.semianalysis.com/blog/engrams-embedding-entendre-codesign" rel="noopener" target="_blank">InferenceX 2026-09-18</a></td>
+<td><span class="rate rate-4">中高</span> MI355X 有 Kimi K3、GLM-5.2、DeepSeek-V4-Pro、V4.1-Flash 的結果，但 V4.1-Flash 第 7 天的 perf per dollar 仍比 B200 差 2–4 倍<span class="g g-a" title="等級 A：獨立第三方量測">A</span><a href="https://inferencex.semianalysis.com/blog/engrams-embedding-entendre-codesign" rel="noopener" target="_blank">InferenceX 2026-09-18</a></td>
+<td><span class="rate rate-1">低</span> 公開 API 只有 gpt-oss-120b 與 qwen-3.8-27b，四個家族的旗艦都不在公開目錄 <a href="https://inference-docs.cerebras.ai/models/overview" rel="noopener" target="_blank">Cerebras docs</a></td>
+</tr>
+<tr id="b325">
+<td class="rowhead">取得容量與區域覆蓋</td>
+<td><span class="rate rate-1">低</span> Trn2 只能用 Capacity Blocks，且只在 Ohio、Hyderabad、Melbourne、São Paulo；Trn3 無公開價格與 Region；Tokyo、Singapore、Taipei 都沒有 <a href="https://docs.aws.amazon.com/ec2/latest/instancetypes/ec2-instance-regions.html" rel="noopener" target="_blank">AWS EC2 Regions</a></td>
+<td><span class="rate rate-4">中高</span> on-demand；至少 14 個 Region 有牌價，含 Tokyo、Singapore、Sydney、Mumbai，Taipei 沒有 <a href="https://b0.p.awsstatic.com/pricing/2.0/meteredUnitMaps/ec2/USD/current/ec2-ondemand-without-sec-sel/US%20East%20%28N.%20Virginia%29/Linux/index.json" rel="noopener" target="_blank">AWS 價目表</a></td>
+<td><span class="rate rate-2">中低</span> 單一雲；Ironwood 的 zone 在 Region 文件只列 us-central1，on-demand 不保證有容量 <a href="https://docs.cloud.google.com/tpu/docs/regions-zones" rel="noopener" target="_blank">TPU Regions</a></td>
+<td><span class="rate rate-4">中高</span> 七家雲有公開牌價（<a class="xref" href="#t8-9">表 8-9</a>）；但 Vera Rubin 只有 CoreWeave 的 limited availability，GB300、B300 在 CoreWeave 為 contact sales <a href="https://www.coreweave.com/pricing" rel="noopener" target="_blank">CoreWeave</a></td>
+<td><span class="rate rate-2">中低</span> 公開牌價只查到 OCI（MI300X $6.00、MI355X $8.60）；Helios 與 MI455X 沒有任何雲端 SKU <a href="https://www.oracle.com/cloud/compute/pricing/" rel="noopener" target="_blank">Oracle</a></td>
+<td><span class="rate rate-1">低</span> Cerebras Code 兩個方案都售罄，旗艦模型只供 enterprise，管理階層稱「Everyone is in a capacity crunch」<a href="https://www.cerebras.ai/code" rel="noopener" target="_blank">Cerebras Code</a>、<a href="https://venturebeat.com/technology/cerebras-says-its-chips-run-a-trillion-parameter-ai-model-nearly-7-times-faster-than-gpu-clouds" rel="noopener" target="_blank">VentureBeat</a></td>
+</tr>
+<tr id="b326">
+<td class="rowhead">軟體成熟度與工程負擔</td>
+<td><span class="rate rate-2">中低</span> vLLM Neuron 為 Beta，支援表中每個模型的 Perf Tuning 欄都是「In progress」<a href="https://github.com/vllm-project/vllm-neuron/blob/release-0.24.0.1.1.0/README.md" rel="noopener" target="_blank">vLLM Neuron README</a></td>
+<td><span class="rate rate-1">低</span> Inf2 路徑凍結在 PyTorch 2.9 / vLLM 0.16.0，每個配置需 12–38 分鐘的 ahead-of-time 編譯 <a href="https://zenn.dev/exwzd/articles/20250827_inferentia_compile" rel="noopener" target="_blank">Exawizards</a></td>
+<td><span class="rate rate-2">中低</span> 對外的 TorchTPU vLLM stack 仍是 private beta；support matrix 的量化、MLA、MoE 與 multi-host 多為 Untested <a href="https://github.com/vllm-project/tpu-inference/tree/main/support_matrices" rel="noopener" target="_blank">support matrices</a></td>
+<td><span class="rate rate-5">高</span> 同一套 stack 涵蓋 vLLM、SGLang、TensorRT-LLM，並整合 AWS、Google Cloud、Azure、OCI（Dynamo 1.0）<a href="https://developer.nvidia.com/blog/nvidia-dynamo-1-production-ready/" rel="noopener" target="_blank">NVIDIA</a></td>
+<td><span class="rate rate-3">中</span> MI355X 上 DeepSeek-V4-Pro 從首次可跑到調校後，26 天內每 GPU 吞吐量提升 110.5 倍，day 0 不成熟但追趕快<span class="g g-a" title="等級 A：獨立第三方量測">A</span><a href="https://inferencex.semianalysis.com/blog/mi355x-deepseek-v4-pro-sglang-110x-in-26-days" rel="noopener" target="_blank">InferenceX 2026-05-26</a></td>
+<td><span class="rate rate-4">中高</span> 代管 API 相容 OpenAI，含 prompt caching、strict structured outputs、parallel tools，使用者不需自管引擎；但 2025-01 以來有 14 次模型下架 <a href="https://inference-docs.cerebras.ai/support/deprecation" rel="noopener" target="_blank">Cerebras docs</a></td>
+</tr>
+<tr id="b327">
+<td class="rowhead">能效</td>
+<td><span class="rate rate-3">中</span> † 只有相對宣稱（Trainium3「over 5× higher output tokens per megawatt」）；AWS 未揭露任何一代的晶片功耗<span class="g g-c" title="等級 C：廠商宣稱或規格，未揭露方法">C</span><a href="https://aws.amazon.com/about-aws/whats-new/2025/12/amazon-ec2-trn3-ultraservers/" rel="noopener" target="_blank">AWS What's New</a></td>
+<td><span class="rate rate-2">中低</span> † 沒有功耗資料，只有 2023 年「up to 50 percent better performance per watt」的宣稱<span class="g g-c" title="等級 C：廠商宣稱或規格，未揭露方法">C</span><a href="https://aws.amazon.com/blogs/aws/amazon-ec2-inf2-instances-for-low-cost-high-performance-generative-ai-inference-are-now-generally-available/" rel="noopener" target="_blank">AWS News Blog</a></td>
+<td><span class="rate rate-4">中高</span> 以 InferenceX 假設的 all-in 1.207 kW 計，同條件點每 MW 的 total tok/s 是 B200 的 1.49 倍（<span class="g g-d" title="等級 D：本文推算，附算式">D</span>：(9,364 ÷ 1.207) ÷ (8,903 ÷ 1.71)）；無實測功耗 <a href="https://inferencex.semianalysis.com/blog/tpu-inferencex-full-steam" rel="noopener" target="_blank">InferenceX</a></td>
+<td><span class="rate rate-5">高</span> Vera Rubin 在 DeepSeek-V4-Pro AgentX、100 tok/s/user 為 59.4M total tok/s per MW，GB300 為 28.5M（吞吐量 A，功耗為模型值）<a href="https://inferencex.semianalysis.com/blog/vera-rubin-nvl72-agentic-inference" rel="noopener" target="_blank">InferenceX 2026-09-14</a></td>
+<td><span class="rate rate-3">中</span> 實測每 output token 能耗 MI355X 0.91 J，B200 0.63 J、GB300 0.29 J（DeepSeek-V4.1-Flash，<span class="g g-a" title="等級 A：獨立第三方量測">A</span>）<a href="https://inferencex.semianalysis.com/api/v1/benchmarks?model=DeepSeek-V4.1-Flash" rel="noopener" target="_blank">InferenceX API</a></td>
+<td><span class="rate rate-2">中低</span> † 沒有獨立的 tokens per watt 量測；CS-4 機櫃 125–135 kW，SemiAnalysis 認為 perf/W 對 CS-3「at best a slight improvement」<a href="https://newsletter.semianalysis.com/p/cerebrass-next-generation-cs-4-fast" rel="noopener" target="_blank">SemiAnalysis</a></td>
+</tr>
+</tbody>
+</table></div></figure>
+<p id="b328">會改變評等的證據：</p>
+<ul>
+<li id="b329"><strong>Trainium</strong>：任何獨立量測，或 AWS 公布 Trainium3 的絕對 tok/s、TTFT 與 tokens per MW，會改寫速度、成本、能效三格。InferenceX 的 OperatorX 已有 16 顆 Trn3 的 runner 但沒有結果（<a href="https://github.com/SemiAnalysisAI/InferenceX/blob/main/operatorx/CLUSTERS.md" rel="noopener" target="_blank">CLUSTERS.md</a>）；Trn3 出現公開價格或東亞 Region 會改變容量一格。</li>
+<li id="b330"><strong>TPU</strong>：TPU 8i GA 並以原生 FP4 進入 InferenceX 與 AgentX；TorchTPU stack 開源，Kimi K3 與 GLM-5.3 進入 support matrix。這會同時影響速度、成本、模型可用性與軟體四格。</li>
+<li id="b331"><strong>NVIDIA</strong>：LPX 出現公開 SKU、價格與機櫃功耗，每使用者速度可升為「高」；Vera Rubin 的公開牌價與 NVL72 級機櫃功耗的一手數字會檢驗成本與能效。未 pinned 的 spec decode acceptance 若進入 AgentX，每使用者速度可能下修。</li>
+<li id="b332"><strong>AMD</strong>：Helios 或 MI455X 的雲端 SKU 與 InferenceX 結果，會改變容量、成本與能效三格。</li>
+<li id="b333"><strong>Cerebras</strong>：公布每條 pipeline 的 concurrency、系統吞吐量與功耗，成本與能效才評得出來；公開目錄加入四個家族的旗艦，或 context 超過 131K，會改變模型可用性與長上下文兩格。</li>
+<li id="b334"><strong>Inferentia2</strong>：目前沒有 Inferentia3，Neuron 的新功能也只給 Trn2 / Trn3；除非 AWS 改變路線，各格不會上調。</li>
+<li id="b335"><strong>共同</strong>：MLPerf Inference v6.x 的按加速器成績表（本次未能讀取）可交叉驗證 GPU 的吞吐量；任何把 Trainium、TPU、Cerebras 放進同一 harness 的量測，都會取代<a class="xref" href="#t8-12">表 8-12</a> 的推算。</li>
+</ul>
+</div>
+<details class="srcs"><summary>本節來源（37）</summary><ul><li><a href="https://awsdocs-neuron.readthedocs-hosted.com/en/latest/libraries/nxd-inference/tutorials/trn2-llama3.1-405b-speculative-tutorial.html" target="_blank" rel="noopener">NxDI 405B</a></li><li><a href="https://github.com/huggingface/optimum-neuron/blob/main/benchmark/vllm/data-parallel/llama3.1-8b/vllm-results-dp3.csv" target="_blank" rel="noopener">Optimum Neuron CSV</a></li><li><a href="https://inferencex.semianalysis.com/blog/tpu-inferencex-full-steam" target="_blank" rel="noopener">InferenceX</a></li><li><a href="https://inferencex.semianalysis.com/api/v1/benchmarks?model=Kimi-K3" target="_blank" rel="noopener">InferenceX API</a></li><li><a href="https://artificialanalysis.ai/models/gpt-oss-120b/providers" target="_blank" rel="noopener">AA</a></li><li><a href="https://aws.amazon.com/ec2/instance-types/trn2/" target="_blank" rel="noopener">AWS Trn2</a></li><li><a href="https://cloud.google.com/tpu/pricing" target="_blank" rel="noopener">Cloud TPU pricing</a></li><li><a href="https://aws.amazon.com/ec2/capacityblocks/pricing" target="_blank" rel="noopener">AWS Capacity Blocks</a></li><li><a href="https://openrouter.ai/api/v1/models/openai/gpt-oss-120b/endpoints" target="_blank" rel="noopener">OpenRouter</a></li><li><a href="https://awsdocs-neuron.readthedocs-hosted.com/en/latest/vllm-neuron/docs/tutorials/tutorial-gpt-oss.html" target="_blank" rel="noopener">vLLM Neuron</a></li><li><a href="https://docs.aws.amazon.com/bedrock/latest/userguide/latency-optimized-inference.html" target="_blank" rel="noopener">Bedrock User Guide</a></li><li><a href="https://zenn.dev/exwzd/articles/20250930-inferentia-llama" target="_blank" rel="noopener">Exawizards</a></li><li><a href="https://github.com/AI-Hypercomputer/tpu-recipes/tree/main/inference/ironwood/vLLM" target="_blank" rel="noopener">tpu-recipes</a></li><li><a href="https://inferencex.semianalysis.com/blog/deepseek-v4-pro-agentx-mi355x-vs-b200-august" target="_blank" rel="noopener">InferenceX 2026-08-25</a></li><li><a href="https://www.amd.com/en/developer/resources/technical-articles/2026/kimi-k3-on-amd-instinct-gpus.html" target="_blank" rel="noopener">AMD</a></li><li><a href="https://inference-docs.cerebras.ai/models/overview" target="_blank" rel="noopener">Cerebras docs</a></li><li><a href="https://github.com/aws-neuron/neuronx-distributed-inference/blob/main/contrib/models/GLM-5.2/README.md" target="_blank" rel="noopener">NxDI contrib</a></li><li><a href="https://github.com/vllm-project/vllm-neuron/blob/release-0.24.0.1.1.0/README.md" target="_blank" rel="noopener">vLLM Neuron README</a></li><li><a href="https://github.com/vllm-project/tpu-inference/tree/main/support_matrices" target="_blank" rel="noopener">support matrices</a></li><li><a href="https://inferencex.semianalysis.com/blog/engrams-embedding-entendre-codesign" target="_blank" rel="noopener">InferenceX 2026-09-18</a></li><li><a href="https://docs.aws.amazon.com/ec2/latest/instancetypes/ec2-instance-regions.html" target="_blank" rel="noopener">AWS EC2 Regions</a></li><li><a href="https://b0.p.awsstatic.com/pricing/2.0/meteredUnitMaps/ec2/USD/current/ec2-ondemand-without-sec-sel/US%20East%20%28N.%20Virginia%29/Linux/index.json" target="_blank" rel="noopener">AWS 價目表</a></li><li><a href="https://docs.cloud.google.com/tpu/docs/regions-zones" target="_blank" rel="noopener">TPU Regions</a></li><li><a href="https://www.coreweave.com/pricing" target="_blank" rel="noopener">CoreWeave</a></li><li><a href="https://www.oracle.com/cloud/compute/pricing/" target="_blank" rel="noopener">Oracle</a></li><li><a href="https://www.cerebras.ai/code" target="_blank" rel="noopener">Cerebras Code</a></li><li><a href="https://venturebeat.com/technology/cerebras-says-its-chips-run-a-trillion-parameter-ai-model-nearly-7-times-faster-than-gpu-clouds" target="_blank" rel="noopener">VentureBeat</a></li><li><a href="https://zenn.dev/exwzd/articles/20250827_inferentia_compile" target="_blank" rel="noopener">Exawizards</a></li><li><a href="https://developer.nvidia.com/blog/nvidia-dynamo-1-production-ready/" target="_blank" rel="noopener">NVIDIA</a></li><li><a href="https://inferencex.semianalysis.com/blog/mi355x-deepseek-v4-pro-sglang-110x-in-26-days" target="_blank" rel="noopener">InferenceX 2026-05-26</a></li><li><a href="https://inference-docs.cerebras.ai/support/deprecation" target="_blank" rel="noopener">Cerebras docs</a></li><li><a href="https://aws.amazon.com/about-aws/whats-new/2025/12/amazon-ec2-trn3-ultraservers/" target="_blank" rel="noopener">AWS What&#x27;s New</a></li><li><a href="https://aws.amazon.com/blogs/aws/amazon-ec2-inf2-instances-for-low-cost-high-performance-generative-ai-inference-are-now-generally-available/" target="_blank" rel="noopener">AWS News Blog</a></li><li><a href="https://inferencex.semianalysis.com/blog/vera-rubin-nvl72-agentic-inference" target="_blank" rel="noopener">InferenceX 2026-09-14</a></li><li><a href="https://inferencex.semianalysis.com/api/v1/benchmarks?model=DeepSeek-V4.1-Flash" target="_blank" rel="noopener">InferenceX API</a></li><li><a href="https://newsletter.semianalysis.com/p/cerebrass-next-generation-cs-4-fast" target="_blank" rel="noopener">SemiAnalysis</a></li><li><a href="https://github.com/SemiAnalysisAI/InferenceX/blob/main/operatorx/CLUSTERS.md" target="_blank" rel="noopener">CLUSTERS.md</a></li></ul></details></section></div>
+<nav class="pager" aria-label="上一張與下一張"><a href="07-long-context.html"><span>← 07</span>長上下文 200K / 1M</a><a class="nx" href="09-deployment.html"><span>09 →</span>部署模式</a></nav>
+<footer class="foot"><span>資料截至 2026-10-04；逐項查核於 2026-10-05 完成。模型與價格每週在變，引用前請對照來源。</span><span class="code">IA-08 · REV 2026-10-05</span></footer>
+</main>
+</div>
+<script src="assets/site.js" defer></script>
+</body>
+</html>

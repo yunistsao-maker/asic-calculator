@@ -1,0 +1,10354 @@
+[
+{
+"url": "https://awsdocs-neuron.readthedocs-hosted.com/en/latest/about-neuron/arch/neuron-hardware/trainium2.html",
+"name": "Neuron docs: Trainium2",
+"names": [
+"Neuron docs: Trainium2"
+],
+"chs": [
+"01"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://www.nextplatform.com/2025/12/03/with-trainium4-aws-will-crank-up-everything-but-the-clocks/",
+"name": "The Next Platform: Trainium4",
+"names": [
+"The Next Platform: Trainium4",
+"The Next Platform, 2025-12-03"
+],
+"chs": [
+"01",
+"02"
+],
+"status": "web",
+"added": false
+},
+{
+"url": "https://awsdocs-neuron.readthedocs-hosted.com/en/latest/about-neuron/arch/neuron-hardware/trainium3.html",
+"name": "Neuron docs: Trainium3",
+"names": [
+"Neuron docs: Trainium3"
+],
+"chs": [
+"01"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://newsletter.semianalysis.com/p/aws-trainium3-deep-dive-a-potential",
+"name": "SemiAnalysis: Trainium3",
+"names": [
+"SemiAnalysis: Trainium3",
+"SemiAnalysis",
+"SemiAnalysis Trainium3 深度分析"
+],
+"chs": [
+"01",
+"03",
+"04",
+"05",
+"08"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://www.aboutamazon.com/news/aws/trainium-3-ultraserver-faster-ai-training-lower-cost",
+"name": "About Amazon: Trainium3 UltraServers",
+"names": [
+"About Amazon: Trainium3 UltraServers",
+"About Amazon",
+"About Amazon Trainium3",
+"About Amazon, 2 Dec 2025"
+],
+"chs": [
+"01",
+"03",
+"05",
+"08",
+"09"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://www.aboutamazon.com/news/aws/amazon-open-ai-strategic-partnership-investment",
+"name": "About Amazon: OpenAI",
+"names": [
+"About Amazon: OpenAI",
+"About Amazon",
+"About Amazon OpenAI 合作"
+],
+"chs": [
+"01",
+"03",
+"05"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://awsdocs-neuron.readthedocs-hosted.com/en/latest/about-neuron/arch/neuron-hardware/inferentia2.html",
+"name": "Neuron docs: Inferentia2",
+"names": [
+"Neuron docs: Inferentia2"
+],
+"chs": [
+"01"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://aws.amazon.com/blogs/aws/amazon-ec2-inf2-instances-for-low-cost-high-performance-generative-ai-inference-are-now-generally-available/",
+"name": "AWS News Blog",
+"names": [
+"AWS News Blog",
+"AWS News Blog: Inf2 GA"
+],
+"chs": [
+"01",
+"08"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://docs.cloud.google.com/tpu/docs/v6e",
+"name": "Google TPU v6e doc",
+"names": [
+"Google TPU v6e doc"
+],
+"chs": [
+"01"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://docs.cloud.google.com/tpu/docs/release-notes",
+"name": "Cloud TPU release notes",
+"names": [
+"Cloud TPU release notes"
+],
+"chs": [
+"01",
+"09"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://docs.cloud.google.com/tpu/docs/tpu7x",
+"name": "Google TPU7x doc",
+"names": [
+"Google TPU7x doc",
+"TPU7x 文件",
+"TPU7x doc"
+],
+"chs": [
+"01",
+"03",
+"07"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://cloud.google.com/blog/products/compute/tpu-8t-and-tpu-8i-technical-deep-dive",
+"name": "Google Cloud: TPU 8 deep dive",
+"names": [
+"Google Cloud: TPU 8 deep dive",
+"TPU 8t/8i deep dive",
+"TPU 8 deep dive",
+"Google Cloud"
+],
+"chs": [
+"01",
+"06",
+"07",
+"08"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://blog.google/innovation-and-ai/infrastructure-and-cloud/google-cloud/eighth-generation-tpu-agentic-era/",
+"name": "Google: eighth-generation TPU",
+"names": [
+"Google: eighth-generation TPU",
+"Google, 22 Apr 2026",
+"Google TPU 8"
+],
+"chs": [
+"01",
+"07",
+"09"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://www.coreweave.com/pricing",
+"name": "CoreWeave pricing",
+"names": [
+"CoreWeave pricing",
+"CoreWeave"
+],
+"chs": [
+"01",
+"03",
+"07",
+"08",
+"09"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://instances.vantage.sh/aws/ec2/p5en.48xlarge",
+"name": "Vantage: p5en",
+"names": [
+"Vantage: p5en",
+"Vantage"
+],
+"chs": [
+"01",
+"08"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://developer.nvidia.com/blog/inside-the-nvidia-rubin-platform-six-new-chips-one-ai-supercomputer/",
+"name": "NVIDIA: Inside the Rubin platform",
+"names": [
+"NVIDIA: Inside the Rubin platform"
+],
+"chs": [
+"01"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://www.nvidia.com/en-us/data-center/gb200-nvl72/",
+"name": "NVIDIA GB200 NVL72",
+"names": [
+"NVIDIA GB200 NVL72",
+"NVIDIA GB200 NVL72 page",
+"NVIDIA",
+"GB200 NVL72"
+],
+"chs": [
+"01",
+"03",
+"07",
+"08",
+"09"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://www.nvidia.com/en-us/data-center/gb300-nvl72/",
+"name": "NVIDIA GB300 NVL72",
+"names": [
+"NVIDIA GB300 NVL72",
+"NVIDIA",
+"GB300 NVL72",
+"GB300"
+],
+"chs": [
+"01",
+"03",
+"07",
+"08"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://www.nvidia.com/en-us/data-center/vera-rubin-nvl72/",
+"name": "NVIDIA Vera Rubin NVL72",
+"names": [
+"NVIDIA Vera Rubin NVL72",
+"NVIDIA",
+"NVIDIA Vera Rubin NVL72 page",
+"Vera Rubin NVL72"
+],
+"chs": [
+"01",
+"03",
+"07",
+"08",
+"09"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://www.tomshardware.com/tech-industry/semiconductors/nvidia-enterprise-roadmap-rubin-rubin-ultra-feynman-and-silicon-photonics",
+"name": "Tom's Hardware: NVIDIA roadmap",
+"names": [
+"Tom's Hardware: NVIDIA roadmap",
+"Tom's Hardware"
+],
+"chs": [
+"01",
+"08"
+],
+"status": "web",
+"added": false
+},
+{
+"url": "https://www.nvidia.com/en-us/data-center/lpx/",
+"name": "NVIDIA Groq 3 LPX",
+"names": [
+"NVIDIA Groq 3 LPX",
+"NVIDIA LPX"
+],
+"chs": [
+"01",
+"07"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://www.storagereview.com/news/nvidia-groq-3-lpx-everything-we-know",
+"name": "StorageReview: LPX",
+"names": [
+"StorageReview: LPX"
+],
+"chs": [
+"01"
+],
+"status": "web",
+"added": false
+},
+{
+"url": "https://newsletter.semianalysis.com/p/nvidia-the-inference-kingdom-expands",
+"name": "SemiAnalysis: GTC 2026",
+"names": [
+"SemiAnalysis: GTC 2026"
+],
+"chs": [
+"01"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://www.oracle.com/cloud/compute/pricing/",
+"name": "OCI pricing",
+"names": [
+"OCI pricing",
+"Oracle",
+"Oracle Cloud compute pricing"
+],
+"chs": [
+"01",
+"03",
+"08",
+"09"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://www.amd.com/en/products/accelerators/instinct/mi400.html",
+"name": "AMD Instinct MI400",
+"names": [
+"AMD Instinct MI400",
+"AMD",
+"AMD MI400"
+],
+"chs": [
+"01",
+"03",
+"07",
+"08"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://www.theregister.com/2026/01/07/mi500x_amd_ai/",
+"name": "The Register: AMD",
+"names": [
+"The Register: AMD"
+],
+"chs": [
+"01"
+],
+"status": "web",
+"added": false
+},
+{
+"url": "https://www.cerebras.ai/press-release/cerebras-announces-third-generation-wafer-scale-engine",
+"name": "Cerebras: WSE-3 press release",
+"names": [
+"Cerebras: WSE-3 press release"
+],
+"chs": [
+"01"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://www.sec.gov/Archives/edgar/data/2021728/000162828026025762/cerebras-sx1april2026.htm",
+"name": "Cerebras S-1",
+"names": [
+"Cerebras S-1"
+],
+"chs": [
+"01",
+"05"
+],
+"status": "web",
+"added": false
+},
+{
+"url": "https://newsletter.semianalysis.com/p/cerebras-faster-tokens-please",
+"name": "SemiAnalysis: Cerebras",
+"names": [
+"SemiAnalysis: Cerebras",
+"SemiAnalysis",
+"SemiAnalysis, Cerebras",
+"SemiAnalysis CS-3"
+],
+"chs": [
+"01",
+"02",
+"03",
+"04",
+"05",
+"06",
+"07",
+"08",
+"09"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://www.cerebras.ai/press-release/cerebras-unveils-cs-4-up-to-30-times-faster-than-gpu-based-solutions-3347356",
+"name": "Cerebras: CS-4 press release",
+"names": [
+"Cerebras: CS-4 press release",
+"Cerebras 新聞稿",
+"Cerebras press release, 18 Aug 2026"
+],
+"chs": [
+"01",
+"08",
+"09"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://thenextweb.com/news/cerebras-cs-4-wafer-scale-ai-inference-system",
+"name": "TNW: CS-4",
+"names": [
+"TNW: CS-4"
+],
+"chs": [
+"01"
+],
+"status": "web",
+"added": false
+},
+{
+"url": "https://www.tomshardware.com/tech-industry/artificial-intelligence/amazon-launches-trainium3-ai-accelerator-competing-directly-against-blackwell-ultra-in-fp8-performance-new-trn3-gen2-ultraserver-takes-vertical-scaling-notes-from-nvidias-playbook",
+"name": "Tom's Hardware: Trainium3",
+"names": [
+"Tom's Hardware: Trainium3"
+],
+"chs": [
+"01"
+],
+"status": "web",
+"added": false
+},
+{
+"url": "https://www.theregister.com/2025/11/06/googles_ironwood_tpus_ai/",
+"name": "The Register: Ironwood",
+"names": [
+"The Register: Ironwood"
+],
+"chs": [
+"01"
+],
+"status": "web",
+"added": false
+},
+{
+"url": "https://github.com/SemiAnalysisAI/InferenceX/blob/main/inferencex-e2e/perf-changelog.yaml",
+"name": "perf-changelog",
+"names": [
+"perf-changelog",
+"InferenceX perf-changelog"
+],
+"chs": [
+"01",
+"02",
+"04",
+"06",
+"07",
+"08",
+"10",
+"11"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://awsdocs-neuron.readthedocs-hosted.com/en/latest/about-neuron/arch/neuron-hardware/trn2-arch.html",
+"name": "Neuron docs: Trn2 architecture",
+"names": [
+"Neuron docs: Trn2 architecture",
+"Trn2 arch"
+],
+"chs": [
+"01",
+"03"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://aws.amazon.com/ec2/capacityblocks/pricing/",
+"name": "AWS Capacity Blocks pricing",
+"names": [
+"AWS Capacity Blocks pricing",
+"AWS Capacity Blocks"
+],
+"chs": [
+"01",
+"08",
+"09"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://aws.amazon.com/ec2/instance-types/trn2/",
+"name": "AWS EC2 Trn2 page",
+"names": [
+"AWS EC2 Trn2 page",
+"AWS Trn2"
+],
+"chs": [
+"01",
+"08",
+"09"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://awsdocs-neuron.readthedocs-hosted.com/en/latest/about-neuron/arch/neuron-hardware/trn3-arch.html",
+"name": "Neuron docs: Trn3 architecture",
+"names": [
+"Neuron docs: Trn3 architecture",
+"Trn3 arch",
+"Neuron docs, Trn3 architecture"
+],
+"chs": [
+"01",
+"03",
+"09"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://aws.amazon.com/ec2/instance-types/trn3/",
+"name": "AWS EC2 Trn3 page",
+"names": [
+"AWS EC2 Trn3 page",
+"AWS EC2 Trn3",
+"AWS Trn3"
+],
+"chs": [
+"01",
+"07",
+"08",
+"09"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://awsdocs-neuron.readthedocs-hosted.com/en/latest/about-neuron/whats-new.html",
+"name": "What's New",
+"names": [
+"What's New",
+"Neuron docs: What's New",
+"Neuron What's New"
+],
+"chs": [
+"01",
+"02",
+"03",
+"06",
+"07",
+"09"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://awsdocs-neuron.readthedocs-hosted.com/en/latest/about-neuron/arch/neuron-hardware/inf2-arch.html",
+"name": "Neuron docs: Inf2 architecture",
+"names": [
+"Neuron docs: Inf2 architecture"
+],
+"chs": [
+"01"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://b0.p.awsstatic.com/pricing/2.0/meteredUnitMaps/ec2/USD/current/ec2-ondemand-without-sec-sel/US%20East%20%28N.%20Virginia%29/Linux/index.json",
+"name": "AWS price list (us-east-1)",
+"names": [
+"AWS price list (us-east-1)",
+"AWS 價目表"
+],
+"chs": [
+"01",
+"08",
+"09"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://cloud.google.com/tpu/pricing",
+"name": "Cloud TPU pricing",
+"names": [
+"Cloud TPU pricing"
+],
+"chs": [
+"01",
+"08",
+"09"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://cloud.google.com/blog/products/compute/ironwood-tpus-and-new-axion-based-vms-for-your-ai-workloads",
+"name": "Google Cloud blog",
+"names": [
+"Google Cloud blog",
+"Google Cloud: Ironwood GA post",
+"Google Cloud, 6 Nov 2025"
+],
+"chs": [
+"01",
+"03",
+"05",
+"09"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://blog.google/innovation-and-ai/infrastructure-and-cloud/google-cloud/ironwood-tpu-age-of-inference/",
+"name": "Google: Ironwood",
+"names": [
+"Google: Ironwood",
+"Google"
+],
+"chs": [
+"01",
+"08"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://www.thundercompute.com/blog/ec2-gpu-instances",
+"name": "Thunder Compute: EC2 GPU",
+"names": [
+"Thunder Compute: EC2 GPU",
+"Thunder Compute"
+],
+"chs": [
+"01",
+"03",
+"08"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://www.coreweave.com/blog/cognition-becomes-first-customer-for-nvidia-vera-rubin-nvl72-on-coreweave-cloud",
+"name": "CoreWeave: Vera Rubin",
+"names": [
+"CoreWeave: Vera Rubin",
+"CoreWeave",
+"CoreWeave blog, 30 Sep 2026",
+"CoreWeave 2026-09-30"
+],
+"chs": [
+"01",
+"07",
+"08",
+"09"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://nvidianews.nvidia.com/news/nvidia-groq-3-lpx-now-in-full-production-with-world-class-speed-for-agentic-ai",
+"name": "NVIDIA: LPX full production",
+"names": [
+"NVIDIA: LPX full production",
+"NVIDIA Newsroom, 24 Aug 2026",
+"NVIDIA 新聞稿，2026-08-24",
+"NVIDIA 2026-08-24"
+],
+"chs": [
+"01",
+"05",
+"08",
+"09"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://moorinsightsstrategy.com/field-notes/amd-advancing-ai-2026-helios-ships-venice-swings-and-the-software-moat-narrows/",
+"name": "Moor Insights 2026-07-24",
+"names": [
+"Moor Insights 2026-07-24",
+"Moor Insights: AMD",
+"Moor Insights",
+"Moor Insights & Strategy, 24 Jul 2026"
+],
+"chs": [
+"01",
+"05",
+"08",
+"09"
+],
+"status": "web",
+"added": false
+},
+{
+"url": "https://futurumgroup.com/insights/cerebras-cs-4-makes-the-rack-the-new-chip-by-doubling-power-and-tripling-wafers/",
+"name": "Futurum: CS-4",
+"names": [
+"Futurum: CS-4",
+"Futurum",
+"Futurum Group, Aug 2026"
+],
+"chs": [
+"01",
+"08",
+"09"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://newsletter.semianalysis.com/p/cerebrass-next-generation-cs-4-fast",
+"name": "SemiAnalysis: CS-4",
+"names": [
+"SemiAnalysis: CS-4",
+"SemiAnalysis, 19 Aug 2026",
+"SemiAnalysis",
+"SemiAnalysis CS-4"
+],
+"chs": [
+"01",
+"03",
+"04",
+"06",
+"07",
+"08",
+"09"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://awsdocs-neuron.readthedocs-hosted.com/en/latest/setup/index.html",
+"name": "Neuron docs: Install",
+"names": [
+"Neuron docs: Install"
+],
+"chs": [
+"01"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://awsdocs-neuron.readthedocs-hosted.com/en/latest/about-neuron/arch/neuron-hardware/trainium.html",
+"name": "Neuron docs: Trainium",
+"names": [
+"Neuron docs: Trainium"
+],
+"chs": [
+"01"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://aws.amazon.com/blogs/aws/amazon-ec2-trn2-instances-and-trn2-ultraservers-for-aiml-training-and-inference-is-now-available/",
+"name": "AWS News Blog: Trn2 GA",
+"names": [
+"AWS News Blog: Trn2 GA",
+"AWS News Blog",
+"AWS News Blog，2024-12-03"
+],
+"chs": [
+"01",
+"03",
+"05"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://awsdocs-neuron.readthedocs-hosted.com/en/latest/about-neuron/arch/neuron-features/logical-neuroncore-config.html",
+"name": "Neuron docs: LNC",
+"names": [
+"Neuron docs: LNC"
+],
+"chs": [
+"01"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://github.com/SemiAnalysisAI/InferenceX/blob/main/operatorx/runners/trainium/runner.py",
+"name": "InferenceX Trainium runner",
+"names": [
+"InferenceX Trainium runner"
+],
+"chs": [
+"01"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://awsdocs-neuron.readthedocs-hosted.com/en/latest/about-neuron/arch/neuron-hardware/trn1-arch.html",
+"name": "Neuron docs: Trn1/Trn1n architecture",
+"names": [
+"Neuron docs: Trn1/Trn1n architecture"
+],
+"chs": [
+"01"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://aws.amazon.com/ec2/instance-types/trn1/",
+"name": "AWS EC2 Trn1 page",
+"names": [
+"AWS EC2 Trn1 page"
+],
+"chs": [
+"01"
+],
+"status": "local",
+"added": true
+},
+{
+"url": "https://b0.p.awsstatic.com/pricing/2.0/meteredUnitMaps/ec2/USD/current/ec2-ondemand-without-sec-sel/US%20East%20%28Ohio%29/Linux/index.json",
+"name": "AWS price list (Ohio)",
+"names": [
+"AWS price list (Ohio)",
+"AWS 價目表",
+"AWS price list, Ohio"
+],
+"chs": [
+"01",
+"08",
+"09"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://docs.aws.amazon.com/ec2/latest/instancetypes/ec2-instance-regions.html",
+"name": "AWS EC2, instance types by Region",
+"names": [
+"AWS EC2, instance types by Region",
+"AWS EC2 instance types by Region",
+"AWS EC2 Regions"
+],
+"chs": [
+"01",
+"08",
+"09"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://awsdocs-neuron.readthedocs-hosted.com/en/latest/deploy/eks/ultraserver-operator.html",
+"name": "Neuron docs: UltraServer operator",
+"names": [
+"Neuron docs: UltraServer operator",
+"Neuron docs, UltraServer operator"
+],
+"chs": [
+"01",
+"09"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://awsdocs-neuron.readthedocs-hosted.com/en/latest/about-neuron/benchmarks/trn1/trn1-inference-performance.html",
+"name": "Neuron docs: Trn1 inference performance",
+"names": [
+"Neuron docs: Trn1 inference performance"
+],
+"chs": [
+"01"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://www.aboutamazon.com/news/company-news/amazon-invests-additional-5-billion-anthropic-ai",
+"name": "About Amazon: Anthropic",
+"names": [
+"About Amazon: Anthropic",
+"About Amazon Anthropic 追加投資"
+],
+"chs": [
+"01",
+"05"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://aws.amazon.com/ai/machine-learning/inferentia/",
+"name": "AWS Inferentia page",
+"names": [
+"AWS Inferentia page",
+"AWS Inferentia"
+],
+"chs": [
+"01",
+"09"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://www.benzinga.com/media/24/12/42356920/amazon-halts-inferentia-ai-chip-development-to-take-on-nvidia-how-trainium-is-shaping-up-to-be-the-new-weapon-in-ai-chip-wars",
+"name": "Benzinga",
+"names": [
+"Benzinga"
+],
+"chs": [
+"01"
+],
+"status": "web",
+"added": false
+},
+{
+"url": "https://awsdocs-neuron.readthedocs-hosted.com/en/latest/about-neuron/announcements/neuron2.x/announce-maintenance-pytorch-xla-inference.html",
+"name": "XLA inference maintenance announcement",
+"names": [
+"XLA inference maintenance announcement",
+"Neuron docs: XLA inference maintenance"
+],
+"chs": [
+"01",
+"09"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://awsdocs-neuron.readthedocs-hosted.com/en/latest/about-neuron/announcements/neuron2.x/announce-eos-inf1-virtual-environments.html",
+"name": "Neuron docs: Inf1 environments",
+"names": [
+"Neuron docs: Inf1 environments"
+],
+"chs": [
+"01"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://awsdocs-neuron.readthedocs-hosted.com/en/latest/libraries/nxd-inference/developer_guides/feature-guide.html",
+"name": "NxDI feature guide",
+"names": [
+"NxDI feature guide"
+],
+"chs": [
+"01",
+"02",
+"06",
+"07",
+"09"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://awsdocs-neuron.readthedocs-hosted.com/en/latest/about-neuron/arch/neuron-hardware/inferentia.html",
+"name": "Neuron docs: Inferentia",
+"names": [
+"Neuron docs: Inferentia"
+],
+"chs": [
+"01"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://www.aboutamazon.com/news/company-news/amazon-ceo-andy-jassy-2025-letter-to-shareholders",
+"name": "Amazon shareholder letter, 9 Apr 2026",
+"names": [
+"Amazon shareholder letter, 9 Apr 2026",
+"Jassy shareholder letter",
+"股東信",
+"Amazon 股東信"
+],
+"chs": [
+"01",
+"04",
+"05",
+"08",
+"09"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://www.aboutamazon.com/news/aws/amazon-ai-chips-business-history",
+"name": "About Amazon 晶片事業",
+"names": [
+"About Amazon 晶片事業",
+"About Amazon: chips business",
+"About Amazon",
+"About Amazon, 31 Jul 2026"
+],
+"chs": [
+"01",
+"03",
+"05",
+"08",
+"09"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://www.fool.com/earnings/call-transcripts/2026/04/29/amazon-amzn-q1-2026-earnings-call-transcript/",
+"name": "Motley Fool: Q1 2026 call",
+"names": [
+"Motley Fool: Q1 2026 call",
+"Q1 2026 財報電話會"
+],
+"chs": [
+"01",
+"05"
+],
+"status": "web",
+"added": false
+},
+{
+"url": "https://stockanalysis.com/stocks/amzn/transcripts/657334-q2-2026/",
+"name": "Q2 2026 call transcript",
+"names": [
+"Q2 2026 call transcript",
+"Amazon Q2 2026 call transcript, stockanalysis.com"
+],
+"chs": [
+"01",
+"09"
+],
+"status": "web",
+"added": false
+},
+{
+"url": "https://awsdocs-neuron.readthedocs-hosted.com/en/latest/libraries/nxd-inference/tutorials/trn3-gpt-oss-120b-tutorial.html",
+"name": "NxDI Trn3 gpt-oss-120b tutorial",
+"names": [
+"NxDI Trn3 gpt-oss-120b tutorial"
+],
+"chs": [
+"01",
+"09"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://www.aboutamazon.com/news/aws/aws-project-rainier-ai-trainium-chips-compute-cluster",
+"name": "About Amazon: Project Rainier",
+"names": [
+"About Amazon: Project Rainier",
+"About Amazon Project Rainier"
+],
+"chs": [
+"01",
+"05"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://www.datacenterdynamics.com/en/news/aws-makes-trainium3-ultraservers-generally-available/",
+"name": "DataCenterDynamics: Trn3 GA",
+"names": [
+"DataCenterDynamics: Trn3 GA",
+"DataCenterDynamics"
+],
+"chs": [
+"01",
+"05"
+],
+"status": "web",
+"added": false
+},
+{
+"url": "https://www.fool.com/earnings/call-transcripts/2026/02/05/amazon-amzn-q4-2025-earnings-call-transcript/",
+"name": "Motley Fool: Q4 2025 call",
+"names": [
+"Motley Fool: Q4 2025 call",
+"Motley Fool 逐字稿"
+],
+"chs": [
+"01",
+"05"
+],
+"status": "web",
+"added": false
+},
+{
+"url": "https://www.aboutamazon.com/news/company-news/amazon-earnings-q2-2026-report",
+"name": "About Amazon: Q2 2026 results",
+"names": [
+"About Amazon: Q2 2026 results"
+],
+"chs": [
+"01"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://docs.cloud.google.com/tpu/docs/v5e",
+"name": "Google TPU v5e doc",
+"names": [
+"Google TPU v5e doc"
+],
+"chs": [
+"01"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://docs.cloud.google.com/tpu/docs/v5p",
+"name": "Google TPU v5p doc",
+"names": [
+"Google TPU v5p doc"
+],
+"chs": [
+"01"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://github.com/vllm-project/tpu-inference/tree/main/support_matrices",
+"name": "TPU matrices",
+"names": [
+"TPU matrices",
+"support matrices",
+"tpu-inference support matrices",
+"vLLM TPU support matrices"
+],
+"chs": [
+"01",
+"02",
+"03",
+"04",
+"06",
+"07",
+"08",
+"09"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://www.servethehome.com/googles-tpuv8s-for-training-and-inference-at-hot-chips-2026/",
+"name": "ServeTheHome: Hot Chips 2026",
+"names": [
+"ServeTheHome: Hot Chips 2026"
+],
+"chs": [
+"01"
+],
+"status": "web",
+"added": false
+},
+{
+"url": "https://inferencex.semianalysis.com/blog/tpu-inferencex-full-steam",
+"name": "InferenceX TPU post",
+"names": [
+"InferenceX TPU post",
+"InferenceX",
+"SemiAnalysis InferenceX, 7 Sep 2026",
+"InferenceX 2026-09-07"
+],
+"chs": [
+"01",
+"02",
+"03",
+"04",
+"05",
+"06",
+"07",
+"08",
+"09"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://newsletter.semianalysis.com/p/tpuv7-google-takes-a-swing-at-the",
+"name": "SemiAnalysis: TPUv7",
+"names": [
+"SemiAnalysis: TPUv7",
+"SemiAnalysis, 28 Nov 2025",
+"SemiAnalysis TPUv7",
+"SemiAnalysis"
+],
+"chs": [
+"01",
+"05",
+"08",
+"09"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://docs.cloud.google.com/kubernetes-engine/docs/concepts/tpu-ironwood",
+"name": "About Ironwood (TPU7x) in GKE",
+"names": [
+"About Ironwood (TPU7x) in GKE",
+"Ironwood in GKE"
+],
+"chs": [
+"01",
+"09"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://docs.cloud.google.com/kubernetes-engine/docs/concepts/tpus",
+"name": "About TPUs in GKE",
+"names": [
+"About TPUs in GKE"
+],
+"chs": [
+"01",
+"09"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://docs.cloud.google.com/tpu/docs/tpus-in-compute-engine",
+"name": "TPUs in Compute Engine",
+"names": [
+"TPUs in Compute Engine"
+],
+"chs": [
+"01"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://docs.cloud.google.com/gemini-enterprise-agent-platform/machine-learning/predictions/use-tpu",
+"name": "Use TPUs for online inference",
+"names": [
+"Use TPUs for online inference",
+"Agent Platform: TPU online inference"
+],
+"chs": [
+"01",
+"09"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://docs.cloud.google.com/tpu/docs/all-capacity-overview",
+"name": "All Capacity mode",
+"names": [
+"All Capacity mode",
+"All Capacity mode overview"
+],
+"chs": [
+"01",
+"09"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://docs.cloud.google.com/tpu/docs/regions-zones",
+"name": "TPU regions and zones",
+"names": [
+"TPU regions and zones",
+"TPU Regions"
+],
+"chs": [
+"01",
+"08",
+"09"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://docs.cloud.google.com/tpu/docs/quota",
+"name": "Cloud TPU quotas",
+"names": [
+"Cloud TPU quotas"
+],
+"chs": [
+"01"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://cloud.google.com/blog/products/compute/ai-infrastructure-at-next26",
+"name": "Google Cloud: Next '26 infrastructure",
+"names": [
+"Google Cloud: Next '26 infrastructure"
+],
+"chs": [
+"01"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://github.com/vllm-project/tpu-inference/blob/main/tpu_inference/utils.py",
+"name": "vLLM TPU utils.py",
+"names": [
+"vLLM TPU utils.py"
+],
+"chs": [
+"01"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://thenextweb.com/news/google-ironwood-tpu-inference-cloud-next",
+"name": "TNW: TPU 8",
+"names": [
+"TNW: TPU 8"
+],
+"chs": [
+"01"
+],
+"status": "web",
+"added": false
+},
+{
+"url": "https://github.com/AI-Hypercomputer/tpu-recipes/tree/main/inference/ironwood/vLLM/Qwen3-32B",
+"name": "tpu-recipes Qwen3-32B",
+"names": [
+"tpu-recipes Qwen3-32B",
+"Qwen3-32B recipe"
+],
+"chs": [
+"01",
+"02",
+"06",
+"09"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://instances.vantage.sh/aws/ec2/p6-b200.48xlarge",
+"name": "Vantage: p6-b200",
+"names": [
+"Vantage: p6-b200",
+"Vantage"
+],
+"chs": [
+"01",
+"08"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://developer.nvidia.com/blog/nvidia-vera-rubin-pod-seven-chips-five-rack-scale-systems-one-ai-supercomputer/",
+"name": "NVIDIA: Vera Rubin POD",
+"names": [
+"NVIDIA: Vera Rubin POD",
+"NVIDIA"
+],
+"chs": [
+"01",
+"08"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://www.datacenterdynamics.com/en/news/nvidias-rubin-ultra-nvl576-rack-expected-to-be-600kw-coming-second-half-of-2027/",
+"name": "DCD: Rubin Ultra rack",
+"names": [
+"DCD: Rubin Ultra rack",
+"DCD"
+],
+"chs": [
+"01",
+"08"
+],
+"status": "web",
+"added": false
+},
+{
+"url": "https://www.trendforce.com/news/2026/07/21/news-amds-first-rack-scale-ai-system-helios-challenges-nvidia-with-hbm4-memory-edge-but-reportedly-comes-at-a-higher-price/",
+"name": "TrendForce, 21 Jul 2026",
+"names": [
+"TrendForce, 21 Jul 2026",
+"TrendForce: Helios"
+],
+"chs": [
+"01",
+"09"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://www.glennklockwood.com/garden/processors/rubin-cpx",
+"name": "Glenn Lockwood: Rubin CPX",
+"names": [
+"Glenn Lockwood: Rubin CPX",
+"Glenn Lockwood"
+],
+"chs": [
+"01",
+"07"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://www.tomshardware.com/pc-components/gpus/nvidia-groq-3-lpu-and-groq-lpx-racks-join-rubin-platform-at-gtc-sram-packed-accelerator-boosts-every-layer-of-the-ai-model-on-every-token",
+"name": "Tom's Hardware: LPX at GTC",
+"names": [
+"Tom's Hardware: LPX at GTC",
+"Tom's Hardware, 16 Mar 2026"
+],
+"chs": [
+"01",
+"09"
+],
+"status": "web",
+"added": false
+},
+{
+"url": "https://www.tomshardware.com/tech-industry/semiconductors/nvidias-20-billion-groq-deal-produces-its-first-chip",
+"name": "Tom's Hardware: Groq deal",
+"names": [
+"Tom's Hardware: Groq deal",
+"Tom's Hardware 2026-03-19",
+"Tom's Hardware"
+],
+"chs": [
+"01",
+"07",
+"08"
+],
+"status": "web",
+"added": false
+},
+{
+"url": "https://blogs.nvidia.com/blog/vera-rubin-lpx-spectrum-x-nvlink-fusion/",
+"name": "NVIDIA blog: LPX",
+"names": [
+"NVIDIA blog: LPX"
+],
+"chs": [
+"01"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://nebius.com/prices",
+"name": "Nebius prices",
+"names": [
+"Nebius prices",
+"Nebius"
+],
+"chs": [
+"01",
+"08",
+"09"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://finance.yahoo.com/technology/ai/articles/nvidia-nvda-20-billion-groq-190737433.html",
+"name": "Yahoo Finance: Groq",
+"names": [
+"Yahoo Finance: Groq"
+],
+"chs": [
+"01"
+],
+"status": "web",
+"added": false
+},
+{
+"url": "https://apexapps.oracle.com/pls/apex/cetools/api/v1/products/?currencyCode=USD",
+"name": "Oracle price list API",
+"names": [
+"Oracle price list API"
+],
+"chs": [
+"01"
+],
+"status": "local",
+"added": true
+},
+{
+"url": "https://cloud.google.com/products/compute/pricing/accelerator-optimized",
+"name": "Google Cloud GPU pricing",
+"names": [
+"Google Cloud GPU pricing",
+"Google Cloud accelerator-optimized VM pricing",
+"Google Cloud"
+],
+"chs": [
+"01",
+"08",
+"09"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://prices.azure.com/api/retail/prices?$filter=contains%28armSkuName,%27GB200%27%29",
+"name": "Azure Retail Prices API",
+"names": [
+"Azure Retail Prices API",
+"Azure 價目 API"
+],
+"chs": [
+"01",
+"08"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://lambda.ai/pricing",
+"name": "Lambda pricing",
+"names": [
+"Lambda pricing",
+"Lambda"
+],
+"chs": [
+"01",
+"08"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://www.datacenterdynamics.com/en/news/microsoft-claims-to-be-first-hyperscaler-to-power-on-nvidia-vera-rubin-nvl72-system/",
+"name": "DCD: Azure Vera Rubin",
+"names": [
+"DCD: Azure Vera Rubin"
+],
+"chs": [
+"01"
+],
+"status": "web",
+"added": false
+},
+{
+"url": "https://azure.microsoft.com/en-us/blog/microsofts-strategic-ai-datacenter-planning-enables-seamless-large-scale-nvidia-rubin-deployments/",
+"name": "Azure blog: Rubin",
+"names": [
+"Azure blog: Rubin"
+],
+"chs": [
+"01"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://nvidianews.nvidia.com/news/rubin-platform-ai-supercomputer",
+"name": "NVIDIA: Rubin platform release",
+"names": [
+"NVIDIA: Rubin platform release"
+],
+"chs": [
+"01"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://nvidianews.nvidia.com/news/nvidia-vera-rubin-platform",
+"name": "NVIDIA: Vera Rubin release",
+"names": [
+"NVIDIA: Vera Rubin release",
+"NVIDIA press",
+"NVIDIA"
+],
+"chs": [
+"01",
+"07",
+"08"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://ca.finance.yahoo.com/news/aws-raising-gpu-instance-prices-134610388.html",
+"name": "Yahoo Finance: AWS price rise",
+"names": [
+"Yahoo Finance: AWS price rise",
+"Yahoo Finance",
+"Yahoo Finance, 26 Jun 2026"
+],
+"chs": [
+"01",
+"08",
+"09"
+],
+"status": "web",
+"added": false
+},
+{
+"url": "https://www.cerebras.ai/blog/introducing-cerebras-cs-4",
+"name": "Cerebras blog: CS-4",
+"names": [
+"Cerebras blog: CS-4",
+"Cerebras CS-4 blog",
+"Cerebras"
+],
+"chs": [
+"01",
+"06",
+"08"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://venturebeat.com/technology/cerebras-says-its-chips-run-a-trillion-parameter-ai-model-nearly-7-times-faster-than-gpu-clouds",
+"name": "VentureBeat",
+"names": [
+"VentureBeat",
+"VentureBeat, 20 May 2026",
+"VentureBeat: Kimi K2.6"
+],
+"chs": [
+"01",
+"02",
+"03",
+"04",
+"06",
+"08",
+"09"
+],
+"status": "web",
+"added": false
+},
+{
+"url": "https://www.cerebras.ai/blog/cerebras-kimi-k2-Enterprise",
+"name": "Cerebras blog",
+"names": [
+"Cerebras blog",
+"Cerebras Kimi K2 blog",
+"Cerebras blog: Kimi K2.6",
+"Cerebras"
+],
+"chs": [
+"01",
+"02",
+"03",
+"04",
+"06",
+"08",
+"09"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://www.cerebras.ai/blog/how-cerebras-serves-gpt-5-6-sol-at-up-to-750-tokens-per-second",
+"name": "Cerebras GPT-5.6 Sol blog",
+"names": [
+"Cerebras GPT-5.6 Sol blog",
+"Cerebras blog: GPT-5.6 Sol",
+"Cerebras blog",
+"Cerebras blog 2026-08-27"
+],
+"chs": [
+"01",
+"02",
+"03",
+"05",
+"06"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://inference-docs.cerebras.ai/models/overview",
+"name": "Cerebras models",
+"names": [
+"Cerebras models",
+"Cerebras model catalog",
+"模型總覽",
+"Cerebras docs"
+],
+"chs": [
+"01",
+"02",
+"03",
+"06",
+"07",
+"08",
+"09"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://inference-docs.cerebras.ai/models/openai-oss",
+"name": "Cerebras docs: gpt-oss",
+"names": [
+"Cerebras docs: gpt-oss",
+"Cerebras gpt-oss"
+],
+"chs": [
+"01",
+"07"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://inference-docs.cerebras.ai/models/qwen-3.8-27b",
+"name": "Cerebras docs",
+"names": [
+"Cerebras docs",
+"Cerebras docs: Qwen 3.8 27B",
+"qwen-3.8-27b 文件",
+"文件"
+],
+"chs": [
+"01",
+"03",
+"04",
+"06",
+"07"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://inference-docs.cerebras.ai/support/rate-limits",
+"name": "Cerebras rate limits",
+"names": [
+"Cerebras rate limits",
+"Cerebras docs: rate limits",
+"rate limits"
+],
+"chs": [
+"01",
+"04",
+"07",
+"09",
+"10",
+"11"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://inference-docs.cerebras.ai/dedicated/overview",
+"name": "Cerebras Dedicated",
+"names": [
+"Cerebras Dedicated",
+"Dedicated",
+"Cerebras Dedicated Inference",
+"Cerebras docs: Dedicated"
+],
+"chs": [
+"01",
+"02",
+"03",
+"04",
+"05",
+"06",
+"07",
+"09"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://www.sec.gov/Archives/edgar/data/2021728/000162828026056186/cbrsannouncesfinancialresu.htm",
+"name": "Cerebras Q2 2026 results, SEC",
+"names": [
+"Cerebras Q2 2026 results, SEC",
+"Cerebras Q2 2026 results",
+"Cerebras Q2 2026 results (SEC)",
+"Cerebras Q2"
+],
+"chs": [
+"01",
+"03",
+"05",
+"06",
+"07",
+"08",
+"09"
+],
+"status": "web",
+"added": false
+},
+{
+"url": "https://www.cerebras.ai/pricing",
+"name": "Cerebras pricing",
+"names": [
+"Cerebras pricing"
+],
+"chs": [
+"01",
+"09"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://www.cerebras.ai/code",
+"name": "Cerebras Code",
+"names": [
+"Cerebras Code"
+],
+"chs": [
+"01",
+"03",
+"04",
+"08",
+"09"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://www.aboutamazon.com/news/aws/aws-cerebras-ai-inference",
+"name": "About Amazon",
+"names": [
+"About Amazon",
+"About Amazon, 13 Mar 2026",
+"About Amazon: AWS–Cerebras",
+"About Amazon AWS + Cerebras"
+],
+"chs": [
+"01",
+"03",
+"05",
+"07",
+"09"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://futurumgroup.com/insights/two-clouds-pick-cerebras-in-one-week-to-make-multi-silicon-inference-fast/",
+"name": "Futurum: neoclouds",
+"names": [
+"Futurum: neoclouds"
+],
+"chs": [
+"01"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://www.bitget.com/news/detail/12560605668861",
+"name": "Bitget News: Cerebras call",
+"names": [
+"Bitget News: Cerebras call"
+],
+"chs": [
+"01"
+],
+"status": "web",
+"added": false
+},
+{
+"url": "https://substack.revelata.com/p/pressure-testing-the-cerebras-ipo",
+"name": "Revelata: Cerebras IPO",
+"names": [
+"Revelata: Cerebras IPO"
+],
+"chs": [
+"01"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://www.tomshardware.com/tech-industry/artificial-intelligence/hot-chips-2026-cerebras-lays-out-the-future-of-wafer-scale-ai-nexus-system-architecture-triples-rack-scale-performance-cs-6-wafer-to-incorporate-stacked-dram",
+"name": "Tom's Hardware: Cerebras at Hot Chips",
+"names": [
+"Tom's Hardware: Cerebras at Hot Chips"
+],
+"chs": [
+"01"
+],
+"status": "web",
+"added": false
+},
+{
+"url": "https://github.com/ai-dynamo/dynamo/blob/main/deploy/operator/api/v1beta1/dynamocomponentdeployment_types.go",
+"name": "Dynamo component types",
+"names": [
+"Dynamo component types"
+],
+"chs": [
+"02"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://awsdocs-neuron.readthedocs-hosted.com/en/latest/about-neuron/announcements/neuron2.x/announce-nxdi-maintenance-support-2-31.html",
+"name": "NxDI 維護公告",
+"names": [
+"NxDI 維護公告",
+"NxDI maintenance announcement",
+"維護公告"
+],
+"chs": [
+"02",
+"03",
+"06",
+"09"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://github.com/vllm-project/vllm-neuron/blob/release-0.24.0.1.1.0/README.md",
+"name": "vLLM Neuron README",
+"names": [
+"vLLM Neuron README",
+"VN README",
+"README"
+],
+"chs": [
+"02",
+"03",
+"04",
+"06",
+"07",
+"08",
+"09"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://github.com/vllm-project/vllm/blob/main/docs/getting_started/installation/README.md",
+"name": "vLLM installation",
+"names": [
+"vLLM installation"
+],
+"chs": [
+"02"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://github.com/sgl-project/sglang/blob/main/README.md",
+"name": "SGLang README",
+"names": [
+"SGLang README"
+],
+"chs": [
+"02"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://pypi.org/pypi/vllm/json",
+"name": "PyPI vllm",
+"names": [
+"PyPI vllm"
+],
+"chs": [
+"02"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://github.com/vllm-project/vllm/blob/main/docs/contributing/release_process.md",
+"name": "vLLM release process",
+"names": [
+"vLLM release process"
+],
+"chs": [
+"02"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://github.com/vllm-project/vllm/blob/main/README.md",
+"name": "vLLM README",
+"names": [
+"vLLM README"
+],
+"chs": [
+"02",
+"06"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://pypi.org/pypi/sglang/json",
+"name": "PyPI sglang",
+"names": [
+"PyPI sglang"
+],
+"chs": [
+"02"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://pypi.org/pypi/tensorrt-llm/json",
+"name": "PyPI tensorrt-llm",
+"names": [
+"PyPI tensorrt-llm"
+],
+"chs": [
+"02"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://github.com/NVIDIA/TensorRT-LLM/blob/main/docs/source/release-notes.md",
+"name": "TRT-LLM release notes",
+"names": [
+"TRT-LLM release notes"
+],
+"chs": [
+"02",
+"06"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://docs.nvidia.com/nim/large-language-models/latest/about-nim-llm/release-notes.html",
+"name": "NIM release notes",
+"names": [
+"NIM release notes"
+],
+"chs": [
+"02"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://docs.nvidia.com/nim/large-language-models/latest/reference/architecture.html",
+"name": "NIM architecture",
+"names": [
+"NIM architecture"
+],
+"chs": [
+"02"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://docs.nvidia.com/nim/large-language-models/latest/reference/1.x-migration-guide.html",
+"name": "NIM migration guide",
+"names": [
+"NIM migration guide"
+],
+"chs": [
+"02"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://pypi.org/pypi/ai-dynamo/json",
+"name": "PyPI ai-dynamo",
+"names": [
+"PyPI ai-dynamo"
+],
+"chs": [
+"02"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://github.com/ai-dynamo/dynamo/blob/main/docs/fern/components/releases.data.ts",
+"name": "Dynamo releases data",
+"names": [
+"Dynamo releases data"
+],
+"chs": [
+"02"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://github.com/ai-dynamo/dynamo/blob/main/README.md",
+"name": "Dynamo README",
+"names": [
+"Dynamo README"
+],
+"chs": [
+"02"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://github.com/huggingface/text-generation-inference/blob/main/README.md",
+"name": "TGI README",
+"names": [
+"TGI README"
+],
+"chs": [
+"02"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://github.com/huggingface/text-generation-inference/blob/main/Cargo.toml",
+"name": "TGI Cargo.toml",
+"names": [
+"TGI Cargo.toml"
+],
+"chs": [
+"02"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://github.com/ggml-org/llama.cpp/blob/master/CMakeLists.txt",
+"name": "llama.cpp CMakeLists",
+"names": [
+"llama.cpp CMakeLists"
+],
+"chs": [
+"02"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://github.com/ggml-org/llama.cpp/blob/master/README.md",
+"name": "llama.cpp README",
+"names": [
+"llama.cpp README"
+],
+"chs": [
+"02"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://github.com/ROCm/ATOM/blob/main/README.md",
+"name": "ATOM README",
+"names": [
+"ATOM README"
+],
+"chs": [
+"02",
+"06"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://github.com/SemiAnalysisAI/InferenceX/blob/main/inferencex-e2e/configs/amd-master.yaml",
+"name": "InferenceX AMD configs",
+"names": [
+"InferenceX AMD configs"
+],
+"chs": [
+"02"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://github.com/tile-ai/TileRT/blob/main/README.md",
+"name": "TileRT README",
+"names": [
+"TileRT README"
+],
+"chs": [
+"02"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://pypi.org/pypi/tokenspeed/json",
+"name": "PyPI tokenspeed",
+"names": [
+"PyPI tokenspeed"
+],
+"chs": [
+"02"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://github.com/lightseekorg/tokenspeed/blob/main/README.md",
+"name": "TokenSpeed README",
+"names": [
+"TokenSpeed README"
+],
+"chs": [
+"02"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://awsdocs-neuron.readthedocs-hosted.com/en/latest/release-notes/components/vllm-neuron.html",
+"name": "vLLM Neuron release notes",
+"names": [
+"vLLM Neuron release notes"
+],
+"chs": [
+"02"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://pypi.org/pypi/vllm-neuron/json",
+"name": "PyPI vllm-neuron",
+"names": [
+"PyPI vllm-neuron"
+],
+"chs": [
+"02"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://awsdocs-neuron.readthedocs-hosted.com/en/latest/release-notes/components/nxd-inference.html",
+"name": "NxDI release notes",
+"names": [
+"NxDI release notes"
+],
+"chs": [
+"02",
+"03",
+"06",
+"07"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://pypi.org/project/optimum-neuron/",
+"name": "PyPI optimum-neuron",
+"names": [
+"PyPI optimum-neuron"
+],
+"chs": [
+"02"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://github.com/huggingface/optimum-neuron/blob/main/docs/source/guides/vllm_plugin.mdx",
+"name": "Optimum Neuron vLLM plugin guide",
+"names": [
+"Optimum Neuron vLLM plugin guide"
+],
+"chs": [
+"02"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://pypi.org/project/vllm-tpu/",
+"name": "PyPI vllm-tpu",
+"names": [
+"PyPI vllm-tpu"
+],
+"chs": [
+"02"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://github.com/vllm-project/tpu-inference",
+"name": "tpu-inference",
+"names": [
+"tpu-inference",
+"tpu-inference README",
+"vLLM TPU repo"
+],
+"chs": [
+"02",
+"03",
+"06",
+"07",
+"09"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://pypi.org/pypi/sglang-jax/json",
+"name": "PyPI sglang-jax",
+"names": [
+"PyPI sglang-jax"
+],
+"chs": [
+"02"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://github.com/sgl-project/sglang-jax",
+"name": "sglang-jax",
+"names": [
+"sglang-jax"
+],
+"chs": [
+"02"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://github.com/vllm-project/vllm/blob/main/docs/features/README.md",
+"name": "vLLM feature matrix",
+"names": [
+"vLLM feature matrix"
+],
+"chs": [
+"02",
+"06"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://github.com/vllm-project/vllm/blob/main/docs/getting_started/installation/gpu.cuda.inc.md",
+"name": "vLLM CUDA install",
+"names": [
+"vLLM CUDA install"
+],
+"chs": [
+"02"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://github.com/vllm-project/vllm/blob/main/docs/getting_started/installation/gpu.rocm.inc.md",
+"name": "vLLM ROCm install",
+"names": [
+"vLLM ROCm install"
+],
+"chs": [
+"02"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://github.com/sgl-project/sglang/blob/main/.github/workflows/release-docker-cu134-nightly.yml",
+"name": "SGLang cu134 nightly",
+"names": [
+"SGLang cu134 nightly"
+],
+"chs": [
+"02"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://github.com/sgl-project/sglang/blob/main/docs/docs/hardware-platforms/amd_gpu.mdx",
+"name": "SGLang AMD GPUs",
+"names": [
+"SGLang AMD GPUs"
+],
+"chs": [
+"02",
+"06"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://github.com/NVIDIA/TensorRT-LLM/blob/main/docs/source/supported-hardware.md",
+"name": "TRT-LLM supported hardware",
+"names": [
+"TRT-LLM supported hardware"
+],
+"chs": [
+"02",
+"06"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://github.com/NVIDIA/TensorRT-LLM/blob/main/docs/source/features/quantization.md",
+"name": "TRT-LLM quantization",
+"names": [
+"TRT-LLM quantization"
+],
+"chs": [
+"02",
+"06"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://github.com/ai-dynamo/dynamo/blob/main/deploy/operator/api/config/v1alpha1/lpx.go",
+"name": "Dynamo LPX operator config",
+"names": [
+"Dynamo LPX operator config"
+],
+"chs": [
+"02"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://github.com/huggingface/text-generation-inference/blob/main/docs/source/architecture.md",
+"name": "TGI architecture",
+"names": [
+"TGI architecture"
+],
+"chs": [
+"02"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://github.com/lightseekorg/tokenspeed/blob/main/docs/recipes/models.md",
+"name": "TokenSpeed model recipes",
+"names": [
+"TokenSpeed model recipes",
+"TokenSpeed recipes"
+],
+"chs": [
+"02",
+"03"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://awsdocs-neuron.readthedocs-hosted.com/en/latest/libraries/vllm-neuron/neuron-inference-overview.html",
+"name": "AI Inference on Neuron",
+"names": [
+"AI Inference on Neuron",
+"Neuron 推論總覽"
+],
+"chs": [
+"02",
+"03"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://github.com/sgl-project/sglang/blob/main/docs/docs/hardware-platforms/tpu.mdx",
+"name": "SGLang TPU",
+"names": [
+"SGLang TPU"
+],
+"chs": [
+"02"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://github.com/huggingface/optimum-neuron/commits/main",
+"name": "Optimum Neuron commits",
+"names": [
+"Optimum Neuron commits"
+],
+"chs": [
+"02",
+"09"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://github.com/vllm-project/vllm-gaudi/blob/main/README.md",
+"name": "vllm-gaudi README",
+"names": [
+"vllm-gaudi README"
+],
+"chs": [
+"02"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://pypi.org/pypi/vllm-ascend/json",
+"name": "PyPI vllm-ascend",
+"names": [
+"PyPI vllm-ascend"
+],
+"chs": [
+"02"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://github.com/vllm-project/vllm-metal/blob/main/README.md",
+"name": "vllm-metal README",
+"names": [
+"vllm-metal README"
+],
+"chs": [
+"02"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://github.com/tenstorrent/tt-inference-server/blob/main/docs/model_support/models_by_hardware.md",
+"name": "tt-inference-server models",
+"names": [
+"tt-inference-server models"
+],
+"chs": [
+"02"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://github.com/InternLM/lmdeploy/blob/main/docs/en/supported_models/supported_models.md",
+"name": "LMDeploy supported models",
+"names": [
+"LMDeploy supported models"
+],
+"chs": [
+"02"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://pypi.org/project/lmdeploy/",
+"name": "PyPI lmdeploy",
+"names": [
+"PyPI lmdeploy"
+],
+"chs": [
+"02"
+],
+"status": "local",
+"added": true
+},
+{
+"url": "https://github.com/kvcache-ai/ktransformers/blob/main/README.md",
+"name": "KTransformers README",
+"names": [
+"KTransformers README"
+],
+"chs": [
+"02"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://pypi.org/project/ktransformers/",
+"name": "PyPI ktransformers",
+"names": [
+"PyPI ktransformers"
+],
+"chs": [
+"02"
+],
+"status": "local",
+"added": true
+},
+{
+"url": "https://max.modular.com/releases/",
+"name": "MAX releases",
+"names": [
+"MAX releases"
+],
+"chs": [
+"02"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://www.modular.com/models/deepseek-v4-pro",
+"name": "Modular DeepSeek V4 Pro",
+"names": [
+"Modular DeepSeek V4 Pro"
+],
+"chs": [
+"02"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://inferencex.semianalysis.com/api/v1/benchmarks?model=DeepSeek-V4.1-Flash",
+"name": "InferenceX API, DeepSeek-V4.1-Flash",
+"names": [
+"InferenceX API, DeepSeek-V4.1-Flash",
+"DeepSeek-V4.1-Flash",
+"InferenceX API, model=DeepSeek-V4.1-Flash, pulled 4 Oct 2026",
+"model=DeepSeek-V4.1-Flash"
+],
+"chs": [
+"02",
+"04",
+"07",
+"08",
+"10",
+"11"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://inferencex.semianalysis.com/blog/engrams-embedding-entendre-codesign",
+"name": "InferenceX blog, 2026-09-18",
+"names": [
+"InferenceX blog, 2026-09-18",
+"InferenceX 2026-09-18",
+"InferenceX blog 2026-09-18"
+],
+"chs": [
+"02",
+"03",
+"08"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://github.com/SemiAnalysisAI/InferenceX/blob/main/inferencex-e2e/docs/MODELS.md",
+"name": "InferenceX MODELS.md",
+"names": [
+"InferenceX MODELS.md",
+"MODELS.md"
+],
+"chs": [
+"02",
+"03",
+"04",
+"06",
+"08",
+"10"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://github.com/vllm-project/vllm/blob/main/docs/features/disagg_prefill.md",
+"name": "vLLM disaggregated prefill",
+"names": [
+"vLLM disaggregated prefill"
+],
+"chs": [
+"02",
+"06"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://github.com/vllm-project/vllm/blob/main/docs/features/quantization/gguf.md",
+"name": "vLLM GGUF",
+"names": [
+"vLLM GGUF"
+],
+"chs": [
+"02",
+"06"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://github.com/SemiAnalysisAI/InferenceX/blob/main/inferencex-e2e/configs/nvidia-master.yaml",
+"name": "InferenceX NVIDIA configs",
+"names": [
+"InferenceX NVIDIA configs"
+],
+"chs": [
+"02"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://github.com/ai-dynamo/dynamo/blob/main/docs/fern/pages/developer-guide/knowledge-base/modular-components/router/offloading-support-matrix.md",
+"name": "Dynamo offloading matrix",
+"names": [
+"Dynamo offloading matrix"
+],
+"chs": [
+"02",
+"06"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://github.com/sgl-project/sglang/blob/main/docs/docs/advanced_features/quantized_kv_cache.mdx",
+"name": "SGLang quantized KV cache",
+"names": [
+"SGLang quantized KV cache"
+],
+"chs": [
+"02",
+"06"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://inferencex.semianalysis.com/blog/vera-rubin-nvl72-agentic-inference",
+"name": "InferenceX 2026-09-14",
+"names": [
+"InferenceX 2026-09-14",
+"InferenceX Vera Rubin post"
+],
+"chs": [
+"02",
+"04",
+"07",
+"08"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://inferencex.semianalysis.com/blog/agentx-inferencexv3-does-cuda-moat",
+"name": "InferenceX AgentX",
+"names": [
+"InferenceX AgentX",
+"InferenceX AgentX blog"
+],
+"chs": [
+"02",
+"06",
+"07"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://github.com/NVIDIA/TensorRT-LLM/blob/main/docs/source/features/helix.md",
+"name": "TRT-LLM Helix",
+"names": [
+"TRT-LLM Helix"
+],
+"chs": [
+"02",
+"06"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://github.com/vllm-project/vllm/blob/main/docs/features/quantization/README.md",
+"name": "vLLM quantization",
+"names": [
+"vLLM quantization"
+],
+"chs": [
+"02",
+"06"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://github.com/sgl-project/sglang/blob/main/docs/docs/advanced_features/quantization.mdx",
+"name": "SGLang quantization",
+"names": [
+"SGLang quantization"
+],
+"chs": [
+"02",
+"06"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://github.com/sgl-project/sglang/blob/main/docs/docs/advanced_features/attention_backend.mdx",
+"name": "SGLang attention backends",
+"names": [
+"SGLang attention backends"
+],
+"chs": [
+"02",
+"06"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://inferencex.semianalysis.com/api/v1/benchmarks?model=Kimi-K3",
+"name": "InferenceX API, model=Kimi-K3, pulled 4 Oct 2026",
+"names": [
+"InferenceX API, model=Kimi-K3, pulled 4 Oct 2026",
+"InferenceX API, Kimi-K3",
+"InferenceX API",
+"InferenceX API,model=Kimi-K3"
+],
+"chs": [
+"02",
+"04",
+"07",
+"08",
+"10",
+"11"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://inferencex.semianalysis.com/api/v1/benchmarks?model=GLM-5.2",
+"name": "InferenceX API, GLM-5.2",
+"names": [
+"InferenceX API, GLM-5.2",
+"GLM-5.2",
+"InferenceX API, model=GLM-5.2, pulled 4 Oct 2026",
+"InferenceX API,model=GLM-5.2"
+],
+"chs": [
+"02",
+"04",
+"07",
+"08",
+"10",
+"11"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://rocm.blogs.amd.com/software-tools-optimization/atom-inference-engine/README.html",
+"name": "AMD ATOM blog",
+"names": [
+"AMD ATOM blog"
+],
+"chs": [
+"02",
+"06"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://github.com/ROCm/ATOM/blob/main/atom_overview_draft.md",
+"name": "ATOM overview draft",
+"names": [
+"ATOM overview draft"
+],
+"chs": [
+"02"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://github.com/ggml-org/llama.cpp/blob/master/tools/rpc/README.md",
+"name": "llama.cpp RPC README",
+"names": [
+"llama.cpp RPC README"
+],
+"chs": [
+"02"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://inferencex.semianalysis.com/api/v1/benchmarks?model=DeepSeek-V4-Pro",
+"name": "InferenceX API, DeepSeek-V4-Pro",
+"names": [
+"InferenceX API, DeepSeek-V4-Pro",
+"DeepSeek-V4-Pro",
+"InferenceX API, model=DeepSeek-V4-Pro, pulled 4 Oct 2026",
+"model=DeepSeek-V4-Pro"
+],
+"chs": [
+"02",
+"04",
+"06",
+"07",
+"08",
+"10",
+"11"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://inferencex.semianalysis.com/api/v1/benchmarks?model=Qwen-3.5-397B-A17B",
+"name": "Qwen-3.5-397B-A17B",
+"names": [
+"Qwen-3.5-397B-A17B",
+"InferenceX API, Qwen3.5-397B",
+"model=Qwen-3.5-397B-A17B",
+"InferenceX API"
+],
+"chs": [
+"02",
+"04",
+"07",
+"08"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://inferencex.semianalysis.com/api/v1/benchmarks?model=Qwen3.8-Flash-Next",
+"name": "InferenceX API, Qwen3.8-Flash-Next",
+"names": [
+"InferenceX API, Qwen3.8-Flash-Next",
+"model=Qwen3.8-Flash-Next",
+"Qwen3.8-Flash-Next"
+],
+"chs": [
+"02",
+"04",
+"07"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://awsdocs-neuron.readthedocs-hosted.com/en/latest/vllm-neuron/docs/guides/features-guide.html",
+"name": "VN features",
+"names": [
+"VN features",
+"vLLM Neuron features guide",
+"features guide"
+],
+"chs": [
+"02",
+"06",
+"07",
+"09"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://github.com/vllm-project/vllm-neuron/blob/release-0.24.0.1.1.0/vllm_neuron/model/registry.py",
+"name": "VN registry",
+"names": [
+"VN registry",
+"vLLM Neuron registry",
+"registry.py"
+],
+"chs": [
+"02",
+"03",
+"06"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://awsdocs-neuron.readthedocs-hosted.com/en/latest/libraries/nxd-inference/developer_guides/vllm-user-guide-v1.html",
+"name": "vLLM guide for NxDI",
+"names": [
+"vLLM guide for NxDI"
+],
+"chs": [
+"02",
+"06",
+"07",
+"09"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://awsdocs-neuron.readthedocs-hosted.com/en/latest/libraries/nxd-inference/developer_guides/model-reference.html",
+"name": "model reference",
+"names": [
+"model reference",
+"NxDI model reference"
+],
+"chs": [
+"02",
+"03"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://awsdocs-neuron.readthedocs-hosted.com/en/latest/vllm-neuron/docs/getting-started/migration-nxdi-to-vllm-neuron.html",
+"name": "vLLM Neuron migration guide",
+"names": [
+"vLLM Neuron migration guide",
+"VN migration guide"
+],
+"chs": [
+"02",
+"06"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://awsdocs-neuron.readthedocs-hosted.com/en/latest/vllm-neuron/docs/model-dev/onboarding-models.html",
+"name": "vLLM Neuron onboarding",
+"names": [
+"vLLM Neuron onboarding",
+"vLLM Neuron onboarding guide"
+],
+"chs": [
+"02",
+"03",
+"09"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://github.com/aws-neuron/neuronx-distributed-inference/tree/main/contrib/models",
+"name": "NxDI contrib models",
+"names": [
+"NxDI contrib models",
+"contrib 目錄",
+"contrib models"
+],
+"chs": [
+"02",
+"03",
+"04"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://github.com/aws-neuron/neuronx-distributed-inference/blob/main/contrib/models/GLM-5.2/README.md",
+"name": "GLM-5.2 contrib",
+"names": [
+"GLM-5.2 contrib",
+"contrib",
+"NxDI contrib, GLM-5.2",
+"NxDI contrib"
+],
+"chs": [
+"02",
+"03",
+"04",
+"06",
+"08",
+"09"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://awsdocs-neuron.readthedocs-hosted.com/en/latest/vllm-neuron/docs/tutorials/tutorial-eagle3-speculative-decoding-gpt-oss.html",
+"name": "EAGLE3 gpt-oss tutorial",
+"names": [
+"EAGLE3 gpt-oss tutorial",
+"vLLM Neuron"
+],
+"chs": [
+"02",
+"08"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://github.com/huggingface/optimum-neuron/blob/main/benchmark/vllm/data-parallel/llama3.1-8b/docker-compose-dp3.yaml",
+"name": "Optimum Neuron benchmark",
+"names": [
+"Optimum Neuron benchmark"
+],
+"chs": [
+"02"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://github.com/huggingface/optimum-neuron/blob/main/benchmark/vllm/data-parallel/llama3.1-8b/.env",
+"name": "Optimum Neuron benchmark .env",
+"names": [
+"Optimum Neuron benchmark .env"
+],
+"chs": [
+"02"
+],
+"status": "local",
+"added": true
+},
+{
+"url": "https://github.com/huggingface/optimum-neuron/blob/main/benchmark/vllm/data-parallel/llama3.1-8b/vllm-results-dp3.csv",
+"name": "Optimum Neuron CSV",
+"names": [
+"Optimum Neuron CSV",
+"Optimum Neuron result CSV",
+"結果 CSV"
+],
+"chs": [
+"02",
+"03",
+"08",
+"09"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://github.com/huggingface/optimum-neuron/blob/main/pyproject.toml",
+"name": "Optimum Neuron pyproject",
+"names": [
+"Optimum Neuron pyproject"
+],
+"chs": [
+"02"
+],
+"status": "local",
+"added": true
+},
+{
+"url": "https://github.com/huggingface/optimum-neuron/blob/main/optimum/neuron/vllm/ARCHITECTURE_VLLM_SERVING.md",
+"name": "Optimum Neuron vLLM architecture",
+"names": [
+"Optimum Neuron vLLM architecture",
+"說明文件",
+"Optimum Neuron"
+],
+"chs": [
+"02",
+"03",
+"07"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://github.com/deepjavalibrary/djl-serving/pull/2939",
+"name": "DJL PR #2939",
+"names": [
+"DJL PR #2939"
+],
+"chs": [
+"02",
+"09"
+],
+"status": "web",
+"added": false
+},
+{
+"url": "https://docs.cloud.google.com/tpu/docs/tpu-inference",
+"name": "Run inference on Cloud TPU",
+"names": [
+"Run inference on Cloud TPU"
+],
+"chs": [
+"02"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://vllm.ai/blog/2025-10-16-vllm-tpu",
+"name": "vLLM blog, 2025-10-16",
+"names": [
+"vLLM blog, 2025-10-16",
+"vLLM TPU blog"
+],
+"chs": [
+"02",
+"06"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://github.com/AI-Hypercomputer/tpu-recipes/tree/main/inference/ironwood/vLLM",
+"name": "tpu-recipes",
+"names": [
+"tpu-recipes"
+],
+"chs": [
+"02",
+"03",
+"04",
+"06",
+"07",
+"08"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://github.com/sgl-project/sglang-jax/tree/main/docs/cookbook/autoregressive",
+"name": "sglang-jax cookbook",
+"names": [
+"sglang-jax cookbook",
+"SGL-JAX cookbook",
+"SGL-JAX",
+"sglang-jax"
+],
+"chs": [
+"02",
+"03",
+"04",
+"06",
+"07",
+"08",
+"09"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://github.com/AI-Hypercomputer/JetStream",
+"name": "JetStream",
+"names": [
+"JetStream",
+"JetStream repo"
+],
+"chs": [
+"02",
+"09"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://docs.cloud.google.com/gemini-enterprise-agent-platform/models/open-models/use-hex-llm",
+"name": "Hex-LLM",
+"names": [
+"Hex-LLM",
+"Hex-LLM docs"
+],
+"chs": [
+"02",
+"03",
+"09"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://docs.cloud.google.com/kubernetes-engine/docs/tutorials/serve-vllm-tpu",
+"name": "GKE vLLM TPU tutorial",
+"names": [
+"GKE vLLM TPU tutorial"
+],
+"chs": [
+"02",
+"06",
+"09"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://developers.googleblog.com/torchtpu-running-pytorch-natively-on-tpus-at-google-scale/",
+"name": "TorchTPU blog",
+"names": [
+"TorchTPU blog"
+],
+"chs": [
+"02",
+"06"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://inference-docs.cerebras.ai/capabilities/prompt-caching",
+"name": "Cerebras prompt caching",
+"names": [
+"Cerebras prompt caching"
+],
+"chs": [
+"02",
+"06",
+"07",
+"09"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://inference-docs.cerebras.ai/support/change-log",
+"name": "Cerebras change log",
+"names": [
+"Cerebras change log",
+"change-log"
+],
+"chs": [
+"02",
+"03",
+"06"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://github.com/ai-dynamo/dynamo/blob/main/docs/fern/pages/reference/general/releases/deprecations.mdx",
+"name": "Dynamo deprecations",
+"names": [
+"Dynamo deprecations"
+],
+"chs": [
+"02"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://github.com/aws-neuron/neuronx-distributed-inference/blob/main/contrib/models/DeepSeek-V3/README.md",
+"name": "DeepSeek-V3 contrib",
+"names": [
+"DeepSeek-V3 contrib",
+"contrib",
+"NxDI contrib, DeepSeek-V3"
+],
+"chs": [
+"02",
+"03",
+"04",
+"06",
+"09"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://zenn.dev/exwzd/articles/20250930-inferentia-llama",
+"name": "Exawizards",
+"names": [
+"Exawizards",
+"Exawizards (Zenn), 30 Sep 2025",
+"Exawizards, 2025-09-30"
+],
+"chs": [
+"02",
+"03",
+"06",
+"07",
+"08",
+"09"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://awsdocs-neuron.readthedocs-hosted.com/en/latest/vllm-neuron/docs/design/vllm/structured-outputs-and-tool-calling.html",
+"name": "vLLM Neuron structured output design",
+"names": [
+"vLLM Neuron structured output design",
+"VN structured-output design"
+],
+"chs": [
+"02",
+"06"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://zenn.dev/exwzd/articles/20250827_inferentia_compile",
+"name": "Exawizards, 2025-08-28",
+"names": [
+"Exawizards, 2025-08-28",
+"Exawizards (Zenn), 28 Aug 2025",
+"Exawizards"
+],
+"chs": [
+"02",
+"08",
+"09"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://github.com/vllm-project/tpu-inference/blob/main/tpu_inference/envs.py",
+"name": "tpu-inference envs.py",
+"names": [
+"tpu-inference envs.py"
+],
+"chs": [
+"02",
+"06"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://github.com/ai-dynamo/dynamo/blob/main/deploy/operator/api/v1beta1/lpx_types.go",
+"name": "Dynamo LPX types",
+"names": [
+"Dynamo LPX types"
+],
+"chs": [
+"02"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://github.com/ai-dynamo/dynamo/blob/main/deploy/operator/internal/dynamo/lpx/build.go",
+"name": "Dynamo LPX build",
+"names": [
+"Dynamo LPX build"
+],
+"chs": [
+"02"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://www.servethehome.com/nvidias-groq-3-lpu-accelerators-for-heterogeneous-ai-compute-at-hot-chips-2026/",
+"name": "ServeTheHome, Hot Chips 2026",
+"names": [
+"ServeTheHome, Hot Chips 2026"
+],
+"chs": [
+"02"
+],
+"status": "web",
+"added": false
+},
+{
+"url": "https://github.com/vllm-project/vllm/blob/main/docs/features/quantization/modelopt.md",
+"name": "vLLM ModelOpt",
+"names": [
+"vLLM ModelOpt"
+],
+"chs": [
+"02",
+"06"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://awsdocs-neuron.readthedocs-hosted.com/en/latest/vllm-neuron/docs/tutorials/tutorial-gpt-oss.html",
+"name": "vLLM Neuron gpt-oss tutorial",
+"names": [
+"vLLM Neuron gpt-oss tutorial",
+"gpt-oss tutorial",
+"vLLM Neuron",
+"教學"
+],
+"chs": [
+"02",
+"03",
+"08",
+"09"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://github.com/vllm-project/tpu-inference/blob/main/.buildkite/benchmark/cases/daily/daily_qwen3_8_2p4t_fp8_tpu7x_32.json",
+"name": "tpu-inference CI case",
+"names": [
+"tpu-inference CI case",
+"CI 案例",
+"CI case"
+],
+"chs": [
+"02",
+"03",
+"04",
+"09"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://aws.amazon.com/blogs/machine-learning/accelerate-llm-model-loading-and-increase-context-windows-with-gpudirect-on-amazon-fsx-for-lustre-and-turboquant/",
+"name": "AWS ML blog, 1 Jun 2026",
+"names": [
+"AWS ML blog, 1 Jun 2026",
+"AWS ML blog, 2026-06-01"
+],
+"chs": [
+"02",
+"09"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://awsdocs-neuron.readthedocs-hosted.com/en/latest/vllm-neuron/docs/design/compilation/cpu_compilation.html",
+"name": "vLLM Neuron CPU compilation",
+"names": [
+"vLLM Neuron CPU compilation",
+"vLLM Neuron CPU compilation design"
+],
+"chs": [
+"02",
+"09"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://awsdocs-neuron.readthedocs-hosted.com/en/latest/vllm-neuron/docs/design/compilation/compilation_cache.html",
+"name": "vLLM Neuron compilation cache",
+"names": [
+"vLLM Neuron compilation cache",
+"vLLM Neuron compilation cache design"
+],
+"chs": [
+"02",
+"09"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://github.com/ai-dynamo/dynamo/blob/main/docs/fern/pages/developer-guide/knowledge-base/modular-components/planner/overview.md",
+"name": "Dynamo Planner overview",
+"names": [
+"Dynamo Planner overview"
+],
+"chs": [
+"02",
+"06"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://github.com/vllm-project/vllm/blob/main/docs/features/initialized_snapshots.md",
+"name": "vLLM initialized snapshots",
+"names": [
+"vLLM initialized snapshots"
+],
+"chs": [
+"02"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://github.com/vllm-project/tpu-inference/blob/main/tests/e2e/benchmarking/mm_bench.sh",
+"name": "tpu-inference mm_bench.sh",
+"names": [
+"tpu-inference mm_bench.sh"
+],
+"chs": [
+"02"
+],
+"status": "local",
+"added": true
+},
+{
+"url": "https://github.com/vllm-project/recipes/blob/main/models/Qwen/Qwen3.8-2.4T-A95B.yaml",
+"name": "vLLM Qwen3.8-2.4T recipe",
+"names": [
+"vLLM Qwen3.8-2.4T recipe",
+"Qwen3.8-2.4T recipe",
+"vLLM recipe",
+"vLLM recipe Qwen3.8-2.4T"
+],
+"chs": [
+"02",
+"03",
+"04",
+"06",
+"07"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://github.com/NVIDIA/TensorRT-LLM/blob/main/docs/source/deployment-guide/deployment-guide-for-glm-5.3-flash-on-trtllm.md",
+"name": "TRT-LLM GLM-5.3-Flash guide",
+"names": [
+"TRT-LLM GLM-5.3-Flash guide"
+],
+"chs": [
+"02",
+"06"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://awsdocs-neuron.readthedocs-hosted.com/en/latest/vllm-neuron/docs/model-recipes/gpt-oss.html",
+"name": "VN gpt-oss recipe",
+"names": [
+"VN gpt-oss recipe",
+"gpt-oss recipe",
+"recipe"
+],
+"chs": [
+"02",
+"03",
+"06"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://huggingface.co/Qwen/Qwen3-235B-A22B-Instruct-2507/raw/main/config.json",
+"name": "Qwen3 config",
+"names": [
+"Qwen3 config"
+],
+"chs": [
+"03"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://huggingface.co/zai-org/GLM-4.5/raw/main/config.json",
+"name": "GLM-4.5 config",
+"names": [
+"GLM-4.5 config"
+],
+"chs": [
+"03"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://github.com/MoonshotAI/Kimi-K3/blob/main/k3_tech_report.pdf",
+"name": "K3 tech report",
+"names": [
+"K3 tech report",
+"tech report"
+],
+"chs": [
+"03",
+"04"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://huggingface.co/Qwen/Qwen3.8-2.4T-A95B",
+"name": "card",
+"names": [
+"card",
+"Qwen3.8-2.4T 模型卡"
+],
+"chs": [
+"03",
+"04"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://llm-d.ai/blog/serving-glm-5-2-agentic-workloads-on-llm-d",
+"name": "llm-d 2026-07-22",
+"names": [
+"llm-d 2026-07-22",
+"llm-d blog, 22 Jul 2026",
+"llm-d blog",
+"llm-d"
+],
+"chs": [
+"03",
+"04",
+"07",
+"09",
+"10",
+"11"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://github.com/vllm-project/vllm-project.github.io/blob/main/_posts/2026-09-13-kimi-k3-performance-optimization.md",
+"name": "vLLM blog 2026-09-13",
+"names": [
+"vLLM blog 2026-09-13",
+"vLLM blog, 13 Sep 2026",
+"vLLM 2026-09-13"
+],
+"chs": [
+"03",
+"04",
+"10",
+"11"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://github.com/vllm-project/vllm-project.github.io/blob/main/_posts/2026-04-24-deepseek-v4.md",
+"name": "vLLM blog, 24 Apr 2026",
+"names": [
+"vLLM blog, 24 Apr 2026",
+"vLLM blog 2026-04-24",
+"vLLM 2026-04-24"
+],
+"chs": [
+"03",
+"04",
+"10",
+"11"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://huggingface.co/deepseek-ai/DeepSeek-V4.1-Flash",
+"name": "card",
+"names": [
+"card",
+"V4.1-Flash card",
+"V4.1-Flash 模型卡"
+],
+"chs": [
+"03",
+"04",
+"10",
+"11"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://github.com/vllm-project/vllm-project.github.io/blob/main/_posts/2026-09-21-qwen38-pd-serving.md",
+"name": "vLLM blog 2026-09-21",
+"names": [
+"vLLM blog 2026-09-21",
+"vLLM 2026-09-21"
+],
+"chs": [
+"03",
+"04"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://www.lmsys.org/blog/2026-07-27-kimi-k3-day0-support/",
+"name": "LMSYS blog, 27 Jul 2026",
+"names": [
+"LMSYS blog, 27 Jul 2026",
+"LMSYS 2026-07-27",
+"LMSYS blog",
+"LMSYS K3"
+],
+"chs": [
+"03",
+"04",
+"07",
+"10",
+"11"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://github.com/vllm-project/recipes/blob/main/models/deepseek-ai/DeepSeek-V4.1-Flash.yaml",
+"name": "V4.1-Flash recipe",
+"names": [
+"V4.1-Flash recipe",
+"recipe",
+"vLLM recipe DeepSeek-V4.1-Flash",
+"DeepSeek-V4.1-Flash"
+],
+"chs": [
+"03",
+"04",
+"07",
+"11"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://www.lmsys.org/blog/2026-08-26-qwen-flash-next/",
+"name": "LMSYS blog 2026-08-26",
+"names": [
+"LMSYS blog 2026-08-26",
+"LMSYS 2026-08-26"
+],
+"chs": [
+"03",
+"04"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://huggingface.co/moonshotai/Kimi-K3",
+"name": "K3 模型卡",
+"names": [
+"K3 模型卡",
+"card",
+"Kimi K3 card"
+],
+"chs": [
+"03",
+"04",
+"07"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://awsdocs-neuron.readthedocs-hosted.com/en/latest/vllm-neuron/docs/model-recipes/qwen3-vl.html",
+"name": "recipe",
+"names": [
+"recipe",
+"Qwen3-VL recipe",
+"VN Qwen3-VL recipe"
+],
+"chs": [
+"03",
+"06"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://awsdocs-neuron.readthedocs-hosted.com/en/latest/vllm-neuron/docs/model-recipes/qwen3-embedding-8b.html",
+"name": "recipe",
+"names": [
+"recipe",
+"Qwen3-Embedding recipe"
+],
+"chs": [
+"03"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://aws.amazon.com/ai/machine-learning/trainium/customers/",
+"name": "AWS Trainium customers",
+"names": [
+"AWS Trainium customers",
+"Trainium customers"
+],
+"chs": [
+"03",
+"05"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://github.com/vllm-project/recipes/blob/main/models/Qwen/Qwen3.8-27B.yaml",
+"name": "recipe",
+"names": [
+"recipe",
+"Qwen3.8-27B",
+"vLLM recipe Qwen3.8-27B"
+],
+"chs": [
+"03",
+"04",
+"07"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://inference-docs.cerebras.ai/support/deprecation",
+"name": "deprecation",
+"names": [
+"deprecation",
+"Cerebras docs",
+"Cerebras deprecations"
+],
+"chs": [
+"03",
+"04",
+"08",
+"09"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://github.com/vllm-project/recipes/blob/main/models/moonshotai/Kimi-K3.yaml",
+"name": "K3 recipe",
+"names": [
+"K3 recipe",
+"Kimi K3",
+"recipe",
+"vLLM recipe Kimi-K3"
+],
+"chs": [
+"03",
+"04",
+"07"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://github.com/vllm-project/recipes/blob/main/models/deepseek-ai/DeepSeek-V4-Pro.yaml",
+"name": "V4-Pro recipe",
+"names": [
+"V4-Pro recipe",
+"vLLM recipe DeepSeek-V4-Pro",
+"DeepSeek-V4-Pro-0813",
+"recipe"
+],
+"chs": [
+"03",
+"04",
+"07"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://aws.amazon.com/blogs/machine-learning/optimizing-mixtral-8x7b-on-amazon-sagemaker-with-aws-inferentia2/",
+"name": "AWS blog",
+"names": [
+"AWS blog",
+"AWS ML blog"
+],
+"chs": [
+"03"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://github.com/vllm-project/recipes/blob/main/models/moonshotai/Kimi-K2.6.yaml",
+"name": "K2.6 recipe",
+"names": [
+"K2.6 recipe",
+"Kimi K2.6",
+"recipe"
+],
+"chs": [
+"03",
+"04"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://github.com/vllm-project/recipes/blob/main/models/zai-org/GLM-5.3-Flash.yaml",
+"name": "GLM-5.3-Flash recipe",
+"names": [
+"GLM-5.3-Flash recipe",
+"recipe",
+"GLM-5.3-Flash"
+],
+"chs": [
+"03",
+"04"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://github.com/vllm-project/recipes/blob/main/models/zai-org/GLM-5.3.yaml",
+"name": "GLM-5.3 recipe",
+"names": [
+"GLM-5.3 recipe",
+"vLLM recipe GLM-5.3",
+"recipe",
+"GLM-5.3"
+],
+"chs": [
+"03",
+"04",
+"07",
+"11"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://awsdocs-neuron.readthedocs-hosted.com/en/latest/release-notes/components/nki-lib.html",
+"name": "NKI-Lib notes",
+"names": [
+"NKI-Lib notes"
+],
+"chs": [
+"03",
+"06"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://github.com/vllm-project/tpu-inference/tree/main/tpu_inference/kernels/experimental/deepseek_v4",
+"name": "experimental kernels",
+"names": [
+"experimental kernels",
+"TPU experimental kernels"
+],
+"chs": [
+"03",
+"06"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://www.amd.com/en/developer/resources/technical-articles/2026/kimi-k3-on-amd-instinct-gpus.html",
+"name": "AMD K3 文章",
+"names": [
+"AMD K3 文章",
+"AMD K3 article",
+"AMD 2026-07-27",
+"AMD"
+],
+"chs": [
+"03",
+"07",
+"08"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://github.com/aws-neuron/neuronx-distributed-inference/blob/main/contrib/models/Qwen3.5-35B-A3B/README.md",
+"name": "Qwen3.5-35B-A3B contrib",
+"names": [
+"Qwen3.5-35B-A3B contrib",
+"35B-A3B",
+"contrib"
+],
+"chs": [
+"03",
+"04"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://github.com/vllm-project/recipes/blob/main/models/Qwen/Qwen3.8-Flash-Next.yaml",
+"name": "Flash-Next recipe",
+"names": [
+"Flash-Next recipe",
+"Qwen3.8-Flash-Next",
+"recipe"
+],
+"chs": [
+"03",
+"04"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://awsdocs-neuron.readthedocs-hosted.com/en/latest/about-neuron/benchmarks/inf2/inf2-performance.html",
+"name": "Inf2 performance page",
+"names": [
+"Inf2 performance page",
+"Inf2 效能頁"
+],
+"chs": [
+"03"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://awsdocs-neuron.readthedocs-hosted.com/en/latest/libraries/nxd-inference/tutorials/trn2-llama3.1-405b-speculative-tutorial.html",
+"name": "NxDI 405B",
+"names": [
+"NxDI 405B",
+"405B 教學"
+],
+"chs": [
+"03",
+"08"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://awsdocs-neuron.readthedocs-hosted.com/en/latest/libraries/nxd-inference/tutorials/sd-inference-tutorial.html",
+"name": "投機解碼教學",
+"names": [
+"投機解碼教學",
+"NxDI tutorial"
+],
+"chs": [
+"03",
+"04"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://awsdocs-neuron.readthedocs-hosted.com/en/latest/release-notes/prev/2.26.0/nxd-inference.html",
+"name": "NxDI 2.26 notes",
+"names": [
+"NxDI 2.26 notes",
+"2.26 notes"
+],
+"chs": [
+"03",
+"06"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://github.com/huggingface/optimum-neuron/tree/main/benchmark/vllm/single-instance",
+"name": "Optimum Neuron",
+"names": [
+"Optimum Neuron",
+"HF 量測"
+],
+"chs": [
+"03",
+"04",
+"08"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://awsdocs-neuron.readthedocs-hosted.com/en/latest/vllm-omni-neuron/docs/index.html",
+"name": "vLLM Omni Neuron",
+"names": [
+"vLLM Omni Neuron"
+],
+"chs": [
+"03"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://github.com/aws-neuron/neuronx-distributed-inference/blob/main/contrib/models/Qwen3.5-2B/README.md",
+"name": "2B",
+"names": [
+"2B"
+],
+"chs": [
+"03"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://github.com/aws-neuron/neuronx-distributed-inference/blob/main/contrib/models/MiniMax-M3/README.md",
+"name": "contrib",
+"names": [
+"contrib",
+"MiniMax-M3 contrib",
+"NxDI contrib MiniMax-M3"
+],
+"chs": [
+"03",
+"04",
+"06",
+"07"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://github.com/aws-neuron/neuronx-distributed-inference/blob/main/contrib/models/GLM-4-9B-0414/README.md",
+"name": "contrib",
+"names": [
+"contrib"
+],
+"chs": [
+"03"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://docs.aws.amazon.com/bedrock/latest/userguide/latency-optimized-inference.html",
+"name": "Bedrock User Guide, latency-optimized inference",
+"names": [
+"Bedrock User Guide, latency-optimized inference",
+"Bedrock 延遲最佳化推論",
+"Bedrock 文件",
+"Bedrock User Guide"
+],
+"chs": [
+"03",
+"05",
+"08",
+"09"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://aws.amazon.com/blogs/machine-learning/optimizing-ai-responsiveness-a-practical-guide-to-amazon-bedrock-latency-optimized-inference/",
+"name": "AWS ML Blog",
+"names": [
+"AWS ML Blog",
+"AWS ML Blog, 28 Jan 2025"
+],
+"chs": [
+"03",
+"05",
+"08",
+"09"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://aws.amazon.com/blogs/machine-learning/scaling-rufus-the-amazon-generative-ai-powered-conversational-shopping-assistant-with-over-80000-aws-inferentia-and-aws-trainium-chips-for-prime-day/",
+"name": "Rufus 2024 blog",
+"names": [
+"Rufus 2024 blog"
+],
+"chs": [
+"03"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://aws.amazon.com/about-aws/whats-new/2026/02/amazon-bedrock-adds-support-six-open-weights-models/",
+"name": "AWS What's New, 10 Feb 2026",
+"names": [
+"AWS What's New, 10 Feb 2026",
+"What's New",
+"AWS What's New 2026-02-10"
+],
+"chs": [
+"03",
+"04",
+"09"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://aws.amazon.com/blogs/machine-learning/introducing-kimi-k3-on-amazon-bedrock/",
+"name": "Kimi K3 文章",
+"names": [
+"Kimi K3 文章",
+"AWS ML Blog",
+"AWS ML blog: Introducing Kimi K3 on Amazon Bedrock"
+],
+"chs": [
+"03",
+"07",
+"11"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://github.com/huggingface/optimum-neuron/blob/main/docs/source/benchmarks/inferentia-llama3.3-70b.mdx",
+"name": "70B benchmark",
+"names": [
+"70B benchmark"
+],
+"chs": [
+"03"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://github.com/huggingface/optimum-neuron/blob/main/docs/source/supported_architectures.mdx",
+"name": "supported architectures",
+"names": [
+"supported architectures"
+],
+"chs": [
+"03"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://aws.amazon.com/cn/blogs/china/deploying-the-deepseek-r1-distillation-model-using-amazon-inferentia2/",
+"name": "AWS China blog",
+"names": [
+"AWS China blog"
+],
+"chs": [
+"03",
+"04"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://aws.amazon.com/blogs/machine-learning/how-rufus-doubled-their-inference-speed-and-handled-prime-day-traffic-with-aws-ai-chips-and-parallel-decoding/",
+"name": "Rufus 2025 blog",
+"names": [
+"Rufus 2025 blog"
+],
+"chs": [
+"03"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://aws.amazon.com/blogs/machine-learning/bytedance-processes-billions-of-daily-videos-using-their-multimodal-video-understanding-models-on-aws-inferentia2/",
+"name": "ByteDance blog",
+"names": [
+"ByteDance blog"
+],
+"chs": [
+"03"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://aws.amazon.com/ai/machine-learning/inferentia/customers/",
+"name": "Inferentia customers",
+"names": [
+"Inferentia customers"
+],
+"chs": [
+"03"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://github.com/AI-Hypercomputer/tpu-recipes/tree/main/inference/ironwood/vLLM/Qwen3.5-397B",
+"name": "Qwen3.5-397B recipe",
+"names": [
+"Qwen3.5-397B recipe"
+],
+"chs": [
+"03"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://github.com/AI-Hypercomputer/tpu-recipes/tree/main/inference/ironwood/vLLM/DeepSeek-V3",
+"name": "DeepSeek-V3 recipe",
+"names": [
+"DeepSeek-V3 recipe",
+"tpu-recipes DeepSeek-V3"
+],
+"chs": [
+"03",
+"06"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://github.com/vllm-project/tpu-inference/blob/main/.buildkite/pipeline_jax_kube.yml",
+"name": "CI pipeline",
+"names": [
+"CI pipeline"
+],
+"chs": [
+"03",
+"04"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://www.shacknews.com/article/149205/google-3-2-quadrillion-monthly-ai-tokens",
+"name": "Shacknews",
+"names": [
+"Shacknews",
+"Shacknews Pichai I/O"
+],
+"chs": [
+"03",
+"05"
+],
+"status": "web",
+"added": false
+},
+{
+"url": "https://www.anthropic.com/news/google-broadcom-partnership-compute",
+"name": "Anthropic 2026-04-06",
+"names": [
+"Anthropic 2026-04-06",
+"Anthropic"
+],
+"chs": [
+"03",
+"05"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://docs.cloud.google.com/gemini-enterprise-agent-platform/models/maas/use-open-models",
+"name": "Vertex open models",
+"names": [
+"Vertex open models",
+"Vertex 開放模型"
+],
+"chs": [
+"03",
+"04",
+"07"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://docs.cloud.google.com/ai-hypercomputer/docs/workloads/pathways-on-cloud/multihost-inference",
+"name": "Pathways",
+"names": [
+"Pathways"
+],
+"chs": [
+"03"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://github.com/SemiAnalysisAI/InferenceX-app/blob/main/packages/constants/src/models.ts",
+"name": "InferenceX 日期表",
+"names": [
+"InferenceX 日期表",
+"InferenceX model dates"
+],
+"chs": [
+"03",
+"04"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://www.lmsys.org/blog/2026-08-19-deepseek-v4-pro-engine-optimization-h20/",
+"name": "LMSYS / Ant Group",
+"names": [
+"LMSYS / Ant Group",
+"LMSYS V4-Pro H20",
+"SGLang / Ant Group"
+],
+"chs": [
+"03",
+"04",
+"07"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://inferencex.semianalysis.com/",
+"name": "InferenceX",
+"names": [
+"InferenceX"
+],
+"chs": [
+"03",
+"08"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://huggingface.co/moonshotai/Kimi-K2.6/blob/main/docs/deploy_guidance.md",
+"name": "K2.6 部署指南",
+"names": [
+"K2.6 部署指南"
+],
+"chs": [
+"03"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://huggingface.co/zai-org/GLM-5.3",
+"name": "GLM-5.3 模型卡",
+"names": [
+"GLM-5.3 模型卡",
+"card"
+],
+"chs": [
+"03",
+"04"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://github.com/QwenLM/Qwen3.8",
+"name": "Qwen3.8 README",
+"names": [
+"Qwen3.8 README",
+"QwenLM/Qwen3.8 README"
+],
+"chs": [
+"03",
+"04"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://www.lmsys.org/blog/2026-08-29-sglang-ssd-expert-pack/",
+"name": "LMSYS SSD Expert Pack",
+"names": [
+"LMSYS SSD Expert Pack"
+],
+"chs": [
+"03"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://github.com/vllm-project/recipes/blob/main/models/moonshotai/Kimi-K2.7-Code.yaml",
+"name": "K2.7-Code",
+"names": [
+"K2.7-Code"
+],
+"chs": [
+"03"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://github.com/vllm-project/recipes/blob/main/models/zai-org/GLM-5.2.yaml",
+"name": "GLM-5.2",
+"names": [
+"GLM-5.2"
+],
+"chs": [
+"03"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://github.com/vllm-project/recipes/blob/main/models/deepseek-ai/DeepSeek-V4-Flash.yaml",
+"name": "DeepSeek-V4-Flash-0731",
+"names": [
+"DeepSeek-V4-Flash-0731",
+"recipe"
+],
+"chs": [
+"03",
+"04"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://techstrong.ai/articles/mlperf-inference-v6-1-updated-for-rag-agents-and-api-based-serving/",
+"name": "Techstrong.ai",
+"names": [
+"Techstrong.ai"
+],
+"chs": [
+"03",
+"08"
+],
+"status": "web",
+"added": false
+},
+{
+"url": "https://lambda.ai/blog/mlperf-inference-v6.1",
+"name": "Lambda: MLPerf Inference v6.1",
+"names": [
+"Lambda: MLPerf Inference v6.1"
+],
+"chs": [
+"03"
+],
+"status": "local",
+"added": true
+},
+{
+"url": "https://rocm.blogs.amd.com/artificial-intelligence/mlperf-inf-v6.1/README.html",
+"name": "AMD ROCm blog",
+"names": [
+"AMD ROCm blog"
+],
+"chs": [
+"03",
+"08"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://artificialanalysis.ai/models/gpt-oss-120b/providers",
+"name": "AA",
+"names": [
+"AA",
+"AA gpt-oss-120b",
+"Artificial Analysis, gpt-oss-120b providers",
+"Artificial Analysis"
+],
+"chs": [
+"03",
+"04",
+"05",
+"07",
+"08",
+"09"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://inference-docs.cerebras.ai/capabilities/reasoning",
+"name": "reasoning 文件",
+"names": [
+"reasoning 文件",
+"Cerebras reasoning"
+],
+"chs": [
+"03",
+"06"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://www.techzine.eu/news/analytics/138754/openai-swaps-nvidia-for-cerebras-with-gpt-5-3-codex-spark/",
+"name": "Techzine",
+"names": [
+"Techzine",
+"Techzine 2026-02-13"
+],
+"chs": [
+"03",
+"05"
+],
+"status": "web",
+"added": false
+},
+{
+"url": "https://openai.com/index/previewing-ultrafast/",
+"name": "OpenAI",
+"names": [
+"OpenAI",
+"OpenAI Ultrafast 預覽",
+"OpenAI 預覽",
+"OpenAI, 13 Aug 2026"
+],
+"chs": [
+"03",
+"05",
+"09"
+],
+"status": "web",
+"added": false
+},
+{
+"url": "https://x.com/SemiAnalysis_/status/2105055045959995719",
+"name": "X 貼文",
+"names": [
+"X 貼文"
+],
+"chs": [
+"03"
+],
+"status": "unreadable",
+"added": false
+},
+{
+"url": "https://officechai.com/ai/openais-gpt-6-1-sol-ultrafast-is-not-running-on-cerebras-but-on-nvidia-gpus-says-semi-analysis/",
+"name": "OfficeChai",
+"names": [
+"OfficeChai",
+"OfficeChai 2026-09-30"
+],
+"chs": [
+"03",
+"05"
+],
+"status": "web",
+"added": false
+},
+{
+"url": "https://www.cerebras.ai/blog/2026Insights",
+"name": "2025 回顧",
+"names": [
+"2025 回顧",
+"Cerebras blog 2025 回顧"
+],
+"chs": [
+"03",
+"05"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://openrouter.ai/provider/cerebras",
+"name": "OpenRouter",
+"names": [
+"OpenRouter"
+],
+"chs": [
+"03"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://artificialanalysis.ai/providers/cerebras",
+"name": "Artificial Analysis",
+"names": [
+"Artificial Analysis"
+],
+"chs": [
+"03"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://api-docs.deepseek.com/updates",
+"name": "DeepSeek API updates",
+"names": [
+"DeepSeek API updates"
+],
+"chs": [
+"04"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://huggingface.co/moonshotai/Kimi-K3/raw/main/config.json",
+"name": "config",
+"names": [
+"config"
+],
+"chs": [
+"04"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://huggingface.co/moonshotai/Kimi-K2.7-Code/raw/main/config.json",
+"name": "config",
+"names": [
+"config"
+],
+"chs": [
+"04"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://huggingface.co/moonshotai/Kimi-K2.7-Code",
+"name": "card",
+"names": [
+"card"
+],
+"chs": [
+"04"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://huggingface.co/zai-org/GLM-5.3/raw/main/config.json",
+"name": "config",
+"names": [
+"config"
+],
+"chs": [
+"04"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://huggingface.co/zai-org/GLM-5.3-Flash/raw/main/config.json",
+"name": "config",
+"names": [
+"config"
+],
+"chs": [
+"04"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://huggingface.co/zai-org/GLM-5.3-Flash",
+"name": "card",
+"names": [
+"card"
+],
+"chs": [
+"04"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://huggingface.co/deepseek-ai/DeepSeek-V4-Pro-0813/raw/main/config.json",
+"name": "config",
+"names": [
+"config"
+],
+"chs": [
+"04"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://huggingface.co/deepseek-ai/DeepSeek-V4-Pro-0813",
+"name": "card",
+"names": [
+"card"
+],
+"chs": [
+"04"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://huggingface.co/deepseek-ai/DeepSeek-V4-Flash-0731/raw/main/config.json",
+"name": "config",
+"names": [
+"config"
+],
+"chs": [
+"04"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://huggingface.co/deepseek-ai/DeepSeek-V4-Flash-0731",
+"name": "card",
+"names": [
+"card"
+],
+"chs": [
+"04"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://huggingface.co/deepseek-ai/DeepSeek-V4.1-Flash/raw/main/config.json",
+"name": "config",
+"names": [
+"config"
+],
+"chs": [
+"04"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://huggingface.co/Qwen/Qwen3.8-2.4T-A95B/raw/main/config.json",
+"name": "config",
+"names": [
+"config"
+],
+"chs": [
+"04"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://huggingface.co/Qwen/Qwen3.8-27B/raw/main/config.json",
+"name": "config",
+"names": [
+"config"
+],
+"chs": [
+"04"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://huggingface.co/Qwen/Qwen3.8-27B",
+"name": "card",
+"names": [
+"card"
+],
+"chs": [
+"04"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://huggingface.co/Qwen/Qwen3.8-Flash-Next/raw/main/config.json",
+"name": "config",
+"names": [
+"config"
+],
+"chs": [
+"04"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://huggingface.co/Qwen/Qwen3.8-Flash-Next",
+"name": "card",
+"names": [
+"card"
+],
+"chs": [
+"04"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://huggingface.co/moonshotai/Kimi-K3/blob/main/LICENSE",
+"name": "LICENSE",
+"names": [
+"LICENSE"
+],
+"chs": [
+"04"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://huggingface.co/zai-org/GLM-5.3/blob/main/LICENSE",
+"name": "LICENSE",
+"names": [
+"LICENSE"
+],
+"chs": [
+"04"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://huggingface.co/Qwen/Qwen3.8-2.4T-A95B/blob/main/LICENSE",
+"name": "LICENSE",
+"names": [
+"LICENSE"
+],
+"chs": [
+"04"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://huggingface.co/Qwen/Qwen3.8-Flash-Next/blob/main/LICENSE",
+"name": "LICENSE",
+"names": [
+"LICENSE"
+],
+"chs": [
+"04"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://huggingface.co/api/models/moonshotai/Kimi-K3/tree/main?recursive=true",
+"name": "Hugging Face API",
+"names": [
+"Hugging Face API"
+],
+"chs": [
+"04"
+],
+"status": "local",
+"added": true
+},
+{
+"url": "https://huggingface.co/moonshotai/Kimi-K2.6/raw/main/config.json",
+"name": "config",
+"names": [
+"config"
+],
+"chs": [
+"04"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://inferencex.semianalysis.com/blog/deepseek-v4-pro-agentx-b200-vs-b300-kv-working-set",
+"name": "InferenceX 2026-08-25",
+"names": [
+"InferenceX 2026-08-25",
+"InferenceX blog, 25 Aug 2026"
+],
+"chs": [
+"04",
+"07",
+"10",
+"11"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://platform.kimi.ai/docs/pricing/chat",
+"name": "Kimi pricing",
+"names": [
+"Kimi pricing"
+],
+"chs": [
+"04",
+"07",
+"10",
+"11"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://platform.kimi.ai/docs/guide/kimi-k3-quickstart",
+"name": "K3 quickstart",
+"names": [
+"K3 quickstart",
+"Kimi K3 quickstart"
+],
+"chs": [
+"04",
+"07"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://docs.z.ai/guides/overview/pricing",
+"name": "Z.ai pricing",
+"names": [
+"Z.ai pricing"
+],
+"chs": [
+"04",
+"07",
+"10",
+"11"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://docs.z.ai/guides/llm/glm-5.3",
+"name": "GLM-5.3 guide",
+"names": [
+"GLM-5.3 guide",
+"Z.ai GLM-5.3"
+],
+"chs": [
+"04",
+"07"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://api-docs.deepseek.com/quick_start/pricing",
+"name": "DeepSeek pricing",
+"names": [
+"DeepSeek pricing"
+],
+"chs": [
+"04",
+"07",
+"10",
+"11"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://www.qwencloud.com/models/qwen3.8-max",
+"name": "Qwen Cloud",
+"names": [
+"Qwen Cloud"
+],
+"chs": [
+"04",
+"07"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://www.alibabacloud.com/help/en/model-studio/model-pricing",
+"name": "Model Studio pricing",
+"names": [
+"Model Studio pricing"
+],
+"chs": [
+"04",
+"07"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://www.qwencloud.com/models/qwen3.8-flash",
+"name": "Qwen Cloud",
+"names": [
+"Qwen Cloud"
+],
+"chs": [
+"04"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://platform.kimi.ai/docs/pricing/limits",
+"name": "Kimi rate limits",
+"names": [
+"Kimi rate limits"
+],
+"chs": [
+"04",
+"07"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://artificialanalysis.ai/methodology/performance-benchmarking",
+"name": "AA methodology",
+"names": [
+"AA methodology",
+"AA 方法論"
+],
+"chs": [
+"04",
+"05"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://openrouter.ai/docs/features/provider-routing",
+"name": "OpenRouter routing",
+"names": [
+"OpenRouter routing"
+],
+"chs": [
+"04"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://openrouter.ai/qwen/qwen3.8-27b",
+"name": "OpenRouter",
+"names": [
+"OpenRouter",
+"OR qwen3.8-27b",
+"OR"
+],
+"chs": [
+"04",
+"07",
+"08"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://console.groq.com/docs/models",
+"name": "Groq docs",
+"names": [
+"Groq docs",
+"Groq models"
+],
+"chs": [
+"04",
+"07"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://docs.sambanova.ai/docs/en/models/sambacloud-models",
+"name": "SambaNova docs",
+"names": [
+"SambaNova docs"
+],
+"chs": [
+"04"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://openrouter.ai/deepseek/deepseek-v3.2",
+"name": "OR deepseek-v3.2",
+"names": [
+"OR deepseek-v3.2"
+],
+"chs": [
+"04"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://openrouter.ai/moonshotai/kimi-k2.7-code",
+"name": "OR kimi-k2.7-code",
+"names": [
+"OR kimi-k2.7-code",
+"OR"
+],
+"chs": [
+"04"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://artificialanalysis.ai/leaderboards/providers",
+"name": "AA providers leaderboard",
+"names": [
+"AA providers leaderboard",
+"AA leaderboard",
+"Artificial Analysis provider leaderboard"
+],
+"chs": [
+"04",
+"05",
+"09",
+"11"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://artificialanalysis.ai/models/kimi-k3/providers",
+"name": "AA Kimi K3",
+"names": [
+"AA Kimi K3",
+"AA",
+"Artificial Analysis, Kimi K3 providers"
+],
+"chs": [
+"04",
+"07",
+"08",
+"09"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://artificialanalysis.ai/models/kimi-k2-7-code/providers",
+"name": "AA",
+"names": [
+"AA"
+],
+"chs": [
+"04"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://artificialanalysis.ai/models/glm-5-3/providers",
+"name": "AA",
+"names": [
+"AA",
+"AA GLM-5.3"
+],
+"chs": [
+"04",
+"07",
+"08"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://artificialanalysis.ai/models/glm-5-3-flash/providers",
+"name": "AA",
+"names": [
+"AA"
+],
+"chs": [
+"04"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://artificialanalysis.ai/models/deepseek-v4-pro/providers",
+"name": "AA",
+"names": [
+"AA",
+"AA DeepSeek V4 Pro"
+],
+"chs": [
+"04",
+"07"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://artificialanalysis.ai/models/deepseek-v4-1-flash/providers",
+"name": "AA",
+"names": [
+"AA",
+"AA DeepSeek V4.1 Flash"
+],
+"chs": [
+"04",
+"07"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://artificialanalysis.ai/models/qwen3-8-2-4t-a95b/providers",
+"name": "AA",
+"names": [
+"AA",
+"AA Qwen3.8 2.4T"
+],
+"chs": [
+"04",
+"07"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://artificialanalysis.ai/models/qwen3-8-27b/providers",
+"name": "AA Qwen3.8 27B",
+"names": [
+"AA Qwen3.8 27B",
+"AA"
+],
+"chs": [
+"04",
+"07"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://openrouter.ai/moonshotai/kimi-k3",
+"name": "OR",
+"names": [
+"OR"
+],
+"chs": [
+"04"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://openrouter.ai/z-ai/glm-5.3",
+"name": "OR",
+"names": [
+"OR",
+"OpenRouter glm-5.3"
+],
+"chs": [
+"04",
+"09"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://openrouter.ai/z-ai/glm-5.3-flash",
+"name": "OR",
+"names": [
+"OR"
+],
+"chs": [
+"04"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://openrouter.ai/deepseek/deepseek-v4-pro-0813",
+"name": "OR",
+"names": [
+"OR"
+],
+"chs": [
+"04"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://openrouter.ai/deepseek/deepseek-v4.1-flash",
+"name": "OR",
+"names": [
+"OR"
+],
+"chs": [
+"04"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://openrouter.ai/qwen/qwen3.8-2.4t-a95b",
+"name": "OR",
+"names": [
+"OR"
+],
+"chs": [
+"04"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://www.lithosai.com/",
+"name": "LithosAI",
+"names": [
+"LithosAI"
+],
+"chs": [
+"04"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://inco.ai/blog/inco-platform-aa/",
+"name": "Inco",
+"names": [
+"Inco"
+],
+"chs": [
+"04"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://supernova-labs.ai/",
+"name": "Supernova",
+"names": [
+"Supernova"
+],
+"chs": [
+"04"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://www.systalyze.com/",
+"name": "Systalyze",
+"names": [
+"Systalyze"
+],
+"chs": [
+"04"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://www.crusoe.ai/resources/blog/430-tokens-per-second-optimizing-kimi-k2-6-and-k2-7-for-production",
+"name": "Crusoe",
+"names": [
+"Crusoe"
+],
+"chs": [
+"04"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://openrouter.ai/moonshotai/kimi-k2.6",
+"name": "OR",
+"names": [
+"OR"
+],
+"chs": [
+"04"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://openrouter.ai/openai/gpt-oss-120b",
+"name": "OpenRouter",
+"names": [
+"OpenRouter",
+"OR gpt-oss-120b"
+],
+"chs": [
+"04",
+"08"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://www.lmsys.org/blog/2026-08-12-qwen3-8-day0-support/",
+"name": "LMSYS",
+"names": [
+"LMSYS"
+],
+"chs": [
+"04"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://vllm.ai/blog/2026-09-21-qwen38-pd-serving",
+"name": "vLLM 2026-09-21",
+"names": [
+"vLLM 2026-09-21",
+"vLLM blog"
+],
+"chs": [
+"04",
+"07"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://whitepapers.openzeka.com/papers/kimi-k3-dgx-b300-inference-benchmark/",
+"name": "OpenZeka",
+"names": [
+"OpenZeka"
+],
+"chs": [
+"04"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://vllm.ai/blog/2026-07-23-glm-5.2-nvfp4-b300-pd",
+"name": "vLLM / DaoCloud",
+"names": [
+"vLLM / DaoCloud"
+],
+"chs": [
+"04",
+"07"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://www.kimi.ai/blog/kimi-k3",
+"name": "Kimi K3 tech blog",
+"names": [
+"Kimi K3 tech blog"
+],
+"chs": [
+"04"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://docs.aws.amazon.com/bedrock/latest/userguide/model-cards.html",
+"name": "Bedrock model cards",
+"names": [
+"Bedrock model cards"
+],
+"chs": [
+"04",
+"07",
+"09"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://docs.cloud.google.com/gemini-enterprise-agent-platform/models/deprecations/open-models",
+"name": "Vertex open model deprecations",
+"names": [
+"Vertex open model deprecations",
+"Vertex deprecations"
+],
+"chs": [
+"04",
+"09"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://learn.microsoft.com/en-us/azure/foundry/foundry-models/concepts/models-sold-directly-by-azure",
+"name": "Foundry Models sold by Azure",
+"names": [
+"Foundry Models sold by Azure",
+"Azure models",
+"Azure Foundry models"
+],
+"chs": [
+"04",
+"07",
+"09"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://www.zyphra.com/our-work/zyphra-and-amd-partner-to-power-zyphra-cloud-on-amd-instinct-mi355x-gpus",
+"name": "Zyphra",
+"names": [
+"Zyphra",
+"Zyphra, 4 May 2026"
+],
+"chs": [
+"04",
+"09"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://learn.microsoft.com/en-us/azure/foundry/foundry-models/concepts/models-sold-directly-by-azure-region-availability",
+"name": "Azure region availability, 4 Sep 2026",
+"names": [
+"Azure region availability, 4 Sep 2026",
+"Azure regions"
+],
+"chs": [
+"04",
+"09"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://docs.cloud.google.com/gemini-enterprise-agent-platform/models/maas/zaiorg/glm-52",
+"name": "Vertex GLM 5.2 page",
+"names": [
+"Vertex GLM 5.2 page",
+"Vertex GLM 5.2"
+],
+"chs": [
+"04",
+"09"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://aws.amazon.com/bedrock/pricing/",
+"name": "Bedrock pricing",
+"names": [
+"Bedrock pricing"
+],
+"chs": [
+"04",
+"05"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://docs.aws.amazon.com/general/latest/gr/bedrock.html",
+"name": "Amazon Bedrock endpoints and quotas",
+"names": [
+"Amazon Bedrock endpoints and quotas",
+"Bedrock quotas"
+],
+"chs": [
+"04",
+"07",
+"09",
+"10",
+"11"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://docs.aws.amazon.com/bedrock/latest/userguide/model-card-moonshot-ai-kimi-k3.html",
+"name": "Bedrock Kimi K3 model card",
+"names": [
+"Bedrock Kimi K3 model card",
+"card"
+],
+"chs": [
+"04",
+"07",
+"09"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://docs.aws.amazon.com/bedrock/latest/userguide/model-card-moonshot-ai-kimi-k2-5.html",
+"name": "Bedrock Kimi K2.5 model card",
+"names": [
+"Bedrock Kimi K2.5 model card",
+"card"
+],
+"chs": [
+"04",
+"09"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://docs.aws.amazon.com/bedrock/latest/userguide/model-card-zai-glm-5.html",
+"name": "card",
+"names": [
+"card"
+],
+"chs": [
+"04"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://docs.aws.amazon.com/bedrock/latest/userguide/model-card-deepseek-deepseek-v3-2.html",
+"name": "card",
+"names": [
+"card"
+],
+"chs": [
+"04"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://aws.amazon.com/about-aws/whats-new/2026/09/moonshot-ai-kimi-k3-on-amazon-bedrock/",
+"name": "AWS What's New",
+"names": [
+"AWS What's New",
+"AWS What's New, 18 Sep 2026",
+"AWS What's New: Kimi K3 on Amazon Bedrock"
+],
+"chs": [
+"04",
+"07",
+"09",
+"11"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://www.anthropic.com/news/expanding-our-use-of-google-cloud-tpus-and-services",
+"name": "Anthropic 2025-10-23",
+"names": [
+"Anthropic 2025-10-23"
+],
+"chs": [
+"05"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://thenextweb.com/news/anthropic-google-broadcom-compute-deal",
+"name": "TNW",
+"names": [
+"TNW"
+],
+"chs": [
+"05"
+],
+"status": "web",
+"added": false
+},
+{
+"url": "https://finance.yahoo.com/technology/ai/articles/amd-expected-launch-next-generation-100622118.html",
+"name": "Reuters via Yahoo Finance 2026-07-23",
+"names": [
+"Reuters via Yahoo Finance 2026-07-23"
+],
+"chs": [
+"05"
+],
+"status": "web",
+"added": false
+},
+{
+"url": "https://www.cerebras.ai/blog/openai-codexspark",
+"name": "Cerebras blog 2026-02-12",
+"names": [
+"Cerebras blog 2026-02-12"
+],
+"chs": [
+"05"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://investors.cerebras.ai/news-releases/news-release-details/cerebras-systems-announces-strong-first-quarter-2026-results",
+"name": "Cerebras Q1 2026 results",
+"names": [
+"Cerebras Q1 2026 results"
+],
+"chs": [
+"05"
+],
+"status": "web",
+"added": false
+},
+{
+"url": "https://www.viksnewsletter.com/p/cerebras-ipo-and-the-scaling-bottlenecks",
+"name": "Vik's Newsletter",
+"names": [
+"Vik's Newsletter"
+],
+"chs": [
+"05"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://blogs.nvidia.com/blog/gpus-openai-gpt-6-astra-ultrafast/",
+"name": "NVIDIA 部落格",
+"names": [
+"NVIDIA 部落格",
+"NVIDIA blog 2026-10-01"
+],
+"chs": [
+"05"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://venturebeat.com/technology/openais-gpt-6-1-sol-offers-astra-like-performance-at-1-5th-price-a-new-ultrafast-tier-clocks-at-300-tokens-per-second",
+"name": "VentureBeat",
+"names": [
+"VentureBeat",
+"VentureBeat 2026-09-29"
+],
+"chs": [
+"05"
+],
+"status": "web",
+"added": false
+},
+{
+"url": "https://finance.biggo.com/news/ff824066-1b87-4f34-97d6-90fde6ef0de8",
+"name": "BigGo Finance 2026-09-30",
+"names": [
+"BigGo Finance 2026-09-30"
+],
+"chs": [
+"05"
+],
+"status": "web",
+"added": false
+},
+{
+"url": "https://the-decoder.com/meta-signs-multi-billion-dollar-deal-to-rent-googles-tpus-in-a-direct-challenge-to-nvidias-ai-chip-dominance/",
+"name": "The Decoder 2026-02-27",
+"names": [
+"The Decoder 2026-02-27"
+],
+"chs": [
+"05"
+],
+"status": "web",
+"added": false
+},
+{
+"url": "https://investor.nvidia.com/news/press-release-details/2026/NVIDIA-Vera-Rubin-Ramps-Into-Full-Production-to-Power-Agentic-AI-Factories-Worldwide/default.aspx",
+"name": "NVIDIA IR 2026-05-31",
+"names": [
+"NVIDIA IR 2026-05-31"
+],
+"chs": [
+"05"
+],
+"status": "web",
+"added": false
+},
+{
+"url": "https://developers.openai.com/api/docs/guides/amazon-bedrock",
+"name": "OpenAI on Amazon Bedrock",
+"names": [
+"OpenAI on Amazon Bedrock"
+],
+"chs": [
+"05"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://docs.aws.amazon.com/nova/latest/nova2-userguide/what-is-nova-2.html",
+"name": "Nova 2 developer guide",
+"names": [
+"Nova 2 developer guide"
+],
+"chs": [
+"05"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://artificialanalysis.ai/providers/google",
+"name": "AA Google 供應商頁",
+"names": [
+"AA Google 供應商頁",
+"AA"
+],
+"chs": [
+"05",
+"08"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://artificialanalysis.ai/leaderboards/models",
+"name": "AA models leaderboard",
+"names": [
+"AA models leaderboard"
+],
+"chs": [
+"05"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://artificialanalysis.ai/models",
+"name": "AA 模型索引",
+"names": [
+"AA 模型索引"
+],
+"chs": [
+"05"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://artificialanalysis.ai/models/claude-4-5-haiku/providers",
+"name": "Claude Haiku 4.5",
+"names": [
+"Claude Haiku 4.5",
+"AA Claude 4.5 Haiku"
+],
+"chs": [
+"05",
+"07"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://artificialanalysis.ai/models/claude-opus-5-5-low/providers",
+"name": "Claude Opus 5.5 low",
+"names": [
+"Claude Opus 5.5 low",
+"AA Claude Opus 5.5"
+],
+"chs": [
+"05",
+"07"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://artificialanalysis.ai/models/gpt-6-astra/providers",
+"name": "GPT-6 Astra",
+"names": [
+"GPT-6 Astra"
+],
+"chs": [
+"05"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://artificialanalysis.ai/models/gpt-5-6-sol/providers",
+"name": "GPT-5.6 Sol",
+"names": [
+"GPT-5.6 Sol"
+],
+"chs": [
+"05"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://artificialanalysis.ai/models/gemini-3-1-pro-preview/providers",
+"name": "Gemini 3.1 Pro Preview",
+"names": [
+"Gemini 3.1 Pro Preview"
+],
+"chs": [
+"05"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://openrouter.ai/anthropic/claude-opus-5.5",
+"name": "OpenRouter Claude Opus 5.5",
+"names": [
+"OpenRouter Claude Opus 5.5",
+"Claude Opus 5.5"
+],
+"chs": [
+"05",
+"11"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://openrouter.ai/anthropic/claude-sonnet-5.5",
+"name": "OpenRouter Claude Sonnet 5.5",
+"names": [
+"OpenRouter Claude Sonnet 5.5",
+"Claude Sonnet 5.5"
+],
+"chs": [
+"05",
+"11"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://openrouter.ai/anthropic/claude-haiku-4.5",
+"name": "Claude Haiku 4.5",
+"names": [
+"Claude Haiku 4.5"
+],
+"chs": [
+"05"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://openrouter.ai/anthropic/claude-fable-5.1",
+"name": "Claude Fable 5.1",
+"names": [
+"Claude Fable 5.1"
+],
+"chs": [
+"05"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://openrouter.ai/openai/gpt-6-astra",
+"name": "GPT-6 Astra",
+"names": [
+"GPT-6 Astra",
+"OpenRouter GPT-6 Astra"
+],
+"chs": [
+"05"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://openrouter.ai/openai/gpt-6.1-sol",
+"name": "GPT-6.1 Sol",
+"names": [
+"GPT-6.1 Sol"
+],
+"chs": [
+"05"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://openrouter.ai/openai/gpt-6-luna",
+"name": "GPT-6 Luna",
+"names": [
+"GPT-6 Luna"
+],
+"chs": [
+"05"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://openrouter.ai/openai/gpt-5.6-sol",
+"name": "GPT-5.6 Sol",
+"names": [
+"GPT-5.6 Sol",
+"OpenRouter GPT-5.6 Sol"
+],
+"chs": [
+"05"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://openrouter.ai/google/gemini-3.8-flash",
+"name": "Gemini 3.8 Flash",
+"names": [
+"Gemini 3.8 Flash"
+],
+"chs": [
+"05"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://openrouter.ai/x-ai/grok-4.7",
+"name": "Grok 4.7",
+"names": [
+"Grok 4.7"
+],
+"chs": [
+"05"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://platform.claude.com/docs/en/build-with-claude/fast-mode",
+"name": "Claude fast mode",
+"names": [
+"Claude fast mode"
+],
+"chs": [
+"05"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://platform.claude.com/docs/en/about-claude/pricing",
+"name": "Claude pricing",
+"names": [
+"Claude pricing"
+],
+"chs": [
+"05",
+"07"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://platform.claude.com/docs/en/api/service-tiers",
+"name": "Claude service tiers",
+"names": [
+"Claude service tiers",
+"Anthropic service tiers"
+],
+"chs": [
+"05",
+"09"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://developers.openai.com/api/docs/guides/fast-mode",
+"name": "OpenAI Fast mode",
+"names": [
+"OpenAI Fast mode"
+],
+"chs": [
+"05"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://developers.openai.com/api/docs/pricing",
+"name": "OpenAI pricing",
+"names": [
+"OpenAI pricing"
+],
+"chs": [
+"05",
+"07"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://developers.openai.com/api/docs/guides/ultrafast-mode",
+"name": "OpenAI Ultrafast mode",
+"names": [
+"OpenAI Ultrafast mode"
+],
+"chs": [
+"05"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://www.cerebras.ai/blog/accelerating-gpt-5-6-sol-ultrafast-with-openai",
+"name": "Cerebras 2026-08-13",
+"names": [
+"Cerebras 2026-08-13"
+],
+"chs": [
+"05"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://the-decoder.com/gpt-5-6-sol-goes-14x-faster-as-openai-launches-ultrafast-mode-powered-by-cerebras/",
+"name": "The Decoder",
+"names": [
+"The Decoder"
+],
+"chs": [
+"05"
+],
+"status": "unreadable",
+"added": false
+},
+{
+"url": "https://ai.google.dev/gemini-api/docs/priority-inference",
+"name": "Gemini priority inference",
+"names": [
+"Gemini priority inference"
+],
+"chs": [
+"05"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://ai.google.dev/gemini-api/docs/pricing",
+"name": "Gemini pricing",
+"names": [
+"Gemini pricing"
+],
+"chs": [
+"05",
+"07"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://claude.com/blog/trainium2-and-distillation",
+"name": "Anthropic",
+"names": [
+"Anthropic",
+"Anthropic 2024-12"
+],
+"chs": [
+"05",
+"08"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://docs.aws.amazon.com/bedrock/latest/userguide/service-tiers-inference.html",
+"name": "Bedrock service tiers",
+"names": [
+"Bedrock service tiers"
+],
+"chs": [
+"05",
+"09",
+"11"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://learn.microsoft.com/en-us/azure/foundry/openai/concepts/priority-processing",
+"name": "Azure priority processing",
+"names": [
+"Azure priority processing"
+],
+"chs": [
+"05"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://artificialanalysis.ai/models/claude-3-5-haiku/providers",
+"name": "AA Claude 3.5 Haiku",
+"names": [
+"AA Claude 3.5 Haiku"
+],
+"chs": [
+"05"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://aws.amazon.com/about-aws/whats-new/2024/12/latency-optimized-inference-foundation-models-amazon-bedrock/",
+"name": "AWS What's New，2024-12-02",
+"names": [
+"AWS What's New，2024-12-02"
+],
+"chs": [
+"05"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://platform.claude.com/docs/en/models/overview",
+"name": "Claude models overview",
+"names": [
+"Claude models overview"
+],
+"chs": [
+"05"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://en.wikipedia.org/wiki/Claude_(AI)",
+"name": "Wikipedia: Claude",
+"names": [
+"Wikipedia: Claude"
+],
+"chs": [
+"05"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://developers.openai.com/api/docs/models/gpt-6-astra",
+"name": "GPT-6 Astra",
+"names": [
+"GPT-6 Astra"
+],
+"chs": [
+"05"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://developers.openai.com/api/docs/models/gpt-6.1-sol",
+"name": "GPT-6.1 Sol",
+"names": [
+"GPT-6.1 Sol",
+"gpt-6.1-sol",
+"GPT-6.1 Sol model page"
+],
+"chs": [
+"05",
+"07",
+"11"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://developers.openai.com/api/docs/models/gpt-6-luna",
+"name": "GPT-6 Luna",
+"names": [
+"GPT-6 Luna"
+],
+"chs": [
+"05"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://en.wikipedia.org/wiki/GPT-6",
+"name": "Wikipedia: GPT-6",
+"names": [
+"Wikipedia: GPT-6"
+],
+"chs": [
+"05"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://ai.google.dev/gemini-api/docs/models/gemini-3.8-flash",
+"name": "Gemini 3.8 Flash",
+"names": [
+"Gemini 3.8 Flash"
+],
+"chs": [
+"05",
+"07"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://ai.google.dev/gemini-api/docs/models/gemini-3.1-pro-preview",
+"name": "Gemini 3.1 Pro Preview",
+"names": [
+"Gemini 3.1 Pro Preview"
+],
+"chs": [
+"05"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://ai.google.dev/gemini-api/docs/changelog",
+"name": "Gemini API changelog",
+"names": [
+"Gemini API changelog"
+],
+"chs": [
+"05"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://blog.google/innovation-and-ai/models-and-research/gemini-models/gemini-4-argon/",
+"name": "Google 部落格，2026-09-30",
+"names": [
+"Google 部落格，2026-09-30"
+],
+"chs": [
+"05"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://docs.x.ai/docs/models",
+"name": "xAI models documentation",
+"names": [
+"xAI models documentation"
+],
+"chs": [
+"05"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://openrouter.ai/api/v1/models",
+"name": "OpenRouter 模型目錄",
+"names": [
+"OpenRouter 模型目錄"
+],
+"chs": [
+"05"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://microsoft.ai/news/building-a-hillclimbing-machine-launching-seven-new-mai-models/",
+"name": "Microsoft AI，2026-06-02",
+"names": [
+"Microsoft AI，2026-06-02"
+],
+"chs": [
+"05"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://www.latent.space/p/ainews-gemini-4-argon-gdms-answer",
+"name": "Latent Space AINews，2026-10-01",
+"names": [
+"Latent Space AINews，2026-10-01"
+],
+"chs": [
+"05"
+],
+"status": "local",
+"added": true
+},
+{
+"url": "https://the-decoder.com/google-gemini-4-argon-closes-the-gap-with-openai-and-anthropic-but-doesnt-take-a-clear-lead/",
+"name": "The Decoder",
+"names": [
+"The Decoder",
+"The Decoder，2026-10-01"
+],
+"chs": [
+"05",
+"07"
+],
+"status": "unreadable",
+"added": false
+},
+{
+"url": "https://the-decoder.com/claude-opus-5-5-matches-fable-5-1-at-40-percent-lower-cost-as-anthropic-promises-to-fix-claudish-writing/",
+"name": "The Decoder",
+"names": [
+"The Decoder"
+],
+"chs": [
+"05"
+],
+"status": "unreadable",
+"added": false
+},
+{
+"url": "https://platform.claude.com/docs/en/build-with-claude/claude-in-microsoft-foundry",
+"name": "Claude in Microsoft Foundry",
+"names": [
+"Claude in Microsoft Foundry"
+],
+"chs": [
+"05"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://platform.claude.com/docs/en/build-with-claude/claude-on-vertex-ai",
+"name": "Claude on Vertex AI",
+"names": [
+"Claude on Vertex AI"
+],
+"chs": [
+"05"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://awsdocs-neuron.readthedocs-hosted.com/en/latest/vllm-neuron/docs/design/vllm/vllm-integration-kv-cache.html",
+"name": "VN KV design",
+"names": [
+"VN KV design"
+],
+"chs": [
+"06"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://awsdocs-neuron.readthedocs-hosted.com/en/latest/vllm-neuron/docs/guides/reference-configuration.html",
+"name": "VN configuration reference",
+"names": [
+"VN configuration reference",
+"configuration reference"
+],
+"chs": [
+"06",
+"07"
+],
+"status": "local",
+"added": true
+},
+{
+"url": "https://github.com/vllm-project/vllm/blob/main/docs/configuration/optimization.md",
+"name": "vLLM optimization",
+"names": [
+"vLLM optimization"
+],
+"chs": [
+"06"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://github.com/ROCm/ATOM/blob/main/docs/context_parallel_guide.md",
+"name": "ATOM context parallel guide",
+"names": [
+"ATOM context parallel guide"
+],
+"chs": [
+"06"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://github.com/vllm-project/vllm/blob/main/docs/features/kv_offloading_usage.md",
+"name": "vLLM KV offloading",
+"names": [
+"vLLM KV offloading"
+],
+"chs": [
+"06"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://github.com/sgl-project/sglang/blob/main/docs/docs/advanced_features/hicache_design.mdx",
+"name": "SGLang HiCache design",
+"names": [
+"SGLang HiCache design"
+],
+"chs": [
+"06"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://github.com/NVIDIA/TensorRT-LLM/blob/main/docs/source/features/kv-cache-connector.md",
+"name": "TRT-LLM KV connector",
+"names": [
+"TRT-LLM KV connector"
+],
+"chs": [
+"06"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://github.com/vllm-project/tpu-inference/tree/main/examples/offload/gke/benchmarks",
+"name": "TPU offload example",
+"names": [
+"TPU offload example",
+"tpu-inference offload example"
+],
+"chs": [
+"06",
+"09"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://github.com/vllm-project/vllm/blob/main/docs/features/speculative_decoding/README.md",
+"name": "vLLM speculative decoding",
+"names": [
+"vLLM speculative decoding"
+],
+"chs": [
+"06"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://github.com/sgl-project/sglang/blob/main/docs/docs/advanced_features/speculative_decoding.mdx",
+"name": "SGLang speculative decoding",
+"names": [
+"SGLang speculative decoding"
+],
+"chs": [
+"06"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://github.com/vllm-project/vllm/blob/main/vllm/config/speculative.py",
+"name": "vLLM speculative config",
+"names": [
+"vLLM speculative config"
+],
+"chs": [
+"06"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://github.com/NVIDIA/TensorRT-LLM/blob/main/docs/source/features/speculative-decoding.md",
+"name": "TRT-LLM speculative decoding",
+"names": [
+"TRT-LLM speculative decoding"
+],
+"chs": [
+"06"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://awsdocs-neuron.readthedocs-hosted.com/en/latest/vllm-neuron/docs/design/speculation/speculative_decoding_design.html",
+"name": "VN speculation design",
+"names": [
+"VN speculation design"
+],
+"chs": [
+"06"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://github.com/sgl-project/sglang/blob/main/python/sglang/srt/speculative/spec_info.py",
+"name": "SGLang spec_info.py",
+"names": [
+"SGLang spec_info.py"
+],
+"chs": [
+"06"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://github.com/NVIDIA/TensorRT-LLM/blob/main/docs/source/features/feature-combination-matrix.md",
+"name": "TRT-LLM combination matrix",
+"names": [
+"TRT-LLM combination matrix"
+],
+"chs": [
+"06"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://github.com/vllm-project/tpu-inference/blob/main/tpu_inference/runner/speculative_decoding_manager.py",
+"name": "tpu-inference speculative decoding manager",
+"names": [
+"tpu-inference speculative decoding manager"
+],
+"chs": [
+"06"
+],
+"status": "local",
+"added": true
+},
+{
+"url": "https://github.com/vllm-project/tpu-inference/blob/main/tpu_inference/models/jax/gemma4_mtp.py",
+"name": "tpu-inference Gemma 4 MTP",
+"names": [
+"tpu-inference Gemma 4 MTP"
+],
+"chs": [
+"06"
+],
+"status": "local",
+"added": true
+},
+{
+"url": "https://github.com/vllm-project/vllm/blob/main/docs/features/speculative_decoding/adaptive_verification.md",
+"name": "vLLM adaptive verification",
+"names": [
+"vLLM adaptive verification"
+],
+"chs": [
+"06"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://github.com/NVIDIA/TensorRT-LLM/blob/main/tensorrt_llm/llmapi/llm_args.py",
+"name": "TRT-LLM llm_args.py",
+"names": [
+"TRT-LLM llm_args.py"
+],
+"chs": [
+"06"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://awsdocs-neuron.readthedocs-hosted.com/en/latest/vllm-neuron/docs/model-recipes/llama-3.html",
+"name": "VN Llama 3 recipe",
+"names": [
+"VN Llama 3 recipe"
+],
+"chs": [
+"06"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://aws.amazon.com/ko/blogs/tech/llm-model-quantization-techniques-for-aws-inferentia-by-nota-ai/",
+"name": "Nota AI on AWS blog",
+"names": [
+"Nota AI on AWS blog"
+],
+"chs": [
+"06"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://github.com/vllm-project/vllm/blob/main/docs/features/quantization/quantized_kvcache.md",
+"name": "vLLM quantized KV cache",
+"names": [
+"vLLM quantized KV cache"
+],
+"chs": [
+"06"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://awsdocs-neuron.readthedocs-hosted.com/en/latest/vllm-neuron/docs/design/vllm/kv-cache-quantization.html",
+"name": "VN KV-quant design",
+"names": [
+"VN KV-quant design",
+"vLLM Neuron KV quantization",
+"KV quantization design"
+],
+"chs": [
+"06",
+"07"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://github.com/vllm-project/vllm/blob/main/docs/serving/parallelism_scaling.md",
+"name": "vLLM parallelism",
+"names": [
+"vLLM parallelism"
+],
+"chs": [
+"06"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://github.com/ROCm/ATOM/blob/main/docs/distributed_guide.md",
+"name": "ATOM distributed guide",
+"names": [
+"ATOM distributed guide"
+],
+"chs": [
+"06"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://github.com/vllm-project/vllm/blob/main/docs/serving/expert_parallel_deployment.md",
+"name": "vLLM expert parallel",
+"names": [
+"vLLM expert parallel"
+],
+"chs": [
+"06"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://github.com/sgl-project/sglang/blob/main/docs/docs/advanced_features/expert_parallelism.mdx",
+"name": "SGLang expert parallelism",
+"names": [
+"SGLang expert parallelism"
+],
+"chs": [
+"06"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://github.com/NVIDIA/TensorRT-LLM/blob/main/docs/source/features/parallel-strategy.md",
+"name": "TRT-LLM parallel strategy",
+"names": [
+"TRT-LLM parallel strategy"
+],
+"chs": [
+"06"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://awsdocs-neuron.readthedocs-hosted.com/en/latest/vllm-neuron/docs/design/parallelism/expert_parallelism.html",
+"name": "VN EP design",
+"names": [
+"VN EP design"
+],
+"chs": [
+"06"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://github.com/vllm-project/vllm/blob/main/docs/serving/data_parallel_deployment.md",
+"name": "vLLM data parallel",
+"names": [
+"vLLM data parallel"
+],
+"chs": [
+"06"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://awsdocs-neuron.readthedocs-hosted.com/en/latest/libraries/nxd-inference/tutorials/trn2-llama3.3-70b-dp-tutorial.html",
+"name": "NxDI data parallelism tutorial",
+"names": [
+"NxDI data parallelism tutorial"
+],
+"chs": [
+"06"
+],
+"status": "local",
+"added": true
+},
+{
+"url": "https://github.com/vllm-project/vllm/blob/main/docs/serving/context_parallel_deployment.md",
+"name": "vLLM context parallel",
+"names": [
+"vLLM context parallel"
+],
+"chs": [
+"06"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://github.com/sgl-project/sglang/blob/main/docs/docs/advanced_features/dcp.mdx",
+"name": "SGLang DCP",
+"names": [
+"SGLang DCP"
+],
+"chs": [
+"06"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://github.com/sgl-project/sglang/blob/main/docs/docs/advanced_features/prefill_cp.mdx",
+"name": "SGLang prefill CP",
+"names": [
+"SGLang prefill CP"
+],
+"chs": [
+"06"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://awsdocs-neuron.readthedocs-hosted.com/en/latest/vllm-neuron/docs/design/parallelism/dcp.html",
+"name": "VN DCP design",
+"names": [
+"VN DCP design",
+"DCP design"
+],
+"chs": [
+"06",
+"07"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://awsdocs-neuron.readthedocs-hosted.com/en/latest/vllm-neuron/docs/design/vllm/disaggregated-inference.html",
+"name": "VN DI design",
+"names": [
+"VN DI design",
+"vLLM Neuron DI design",
+"DI design"
+],
+"chs": [
+"06",
+"07",
+"09"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://awsdocs-neuron.readthedocs-hosted.com/en/latest/release-notes/prev/rn.html",
+"name": "Neuron previous release notes",
+"names": [
+"Neuron previous release notes"
+],
+"chs": [
+"06"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://github.com/sgl-project/sglang/blob/main/docs/docs/advanced_features/pd_disaggregation.mdx",
+"name": "SGLang PD disaggregation",
+"names": [
+"SGLang PD disaggregation"
+],
+"chs": [
+"06"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://github.com/NVIDIA/TensorRT-LLM/blob/main/docs/source/features/disagg-serving.md",
+"name": "TRT-LLM disaggregated serving",
+"names": [
+"TRT-LLM disaggregated serving"
+],
+"chs": [
+"06"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://github.com/vllm-project/tpu-inference/tree/main/examples/disagg",
+"name": "TPU disagg examples",
+"names": [
+"TPU disagg examples"
+],
+"chs": [
+"06"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://github.com/vllm-project/vllm/blob/main/vllm/v1/attention/backends/registry.py",
+"name": "vLLM attention registry",
+"names": [
+"vLLM attention registry"
+],
+"chs": [
+"06"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://github.com/vllm-project/tpu-inference/blob/main/docs/recommended_models.md",
+"name": "TPU recommended models",
+"names": [
+"TPU recommended models"
+],
+"chs": [
+"06"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://github.com/NVIDIA/TensorRT-LLM/blob/main/docs/source/features/sparse-attention.md",
+"name": "TRT-LLM sparse attention",
+"names": [
+"TRT-LLM sparse attention"
+],
+"chs": [
+"06"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://github.com/sgl-project/sglang/blob/main/docs/docs/basic_usage/anthropic_api.mdx",
+"name": "SGLang Anthropic API",
+"names": [
+"SGLang Anthropic API"
+],
+"chs": [
+"06"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://github.com/vllm-project/vllm/blob/main/docs/features/multimodal_inputs.md",
+"name": "vLLM multimodal inputs",
+"names": [
+"vLLM multimodal inputs"
+],
+"chs": [
+"06"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://github.com/vllm-project/vllm/blob/main/docs/features/structured_outputs.md",
+"name": "vLLM structured outputs",
+"names": [
+"vLLM structured outputs"
+],
+"chs": [
+"06"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://github.com/sgl-project/sglang/blob/main/docs/docs/advanced_features/structured_outputs.mdx",
+"name": "SGLang structured outputs",
+"names": [
+"SGLang structured outputs"
+],
+"chs": [
+"06"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://github.com/NVIDIA/TensorRT-LLM/blob/main/docs/source/features/guided-decoding.md",
+"name": "TRT-LLM guided decoding",
+"names": [
+"TRT-LLM guided decoding"
+],
+"chs": [
+"06"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://inference-docs.cerebras.ai/capabilities/structured-outputs",
+"name": "Cerebras structured outputs",
+"names": [
+"Cerebras structured outputs"
+],
+"chs": [
+"06"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://github.com/vllm-project/vllm/blob/main/docs/features/tool_calling.md",
+"name": "vLLM tool calling",
+"names": [
+"vLLM tool calling"
+],
+"chs": [
+"06"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://github.com/vllm-project/vllm/blob/main/docs/features/reasoning_outputs.md",
+"name": "vLLM reasoning outputs",
+"names": [
+"vLLM reasoning outputs"
+],
+"chs": [
+"06"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://github.com/NVIDIA/TensorRT-LLM/tree/main/tensorrt_llm/serve/tool_parser",
+"name": "TRT-LLM tool parsers",
+"names": [
+"TRT-LLM tool parsers"
+],
+"chs": [
+"06"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://github.com/ROCm/ATOM/blob/main/docs/serving_benchmarking_guide.md",
+"name": "ATOM serving guide",
+"names": [
+"ATOM serving guide"
+],
+"chs": [
+"06"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://github.com/vllm-project/tpu-inference/blob/main/tests/e2e/benchmarking/inferencex/qwen3.5/server.sh",
+"name": "tpu-inference InferenceX server script",
+"names": [
+"tpu-inference InferenceX server script"
+],
+"chs": [
+"06"
+],
+"status": "local",
+"added": true
+},
+{
+"url": "https://inference-docs.cerebras.ai/capabilities/tool-use",
+"name": "Cerebras tool use",
+"names": [
+"Cerebras tool use"
+],
+"chs": [
+"06"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://github.com/vllm-project/vllm/blob/main/docs/features/lora.md",
+"name": "vLLM LoRA",
+"names": [
+"vLLM LoRA"
+],
+"chs": [
+"06"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://github.com/sgl-project/sglang/blob/main/docs/docs/advanced_features/lora.mdx",
+"name": "SGLang LoRA",
+"names": [
+"SGLang LoRA"
+],
+"chs": [
+"06"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://github.com/vllm-project/tpu-inference/tree/main/tpu_inference/lora",
+"name": "TPU LoRA",
+"names": [
+"TPU LoRA"
+],
+"chs": [
+"06"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://github.com/vllm-project/vllm/blob/main/docs/serving/online_serving/README.md",
+"name": "vLLM online serving",
+"names": [
+"vLLM online serving"
+],
+"chs": [
+"06"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://github.com/NVIDIA/TensorRT-LLM/blob/main/tensorrt_llm/serve/openai_server.py",
+"name": "TRT-LLM openai_server.py",
+"names": [
+"TRT-LLM openai_server.py"
+],
+"chs": [
+"06"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://rocm.blogs.amd.com/software-tools-optimization/infera-di/README.html",
+"name": "AMD Infera blog",
+"names": [
+"AMD Infera blog"
+],
+"chs": [
+"06"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://github.com/vllm-project/vllm/blob/main/docs/usage/metrics.md",
+"name": "vLLM metrics",
+"names": [
+"vLLM metrics"
+],
+"chs": [
+"06"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://github.com/sgl-project/sglang/blob/main/docs/docs/advanced_features/observability.mdx",
+"name": "SGLang observability",
+"names": [
+"SGLang observability"
+],
+"chs": [
+"06"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://github.com/ROCm/ATOM/blob/main/docs/metrics_guide.md",
+"name": "ATOM metrics guide",
+"names": [
+"ATOM metrics guide"
+],
+"chs": [
+"06"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://awsdocs-neuron.readthedocs-hosted.com/en/latest/vllm-neuron/docs/design/vllm/neuron-scheduler.html",
+"name": "VN scheduler design",
+"names": [
+"VN scheduler design",
+"scheduler design"
+],
+"chs": [
+"06",
+"07"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://github.com/vllm-project/tpu-inference/blob/main/support_matrices/nightly/v7x/vllm/model_support_matrix.csv",
+"name": "TPU nightly v7x matrix",
+"names": [
+"TPU nightly v7x matrix"
+],
+"chs": [
+"06"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://github.com/google/tpu-sync",
+"name": "TPU-Sync",
+"names": [
+"TPU-Sync",
+"google/tpu-sync"
+],
+"chs": [
+"06",
+"07",
+"09"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://github.com/ROCm/ATOM/blob/main/docs/environment_variables.md",
+"name": "ATOM environment variables",
+"names": [
+"ATOM environment variables"
+],
+"chs": [
+"06"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://vllm.ai/blog/2026-09-29-disaggregated-serving-guide",
+"name": "vLLM blog, 29 Sep 2026",
+"names": [
+"vLLM blog, 29 Sep 2026",
+"vLLM blog, 2026-09-29",
+"vLLM PD guide"
+],
+"chs": [
+"06",
+"07",
+"09"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://arxiv.org/abs/2609.30854",
+"name": "arXiv 2609.30854",
+"names": [
+"arXiv 2609.30854"
+],
+"chs": [
+"07"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://vllm.ai/blog/2026-07-27-k3",
+"name": "vLLM 2026-07-27",
+"names": [
+"vLLM 2026-07-27"
+],
+"chs": [
+"07"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://vllm.ai/blog/2026-04-24-deepseek-v4",
+"name": "vLLM 2026-04-24",
+"names": [
+"vLLM 2026-04-24"
+],
+"chs": [
+"07"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://huggingface.co/deepseek-ai/DeepSeek-V4.1-Flash/blob/main/DeepSeek_V41_Tech_Report.pdf",
+"name": "DeepSeek V4.1 tech report",
+"names": [
+"DeepSeek V4.1 tech report"
+],
+"chs": [
+"07"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://www.lmsys.org/blog/2026-09-16-nvfp4-kv-cache/",
+"name": "LMSYS 2026-09-16",
+"names": [
+"LMSYS 2026-09-16"
+],
+"chs": [
+"07"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://inferencex.semianalysis.com/blog/kimi-k3-the-manos-the-mythos-the",
+"name": "InferenceX blog, 3 Aug 2026",
+"names": [
+"InferenceX blog, 3 Aug 2026",
+"InferenceX 2026-08-03"
+],
+"chs": [
+"07",
+"10",
+"11"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://vllm.ai/blog/2026-09-13-kimi-k3-performance-optimization",
+"name": "vLLM 2026-09-13",
+"names": [
+"vLLM 2026-09-13"
+],
+"chs": [
+"07"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://docs.sglang.io/cookbook/autoregressive/Moonshotai/Kimi-K3",
+"name": "SGLang Kimi-K3 cookbook",
+"names": [
+"SGLang Kimi-K3 cookbook"
+],
+"chs": [
+"07"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://www.lmsys.org/blog/2026-01-15-chunked-pipeline/",
+"name": "LMSYS chunked pipeline",
+"names": [
+"LMSYS chunked pipeline"
+],
+"chs": [
+"07"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://www.lmsys.org/blog/2026-02-19-gb300-longctx/",
+"name": "LMSYS / NVIDIA",
+"names": [
+"LMSYS / NVIDIA"
+],
+"chs": [
+"07"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://llm-d.ai/blog/sticky-until-saturated-token-aware-routing",
+"name": "llm-d 2026-08-17",
+"names": [
+"llm-d 2026-08-17"
+],
+"chs": [
+"07"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://artificialanalysis.ai/models/claude-sonnet-5-5-low/providers",
+"name": "AA Claude Sonnet 5.5",
+"names": [
+"AA Claude Sonnet 5.5"
+],
+"chs": [
+"07"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://artificialanalysis.ai/models/gpt-5-6-terra-non-reasoning/providers",
+"name": "AA GPT-5.6 Terra",
+"names": [
+"AA GPT-5.6 Terra"
+],
+"chs": [
+"07"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://artificialanalysis.ai/models/gemini-3-8-flash/providers",
+"name": "AA Gemini 3.8 Flash",
+"names": [
+"AA Gemini 3.8 Flash"
+],
+"chs": [
+"07"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://inferencex.semianalysis.com/inference/agentic/444098",
+"name": "444098",
+"names": [
+"444098"
+],
+"chs": [
+"07"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://inferencex.semianalysis.com/inference/agentic/443863",
+"name": "443863",
+"names": [
+"443863"
+],
+"chs": [
+"07"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://inferencex.semianalysis.com/inference/agentic/442503",
+"name": "442503",
+"names": [
+"442503"
+],
+"chs": [
+"07"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://inferencex.semianalysis.com/inference/agentic/443959",
+"name": "443959",
+"names": [
+"443959"
+],
+"chs": [
+"07"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://inferencex.semianalysis.com/inference/agentic/442203",
+"name": "442203",
+"names": [
+"442203"
+],
+"chs": [
+"07"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://inferencex.semianalysis.com/inference/agentic/443969",
+"name": "443969",
+"names": [
+"443969"
+],
+"chs": [
+"07"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://inferencex.semianalysis.com/inference/agentic/444064",
+"name": "444064",
+"names": [
+"444064"
+],
+"chs": [
+"07"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://inferencex.semianalysis.com/inference/agentic/442102",
+"name": "442102",
+"names": [
+"442102"
+],
+"chs": [
+"07"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://inferencex.semianalysis.com/inference/agentic/443880",
+"name": "443880",
+"names": [
+"443880"
+],
+"chs": [
+"07"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://inferencex.semianalysis.com/inference/agentic/441866",
+"name": "441866",
+"names": [
+"441866"
+],
+"chs": [
+"07"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://arxiv.org/abs/2607.24653",
+"name": "arXiv 2607.24653",
+"names": [
+"arXiv 2607.24653"
+],
+"chs": [
+"07"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://awsdocs-neuron.readthedocs-hosted.com/en/latest/vllm-neuron/docs/design/vllm/decode-context-length-bucketing.html",
+"name": "context-length bucketing",
+"names": [
+"context-length bucketing"
+],
+"chs": [
+"07"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://claude.com/blog/1m-context-ga",
+"name": "Claude 1M GA",
+"names": [
+"Claude 1M GA",
+"Anthropic, 13 Mar 2026"
+],
+"chs": [
+"07",
+"09"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://aws.amazon.com/blogs/storage/accelerate-inference-with-kv-cache-tiering-on-aws/",
+"name": "AWS Storage Blog",
+"names": [
+"AWS Storage Blog",
+"AWS Storage Blog, 21 Sep 2026"
+],
+"chs": [
+"07",
+"09"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://builder.aws.com/content/2zruvftx03ZtQFFxyur6kdzfwMv/benchmarking-llm-inference-with-optimum-neuron-on-inferentia2",
+"name": "AWS Builder Center",
+"names": [
+"AWS Builder Center"
+],
+"chs": [
+"07",
+"08"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://ai.google.dev/gemini-api/docs/long-context",
+"name": "Gemini long-context guide",
+"names": [
+"Gemini long-context guide"
+],
+"chs": [
+"07"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://vllm.ai/blog/2026-09-08-glm53-part1-hybrid-sparse-offloading",
+"name": "vLLM HiSparse",
+"names": [
+"vLLM HiSparse"
+],
+"chs": [
+"07"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://inferencex.semianalysis.com/blog/kimi-k3-agentx-mi355x-atom-vs-gb300-nvl72",
+"name": "InferenceX Kimi K3 2026-08-25",
+"names": [
+"InferenceX Kimi K3 2026-08-25"
+],
+"chs": [
+"07"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://www.tomshardware.com/tech-industry/semiconductors/nvidia-presents-groq-3-lpx-architecture-and-unveils-its-first-third-party-inference-benchmark",
+"name": "Tom's Hardware 2026-08-26",
+"names": [
+"Tom's Hardware 2026-08-26",
+"Tom's Hardware, 26 Aug 2026"
+],
+"chs": [
+"07",
+"09"
+],
+"status": "web",
+"added": false
+},
+{
+"url": "https://wccftech.com/nvidia-rubin-cpx-is-off-the-roadmap-but-may-return-with-feynman-in-2028/",
+"name": "Wccftech",
+"names": [
+"Wccftech"
+],
+"chs": [
+"07"
+],
+"status": "web",
+"added": false
+},
+{
+"url": "https://rcrtech.com/semiconductor-news/nvidia-reportedly-revives-rubin-cpx/",
+"name": "RCR Tech",
+"names": [
+"RCR Tech"
+],
+"chs": [
+"07"
+],
+"status": "web",
+"added": false
+},
+{
+"url": "https://developer.nvidia.com/blog/introducing-nvidia-bluefield-4-powered-inference-context-memory-storage-platform-for-the-next-frontier-of-ai/",
+"name": "NVIDIA developer blog",
+"names": [
+"NVIDIA developer blog"
+],
+"chs": [
+"07"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://nvidianews.nvidia.com/news/nvidia-bluefield-4-powers-new-class-of-ai-native-storage-infrastructure-for-the-next-frontier-of-ai",
+"name": "NVIDIA press",
+"names": [
+"NVIDIA press"
+],
+"chs": [
+"07"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://www.nvidia.com/en-us/data-center/ai-storage/cmx/",
+"name": "CMX",
+"names": [
+"CMX"
+],
+"chs": [
+"07"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://www.cerebras.ai/press-release/cerebras-launches-qwen3-235b-world-s-fastest-frontier-ai-model-with-full-131k-context-support",
+"name": "131K press release",
+"names": [
+"131K press release"
+],
+"chs": [
+"07"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://developer.nvidia.com/blog/how-nvidia-groq-3-lpx-unlocks-ultrafast-interactivity-at-long-context-on-nvidia-vera-rubin/",
+"name": "NVIDIA developer blog",
+"names": [
+"NVIDIA developer blog"
+],
+"chs": [
+"07"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://www.lmsys.org/blog/2026-08-11-unified-radix-cache/",
+"name": "LMSYS 2026-08-11",
+"names": [
+"LMSYS 2026-08-11"
+],
+"chs": [
+"07"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://arxiv.org/abs/2609.33762",
+"name": "arXiv 2609.33762",
+"names": [
+"arXiv 2609.33762"
+],
+"chs": [
+"07"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://arxiv.org/abs/2609.11744",
+"name": "arXiv 2609.11744",
+"names": [
+"arXiv 2609.11744"
+],
+"chs": [
+"07"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://cloud.google.com/blog/topics/developers-practitioners/boosting-llm-performance-with-tiered-kv-cache-on-google-kubernetes-engine",
+"name": "Google Cloud",
+"names": [
+"Google Cloud",
+"Google Cloud blog, 7 Nov 2025"
+],
+"chs": [
+"07",
+"09"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://nebius.com/blog/posts/nebius-weka-shared-kv-cache-benchmark-hgx-b300",
+"name": "Nebius",
+"names": [
+"Nebius",
+"Nebius blog, 24 Sep 2026"
+],
+"chs": [
+"07",
+"09"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://vllm.ai/blog/2026-05-06-mooncake-store",
+"name": "vLLM Mooncake Store",
+"names": [
+"vLLM Mooncake Store"
+],
+"chs": [
+"07"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://vllm.ai/blog/2026-05-18-pegaflow",
+"name": "vLLM PegaFlow",
+"names": [
+"vLLM PegaFlow"
+],
+"chs": [
+"07"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://docs.sglang.io/docs/advanced_features/hicache_design.md",
+"name": "HiCache design",
+"names": [
+"HiCache design"
+],
+"chs": [
+"07"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://llm-d.ai/blog/kvcache-wins-you-can-see",
+"name": "llm-d KV cache",
+"names": [
+"llm-d KV cache",
+"llm-d blog, 24 Sep 2025"
+],
+"chs": [
+"07",
+"09"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://vllm.ai/blog/2026-09-08-vllm-agentx",
+"name": "vLLM AgentX",
+"names": [
+"vLLM AgentX"
+],
+"chs": [
+"07"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://vllm.ai/blog/2026-08-07-decode-context-parallelism",
+"name": "vLLM DCP",
+"names": [
+"vLLM DCP"
+],
+"chs": [
+"07"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://docs.nvidia.com/dynamo/user-guides/disaggregated-serving",
+"name": "Dynamo docs",
+"names": [
+"Dynamo docs"
+],
+"chs": [
+"07",
+"09"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://api-docs.deepseek.com/quick_start/rate_limit",
+"name": "DeepSeek rate limit",
+"names": [
+"DeepSeek rate limit"
+],
+"chs": [
+"07"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://vllm.ai/blog/2026-09-15-kimi-k3-dspark",
+"name": "vLLM DSpark",
+"names": [
+"vLLM DSpark"
+],
+"chs": [
+"07"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://vllm.ai/blog/2026-04-22-fp8-kvcache",
+"name": "vLLM FP8 KV",
+"names": [
+"vLLM FP8 KV"
+],
+"chs": [
+"07"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://vllm.ai/blog/2026-05-11-turboquant",
+"name": "vLLM TurboQuant",
+"names": [
+"vLLM TurboQuant"
+],
+"chs": [
+"07"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://arxiv.org/abs/2606.19348",
+"name": "arXiv 2606.19348",
+"names": [
+"arXiv 2606.19348"
+],
+"chs": [
+"07"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://huggingface.co/zai-org/GLM-5.2",
+"name": "GLM-5.2",
+"names": [
+"GLM-5.2"
+],
+"chs": [
+"07"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://arxiv.org/abs/2608.30320",
+"name": "arXiv 2608.30320",
+"names": [
+"arXiv 2608.30320"
+],
+"chs": [
+"07"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://inferencex.semianalysis.com/blog/sparse-savings-persistent-demand-inside-glm53",
+"name": "InferenceX 2026-09-28",
+"names": [
+"InferenceX 2026-09-28",
+"InferenceX GLM-5.3"
+],
+"chs": [
+"07",
+"08"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://www.lmsys.org/blog/2026-04-25-deepseek-v4/",
+"name": "LMSYS DeepSeek V4",
+"names": [
+"LMSYS DeepSeek V4"
+],
+"chs": [
+"07"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://www.lmsys.org/blog/2026-07-13-glm52-optimization/",
+"name": "LMSYS GLM-5.2",
+"names": [
+"LMSYS GLM-5.2"
+],
+"chs": [
+"07"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://llm-d.ai/blog/llm-d-v0.5-sustaining-performance-at-scale",
+"name": "llm-d v0.5 blog",
+"names": [
+"llm-d v0.5 blog",
+"llm-d v0.5"
+],
+"chs": [
+"07",
+"09"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://inferencex.semianalysis.com/blog/gb200-nvl72-vs-b200-disagg-deepseek-r1-fp4-dynamo-trt",
+"name": "InferenceX, 23 May 2026",
+"names": [
+"InferenceX, 23 May 2026",
+"InferenceX 2026-05-23"
+],
+"chs": [
+"07",
+"09"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://docs.nvidia.com/dynamo/dev/reference/releases/deprecations",
+"name": "Dynamo deprecations",
+"names": [
+"Dynamo deprecations"
+],
+"chs": [
+"07",
+"09"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://docs.cloud.google.com/kubernetes-engine/docs/concepts/about-gke-inference-gateway",
+"name": "GKE docs",
+"names": [
+"GKE docs"
+],
+"chs": [
+"07",
+"09"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://investor.nvidia.com/news/press-release-details/2026/NVIDIA-Vera-Rubin-Opens-Agentic-AI-Frontier/default.aspx",
+"name": "NVIDIA press 2026-03-16",
+"names": [
+"NVIDIA press 2026-03-16",
+"NVIDIA press release, 16 Mar 2026"
+],
+"chs": [
+"07",
+"09"
+],
+"status": "web",
+"added": false
+},
+{
+"url": "https://platform.kimi.ai/docs/guide/context-caching",
+"name": "Kimi context caching",
+"names": [
+"Kimi context caching"
+],
+"chs": [
+"07"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://platform.claude.com/docs/en/build-with-claude/context-windows",
+"name": "context windows",
+"names": [
+"context windows"
+],
+"chs": [
+"07"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://platform.claude.com/docs/en/build-with-claude/prompt-caching",
+"name": "prompt caching",
+"names": [
+"prompt caching"
+],
+"chs": [
+"07"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://developers.openai.com/api/docs/guides/prompt-caching",
+"name": "OpenAI prompt caching",
+"names": [
+"OpenAI prompt caching"
+],
+"chs": [
+"07"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://ai.google.dev/gemini-api/docs/caching",
+"name": "Gemini caching",
+"names": [
+"Gemini caching"
+],
+"chs": [
+"07"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://www.kimi.com/code/docs/en/kimi-code/models.html",
+"name": "Kimi Code models",
+"names": [
+"Kimi Code models"
+],
+"chs": [
+"07"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://platform.claude.com/docs/en/api/rate-limits",
+"name": "Anthropic rate limits",
+"names": [
+"Anthropic rate limits",
+"Claude rate limits"
+],
+"chs": [
+"07",
+"09",
+"10",
+"11"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://docs.aws.amazon.com/bedrock/latest/userguide/quotas-token-burndown.html",
+"name": "How tokens are counted in Amazon Bedrock",
+"names": [
+"How tokens are counted in Amazon Bedrock",
+"token burndown"
+],
+"chs": [
+"07",
+"09",
+"10",
+"11"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://developers.openai.com/api/docs/guides/rate-limits",
+"name": "OpenAI rate limits",
+"names": [
+"OpenAI rate limits"
+],
+"chs": [
+"07",
+"10",
+"11"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://www.alibabacloud.com/help/en/model-studio/rate-limit",
+"name": "Alibaba rate limits",
+"names": [
+"Alibaba rate limits"
+],
+"chs": [
+"07"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://ramp.com/blog/ai-token-cost-for-businesses",
+"name": "Ramp: AI token cost for businesses",
+"names": [
+"Ramp: AI token cost for businesses",
+"Ramp"
+],
+"chs": [
+"07",
+"10",
+"11"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://openrouter.ai/state-of-ai",
+"name": "OpenRouter/a16z State of AI",
+"names": [
+"OpenRouter/a16z State of AI",
+"OpenRouter State of AI"
+],
+"chs": [
+"07",
+"11"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://boolean.ai/blog/context-rot-quantified",
+"name": "Boolean",
+"names": [
+"Boolean"
+],
+"chs": [
+"07"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://trychroma.com/research/context-rot",
+"name": "Chroma",
+"names": [
+"Chroma"
+],
+"chs": [
+"07"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://huggingface.co/deepseek-ai/DeepSeek-V4-Pro",
+"name": "DeepSeek-V4-Pro card",
+"names": [
+"DeepSeek-V4-Pro card"
+],
+"chs": [
+"07"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://docs.z.ai/guides/llm/glm-5.2",
+"name": "Z.ai GLM-5.2",
+"names": [
+"Z.ai GLM-5.2"
+],
+"chs": [
+"07"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://github.com/SemiAnalysisAI/InferenceX-app/blob/main/packages/constants/src/gpu-keys.ts",
+"name": "InferenceX gpu-keys.ts",
+"names": [
+"InferenceX gpu-keys.ts",
+"gpu-keys.ts"
+],
+"chs": [
+"08"
+],
+"status": "local",
+"added": true
+},
+{
+"url": "https://inferencex.semianalysis.com/api/v1/benchmarks?model=DeepSeek-R1-0528",
+"name": "InferenceX API, DeepSeek-R1",
+"names": [
+"InferenceX API, DeepSeek-R1"
+],
+"chs": [
+"08"
+],
+"status": "local",
+"added": true
+},
+{
+"url": "https://inferencex.semianalysis.com/blog/ultra-high-interactivity-on-nvidia",
+"name": "InferenceX 2026-08-10",
+"names": [
+"InferenceX 2026-08-10"
+],
+"chs": [
+"08"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://github.com/AI-Hypercomputer/tpu-recipes/tree/main/inference/trillium/vLLM/Llama3.x",
+"name": "tpu-recipes",
+"names": [
+"tpu-recipes"
+],
+"chs": [
+"08"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://awsdocs-neuron.readthedocs-hosted.com/en/latest/libraries/nxd-inference/tutorials/trn2-llama3.3-70b-tutorial.html",
+"name": "NxDI 70B",
+"names": [
+"NxDI 70B"
+],
+"chs": [
+"08"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://www.storagereview.com/news/nvidia-groq-3-lpx-enters-full-production-3400-tokens-per-second-at-100k-context-256-lp30s-per-rack",
+"name": "StorageReview",
+"names": [
+"StorageReview"
+],
+"chs": [
+"08"
+],
+"status": "web",
+"added": false
+},
+{
+"url": "https://github.com/SemiAnalysisAI/InferenceX",
+"name": "InferenceX",
+"names": [
+"InferenceX"
+],
+"chs": [
+"08"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://mlcommons.org/2026/09/mlperf-inference-v6-1-results/",
+"name": "MLCommons",
+"names": [
+"MLCommons"
+],
+"chs": [
+"08"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://github.com/huggingface/optimum-neuron/blob/main/benchmark/vllm/data-parallel/llama3.1-8b/vllm-results-dp4.csv",
+"name": "Optimum Neuron DP4",
+"names": [
+"Optimum Neuron DP4"
+],
+"chs": [
+"08"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://inferencex.semianalysis.com/api/v1/benchmarks?model=gpt-oss-120b",
+"name": "InferenceX API，gpt-oss-120b",
+"names": [
+"InferenceX API，gpt-oss-120b"
+],
+"chs": [
+"08"
+],
+"status": "local",
+"added": true
+},
+{
+"url": "https://artificialanalysis.ai/models/kimi-k2-6/providers",
+"name": "AA",
+"names": [
+"AA"
+],
+"chs": [
+"08"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://inferencex.semianalysis.com/blog/gb300-nvl72-vs-gb200-nvl72-dsv4-pro-vllm-fp4",
+"name": "InferenceX 2026-05-27",
+"names": [
+"InferenceX 2026-05-27",
+"InferenceX, 27 May 2026"
+],
+"chs": [
+"08",
+"09"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://b0.p.awsstatic.com/pricing/2.0/meteredUnitMaps/ec2/USD/current/ec2-ondemand-without-sec-sel/Asia%20Pacific%20%28Tokyo%29/Linux/index.json",
+"name": "AWS price list (Tokyo)",
+"names": [
+"AWS price list (Tokyo)"
+],
+"chs": [
+"08",
+"09"
+],
+"status": "local",
+"added": true
+},
+{
+"url": "https://aws.amazon.com/ec2/capacityblocks/pricing",
+"name": "AWS Capacity Blocks",
+"names": [
+"AWS Capacity Blocks"
+],
+"chs": [
+"08"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://openrouter.ai/api/v1/models/openai/gpt-oss-120b/endpoints",
+"name": "OpenRouter",
+"names": [
+"OpenRouter",
+"OpenRouter gpt-oss-120b",
+"OpenRouter gpt-oss-120b endpoints"
+],
+"chs": [
+"08",
+"09"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://github.com/SemiAnalysisAI/InferenceX-app/blob/main/packages/constants/src/tco.ts",
+"name": "tco.ts",
+"names": [
+"tco.ts"
+],
+"chs": [
+"08"
+],
+"status": "local",
+"added": true
+},
+{
+"url": "https://inferencex.semianalysis.com/blog/deepseekv4-16t-day-0-to-day-43-performance",
+"name": "InferenceX 2026-06-09",
+"names": [
+"InferenceX 2026-06-09"
+],
+"chs": [
+"08"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://openrouter.ai/api/v1/models/qwen/qwen3.8-27b/endpoints",
+"name": "OpenRouter Qwen3.8 27B",
+"names": [
+"OpenRouter Qwen3.8 27B"
+],
+"chs": [
+"08"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://aws.amazon.com/about-aws/whats-new/2025/12/amazon-ec2-trn3-ultraservers/",
+"name": "AWS What's New",
+"names": [
+"AWS What's New"
+],
+"chs": [
+"08"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://developer.nvidia.com/blog/nvidia-vera-rubin-and-blackwell-set-a-new-standard-for-agentic-ai-performance-per-watt/",
+"name": "NVIDIA",
+"names": [
+"NVIDIA"
+],
+"chs": [
+"08"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://www.eweek.com/news/amd-cerebras-disaggregated-inference/",
+"name": "eWeek",
+"names": [
+"eWeek"
+],
+"chs": [
+"08"
+],
+"status": "web",
+"added": false
+},
+{
+"url": "https://inferencex.semianalysis.com/blog/deepseek-v4-pro-agentx-mi355x-vs-b200-august",
+"name": "InferenceX 2026-08-25",
+"names": [
+"InferenceX 2026-08-25",
+"InferenceX blog, 25 Aug 2026"
+],
+"chs": [
+"08",
+"10"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://developer.nvidia.com/blog/nvidia-dynamo-1-production-ready/",
+"name": "NVIDIA",
+"names": [
+"NVIDIA",
+"Dynamo 1.0 blog"
+],
+"chs": [
+"08",
+"09"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://inferencex.semianalysis.com/blog/mi355x-deepseek-v4-pro-sglang-110x-in-26-days",
+"name": "InferenceX 2026-05-26",
+"names": [
+"InferenceX 2026-05-26"
+],
+"chs": [
+"08"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://github.com/SemiAnalysisAI/InferenceX/blob/main/operatorx/CLUSTERS.md",
+"name": "CLUSTERS.md",
+"names": [
+"CLUSTERS.md"
+],
+"chs": [
+"08"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://docs.aws.amazon.com/bedrock/latest/userguide/model-customization-import-model.html",
+"name": "Bedrock Custom Model Import docs",
+"names": [
+"Bedrock Custom Model Import docs"
+],
+"chs": [
+"09"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://aws.amazon.com/blogs/machine-learning/optimize-your-applications-for-scale-and-reliability-on-amazon-bedrock/",
+"name": "AWS ML blog",
+"names": [
+"AWS ML blog",
+"AWS ML blog, 11 Feb 2026"
+],
+"chs": [
+"09",
+"10",
+"11"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://docs.aws.amazon.com/bedrock/latest/userguide/cross-region-inference.html",
+"name": "Bedrock cross-Region inference",
+"names": [
+"Bedrock cross-Region inference"
+],
+"chs": [
+"09"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://docs.cloud.google.com/gemini-enterprise-agent-platform/models/standard-paygo",
+"name": "Standard PayGo",
+"names": [
+"Standard PayGo"
+],
+"chs": [
+"09",
+"10",
+"11"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://docs.cloud.google.com/gemini-enterprise-agent-platform/models/provisioned-throughput/supported-models",
+"name": "Provisioned Throughput supported models, updated 1 Oct 2026",
+"names": [
+"Provisioned Throughput supported models, updated 1 Oct 2026"
+],
+"chs": [
+"09",
+"11"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://learn.microsoft.com/en-us/azure/foundry/openai/quotas-limits",
+"name": "Azure OpenAI quotas and limits",
+"names": [
+"Azure OpenAI quotas and limits"
+],
+"chs": [
+"09",
+"11"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://docs.aws.amazon.com/bedrock/latest/userguide/prov-throughput.html",
+"name": "Bedrock Provisioned Throughput",
+"names": [
+"Bedrock Provisioned Throughput",
+"Provisioned Throughput"
+],
+"chs": [
+"09",
+"11"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://docs.aws.amazon.com/bedrock/latest/userguide/prov-thru-purchase.html",
+"name": "Purchase Provisioned Throughput",
+"names": [
+"Purchase Provisioned Throughput"
+],
+"chs": [
+"09"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://learn.microsoft.com/en-us/azure/foundry/openai/how-to/provisioned-throughput-sizing",
+"name": "PTU sizing",
+"names": [
+"PTU sizing"
+],
+"chs": [
+"09",
+"10",
+"11"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://learn.microsoft.com/en-us/azure/foundry/openai/concepts/provisioned-throughput-billing",
+"name": "PTU billing, updated 22 May 2026",
+"names": [
+"PTU billing, updated 22 May 2026"
+],
+"chs": [
+"09"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://learn.microsoft.com/en-us/azure/foundry/openai/how-to/spillover-traffic-management",
+"name": "Azure spillover",
+"names": [
+"Azure spillover",
+"Spillover"
+],
+"chs": [
+"09",
+"11"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://docs.cloud.google.com/gemini-enterprise-agent-platform/models/provisioned-throughput/measure-provisioned-throughput",
+"name": "Calculate Provisioned Throughput requirements",
+"names": [
+"Calculate Provisioned Throughput requirements"
+],
+"chs": [
+"09",
+"11"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://aws.amazon.com/blogs/machine-learning/amazon-sagemaker-inference-2026-year-to-date-launches-in-review/",
+"name": "AWS ML blog, 18 Sep 2026",
+"names": [
+"AWS ML blog, 18 Sep 2026"
+],
+"chs": [
+"09"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://blog.lmcache.ai/en/2026/09/15/lmcache-on-amazon-sagemaker-hyperpod-disaggregated-prefill-and-decode/",
+"name": "LMCache blog, 15 Sep 2026",
+"names": [
+"LMCache blog, 15 Sep 2026"
+],
+"chs": [
+"09"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://github.com/llm-d/llm-d/releases",
+"name": "llm-d releases",
+"names": [
+"llm-d releases"
+],
+"chs": [
+"09"
+],
+"status": "web",
+"added": false
+},
+{
+"url": "https://docs.nvidia.com/dynamo/dev/reference/releases/v1-5-0",
+"name": "Dynamo v1.5.0 notes",
+"names": [
+"Dynamo v1.5.0 notes"
+],
+"chs": [
+"09"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://kserve.github.io/website/blog/kserve-0.18-release",
+"name": "KServe v0.18 blog",
+"names": [
+"KServe v0.18 blog"
+],
+"chs": [
+"09"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://repost.aws/articles/AR7P2P1LpBTQuAqWJPjN-odg/deploying-glm-5-2-on-amazon-eks-using-vllm-deep-learning-containers-dlcs-and-fsx-for-lustre",
+"name": "AWS re:Post",
+"names": [
+"AWS re:Post"
+],
+"chs": [
+"09"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://developer-blogs.nvidia.com/wp-content/uploads/2024/08/S62797-LLM-Inference-Sizing_-Benchmarking-End-to-End-Inference-Systems.pdf",
+"name": "NVIDIA S62797 slides",
+"names": [
+"NVIDIA S62797 slides"
+],
+"chs": [
+"09",
+"11"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://docs.aws.amazon.com/bedrock/latest/userguide/quotas.html",
+"name": "Quotas for Amazon Bedrock",
+"names": [
+"Quotas for Amazon Bedrock"
+],
+"chs": [
+"09",
+"11"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://github.com/kubernetes-sigs/gateway-api-inference-extension",
+"name": "kubernetes-sigs/gateway-api-inference-extension",
+"names": [
+"kubernetes-sigs/gateway-api-inference-extension"
+],
+"chs": [
+"09"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://github.com/huggingface/optimum-neuron/blob/main/docs/source/containers.mdx",
+"name": "Optimum Neuron containers doc",
+"names": [
+"Optimum Neuron containers doc"
+],
+"chs": [
+"09"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://github.com/huggingface/optimum-neuron/blob/main/docs/source/guides/vllm_on_ie.mdx",
+"name": "Optimum Neuron Inference Endpoints guide",
+"names": [
+"Optimum Neuron Inference Endpoints guide"
+],
+"chs": [
+"09"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://docs.cloud.google.com/gemini-enterprise-agent-platform/models/open-models/vllm/use-vllm-tpu",
+"name": "vLLM TPU (Model Garden)",
+"names": [
+"vLLM TPU (Model Garden)"
+],
+"chs": [
+"09"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://blogs.nvidia.com/blog/inference-open-source-models-blackwell-reduce-cost-per-token",
+"name": "NVIDIA blog, 12 Feb 2026",
+"names": [
+"NVIDIA blog, 12 Feb 2026"
+],
+"chs": [
+"09"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://inference-docs.cerebras.ai/capabilities/service-tiers",
+"name": "Cerebras service tiers",
+"names": [
+"Cerebras service tiers"
+],
+"chs": [
+"09"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://github.com/llm-d/llm-d/blob/main/guides/pd-disaggregation/README.md",
+"name": "llm-d P/D guide",
+"names": [
+"llm-d P/D guide"
+],
+"chs": [
+"09"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://docs.nvidia.com/dynamo/v-0-9-1/user-guides/disaggregated-serving",
+"name": "Dynamo v0.9.1 docs",
+"names": [
+"Dynamo v0.9.1 docs"
+],
+"chs": [
+"09"
+],
+"status": "local",
+"added": true
+},
+{
+"url": "https://docs.vllm.ai/en/latest/features/disagg_prefill/",
+"name": "vLLM docs",
+"names": [
+"vLLM docs"
+],
+"chs": [
+"09"
+],
+"status": "web",
+"added": false
+},
+{
+"url": "https://docs.nvidia.com/dynamo/v1.1.0/user-guides/disaggregated-serving",
+"name": "Dynamo v1.1.0 docs",
+"names": [
+"Dynamo v1.1.0 docs"
+],
+"chs": [
+"09"
+],
+"status": "local",
+"added": true
+},
+{
+"url": "https://aws.amazon.com/blogs/machine-learning/introducing-fast-model-loader-in-sagemaker-inference-accelerate-autoscaling-for-your-large-language-models-llms-part-1",
+"name": "AWS ML blog, 2 Dec 2024",
+"names": [
+"AWS ML blog, 2 Dec 2024"
+],
+"chs": [
+"09"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://www.cerebras.ai/blog/cerebras-is-coming-to-aws",
+"name": "Cerebras blog, Mar 2026",
+"names": [
+"Cerebras blog, Mar 2026"
+],
+"chs": [
+"09"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://www.theregister.com/special-features/2026/03/19/a-closer-look-at-nvidias-groq-powered-lpx-rack-systems/5223364",
+"name": "The Register, 19 Mar 2026",
+"names": [
+"The Register, 19 Mar 2026"
+],
+"chs": [
+"09"
+],
+"status": "web",
+"added": false
+},
+{
+"url": "https://arxiv.org/html/2606.17104v1",
+"name": "arXiv 2606.17104",
+"names": [
+"arXiv 2606.17104"
+],
+"chs": [
+"09"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://github.com/Azure/AzurePublicDataset/blob/master/GitHubCopilotCodingAgentDataset2026.md",
+"name": "Copilot agent trace",
+"names": [
+"Copilot agent trace",
+"GitHub Copilot Coding Agent Traces 2026"
+],
+"chs": [
+"09",
+"10",
+"11"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://llm-d.ai/blog/llm-d-v0.8-from-platform-to-control-plane",
+"name": "llm-d v0.8 blog",
+"names": [
+"llm-d v0.8 blog"
+],
+"chs": [
+"09"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://docs.nvidia.com/dynamo/knowledge-base/concepts/system-architecture/kv-aware-routing",
+"name": "Dynamo KV-aware routing docs",
+"names": [
+"Dynamo KV-aware routing docs"
+],
+"chs": [
+"09"
+],
+"status": "local",
+"added": true
+},
+{
+"url": "https://docs.sglang.io/docs/advanced_features/sgl_model_gateway",
+"name": "SGLang gateway docs",
+"names": [
+"SGLang gateway docs"
+],
+"chs": [
+"09"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://aibrix.readthedocs.io/latest/features/gateway-plugins.html",
+"name": "AIBrix routing docs",
+"names": [
+"AIBrix routing docs"
+],
+"chs": [
+"09"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://docs.aws.amazon.com/bedrock/latest/userguide/inference-profiles.html",
+"name": "Bedrock inference profiles",
+"names": [
+"Bedrock inference profiles"
+],
+"chs": [
+"09",
+"11"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://github.com/aws-solutions-library-samples/guidance-for-multi-provider-generative-ai-gateway-on-aws",
+"name": "AWS multi-provider gateway guidance",
+"names": [
+"AWS multi-provider gateway guidance"
+],
+"chs": [
+"09"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://docs.aws.amazon.com/apigateway/latest/developerguide/api-gateway-api-usage-plans.html",
+"name": "API Gateway usage plans",
+"names": [
+"API Gateway usage plans"
+],
+"chs": [
+"09"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://docs.aws.amazon.com/bedrock-agentcore/latest/devguide/bedrock-agentcore-limits.html",
+"name": "AgentCore quotas",
+"names": [
+"AgentCore quotas"
+],
+"chs": [
+"09"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://helix.ml/blog/the-subtraction-dividend",
+"name": "HelixML blog, 30 Jun 2026",
+"names": [
+"HelixML blog, 30 Jun 2026"
+],
+"chs": [
+"09"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://cloud.google.com/blog/products/ai-machine-learning/gke-inference-gateway-and-quickstart-are-ga",
+"name": "Google Cloud blog, 11 Sep 2025",
+"names": [
+"Google Cloud blog, 11 Sep 2025"
+],
+"chs": [
+"09"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://code.claude.com/docs/en/costs",
+"name": "Claude Code docs: Manage costs effectively",
+"names": [
+"Claude Code docs: Manage costs effectively",
+"Claude Code costs"
+],
+"chs": [
+"09",
+"10",
+"11"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://aws.amazon.com/blogs/aws/new-amazon-bedrock-service-tiers-help-you-match-ai-workload-performance-with-cost/",
+"name": "AWS News blog, 18 Nov 2025",
+"names": [
+"AWS News blog, 18 Nov 2025"
+],
+"chs": [
+"09"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://www.datacenterdynamics.com/en/news/cerebras-starts-construction-on-165mw-data-center-in-mikkeli-finland/",
+"name": "DataCenterDynamics, 2 Sep 2026",
+"names": [
+"DataCenterDynamics, 2 Sep 2026"
+],
+"chs": [
+"09"
+],
+"status": "web",
+"added": false
+},
+{
+"url": "https://github.com/HPMLL/BurstGPT",
+"name": "BurstGPT",
+"names": [
+"BurstGPT"
+],
+"chs": [
+"10",
+"11"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://github.com/Azure/AzurePublicDataset/blob/master/AzureLLMInferenceDataset2024.md",
+"name": "AzureLLMInferenceDataset2024",
+"names": [
+"AzureLLMInferenceDataset2024",
+"Azure 2024 trace"
+],
+"chs": [
+"10",
+"11"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://arxiv.org/abs/2608.00101",
+"name": "Agentic Coding in the Wild",
+"names": [
+"Agentic Coding in the Wild"
+],
+"chs": [
+"10",
+"11"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://cdn.openai.com/pdf/7ef17d82-96bf-4dd1-9df2-228f7f377a29/the-state-of-enterprise-ai_2025-report.pdf",
+"name": "OpenAI, The state of enterprise AI 2025",
+"names": [
+"OpenAI, The state of enterprise AI 2025"
+],
+"chs": [
+"10",
+"11"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://en.wikipedia.org/wiki/Little%27s_law",
+"name": "Little's law",
+"names": [
+"Little's law"
+],
+"chs": [
+"10",
+"11"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://docs.aws.amazon.com/bedrock/latest/userguide/quotas-mantle.html",
+"name": "Bedrock mantle quotas",
+"names": [
+"Bedrock mantle quotas"
+],
+"chs": [
+"10",
+"11"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://learn.microsoft.com/en-us/azure/foundry-classic/openai/how-to/quota",
+"name": "Azure quota how-to (classic), updated May 2026",
+"names": [
+"Azure quota how-to (classic), updated May 2026"
+],
+"chs": [
+"10",
+"11"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://learn.microsoft.com/en-us/azure/foundry/openai/how-to/provisioned-get-started",
+"name": "Operate provisioned deployments",
+"names": [
+"Operate provisioned deployments"
+],
+"chs": [
+"10",
+"11"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://openai.com/api-scale-tier/",
+"name": "OpenAI Scale Tier",
+"names": [
+"OpenAI Scale Tier"
+],
+"chs": [
+"10",
+"11"
+],
+"status": "web",
+"added": false
+},
+{
+"url": "https://docs.cloud.google.com/gemini-enterprise-agent-platform/models/provisioned-throughput/use-provisioned-throughput",
+"name": "Use Provisioned Throughput",
+"names": [
+"Use Provisioned Throughput"
+],
+"chs": [
+"10",
+"11"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://ai.google.dev/gemini-api/docs/rate-limits",
+"name": "Gemini API rate limits",
+"names": [
+"Gemini API rate limits"
+],
+"chs": [
+"10"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://docs.databricks.com/aws/en/machine-learning/foundation-model-apis/limits",
+"name": "Databricks limits",
+"names": [
+"Databricks limits"
+],
+"chs": [
+"10",
+"11"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://console.groq.com/docs/rate-limits",
+"name": "Groq rate limits",
+"names": [
+"Groq rate limits"
+],
+"chs": [
+"10",
+"11"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://cdn.openai.com/pdf/a253471f-8260-40c6-a2cc-aa93fe9f142e/economic-research-chatgpt-usage-paper.pdf",
+"name": "OpenAI/NBER \"How People Use ChatGPT\"",
+"names": [
+"OpenAI/NBER \"How People Use ChatGPT\""
+],
+"chs": [
+"10",
+"11"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://www.gov.uk/government/publications/microsoft-365-copilot-experiment-cross-government-findings-report/microsoft-365-copilot-experiment-cross-government-findings-report-html",
+"name": "GOV.UK findings report",
+"names": [
+"GOV.UK findings report"
+],
+"chs": [
+"10",
+"11"
+],
+"status": "local",
+"added": true
+},
+{
+"url": "https://connect.cefpro.com/article/view/inside-jpmorgan-llm-suite-as-ai-agents-spread-across-the-bank",
+"name": "CeFPro Connect",
+"names": [
+"CeFPro Connect"
+],
+"chs": [
+"10",
+"11"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://www.anthropic.com/engineering/multi-agent-research-system",
+"name": "Anthropic: multi-agent research system",
+"names": [
+"Anthropic: multi-agent research system"
+],
+"chs": [
+"10",
+"11"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://stackoverflow.blog/2026/05/27/agents-on-a-leash-agentic-ai-remains-mostly-monitored-at-work/",
+"name": "Stack Overflow pulse survey",
+"names": [
+"Stack Overflow pulse survey",
+"Stack Overflow blog"
+],
+"chs": [
+"10",
+"11"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://arxiv.org/abs/2606.30560",
+"name": "TraceLab",
+"names": [
+"TraceLab"
+],
+"chs": [
+"10",
+"11"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://arxiv.org/abs/2607.13080",
+"name": "Inference Economics of Enterprise Coding Agents",
+"names": [
+"Inference Economics of Enterprise Coding Agents"
+],
+"chs": [
+"10",
+"11"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://ai.google.dev/gemini-api/docs/deep-research",
+"name": "Gemini Deep Research agent docs",
+"names": [
+"Gemini Deep Research agent docs"
+],
+"chs": [
+"10",
+"11"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://platform.claude.com/docs/en/build-with-claude/pdf-support",
+"name": "Claude PDF support docs",
+"names": [
+"Claude PDF support docs"
+],
+"chs": [
+"10",
+"11"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://www.anthropic.com/research/economic-index-june-2026-report",
+"name": "Anthropic Economic Index: Cadences",
+"names": [
+"Anthropic Economic Index: Cadences"
+],
+"chs": [
+"10",
+"11"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://github.com/aws-solutions-library-samples/guidance-for-claude-code-with-amazon-bedrock/blob/main/assets/docs/QUOTA_MONITORING.md",
+"name": "QUOTA_MONITORING.md",
+"names": [
+"QUOTA_MONITORING.md"
+],
+"chs": [
+"10",
+"11"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://blog.pragmaticengineer.com/the-pulse-tokenmaxxing-as-a-weird-new-trend/",
+"name": "The Pragmatic Engineer",
+"names": [
+"The Pragmatic Engineer"
+],
+"chs": [
+"10",
+"11"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://www.gallup.com/workplace/691643/work-nearly-doubled-two-years.aspx",
+"name": "Gallup",
+"names": [
+"Gallup"
+],
+"chs": [
+"11"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://arxiv.org/abs/2504.11436",
+"name": "Dillon et al.",
+"names": [
+"Dillon et al."
+],
+"chs": [
+"11"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://epoch.ai/data/ai_companies_usage_reports.csv",
+"name": "Epoch AI usage-reports CSV",
+"names": [
+"Epoch AI usage-reports CSV"
+],
+"chs": [
+"11"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://news.panasonic.com/jp/press/jn260729-1",
+"name": "Panasonic Newsroom Japan",
+"names": [
+"Panasonic Newsroom Japan"
+],
+"chs": [
+"11"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://openai.com/index/moderna/",
+"name": "OpenAI customer story: Moderna",
+"names": [
+"OpenAI customer story: Moderna"
+],
+"chs": [
+"11"
+],
+"status": "web",
+"added": false
+},
+{
+"url": "https://github.com/Azure/AzurePublicDataset/blob/master/AzureLLMInferenceDataset2023.md",
+"name": "AzureLLMInferenceDataset2023",
+"names": [
+"AzureLLMInferenceDataset2023"
+],
+"chs": [
+"11"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://arxiv.org/abs/2405.01470",
+"name": "WildChat",
+"names": [
+"WildChat"
+],
+"chs": [
+"11"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://stackoverflow.blog/2026/09/30/getting-ready-for-2026-results-a-look-back-on-developer-survey-findings",
+"name": "Stack Overflow blog",
+"names": [
+"Stack Overflow blog"
+],
+"chs": [
+"11"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://arxiv.org/abs/2609.34432",
+"name": "Understanding Agent Serving at Production Scale",
+"names": [
+"Understanding Agent Serving at Production Scale"
+],
+"chs": [
+"11"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://en.wikipedia.org/wiki/ChatGPT_Deep_Research",
+"name": "Wikipedia: ChatGPT Deep Research",
+"names": [
+"Wikipedia: ChatGPT Deep Research"
+],
+"chs": [
+"11"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://learn.microsoft.com/en-us/azure/foundry/openai/how-to/latency",
+"name": "Azure OpenAI performance and latency",
+"names": [
+"Azure OpenAI performance and latency"
+],
+"chs": [
+"11"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://arxiv.org/abs/2603.16054",
+"name": "inference-fleet-sim",
+"names": [
+"inference-fleet-sim"
+],
+"chs": [
+"11"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://github.com/BerriAI/litellm/blob/main/litellm/proxy/hooks/README.dynamic_rate_limiter_v3.md",
+"name": "LiteLLM dynamic rate limiter v3 README",
+"names": [
+"LiteLLM dynamic rate limiter v3 README"
+],
+"chs": [
+"11"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://newsletter.semianalysis.com/p/tokenbudgeting-our-conversations",
+"name": "SemiAnalysis: TokenBudgeting",
+"names": [
+"SemiAnalysis: TokenBudgeting"
+],
+"chs": [
+"11"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://www.theregister.com/software/2026/02/02/microsoft-reveals-just-33-of-copilot-chat-users-pay-for-it/4288251",
+"name": "The Register",
+"names": [
+"The Register"
+],
+"chs": [
+"11"
+],
+"status": "web",
+"added": false
+},
+{
+"url": "https://finance.yahoo.com/technology/ai/articles/microsofts-copilot-just-crossed-30-183023723.html",
+"name": "Yahoo Finance / Benzinga",
+"names": [
+"Yahoo Finance / Benzinga"
+],
+"chs": [
+"11"
+],
+"status": "web",
+"added": false
+},
+{
+"url": "https://arxiv.org/abs/2309.11998",
+"name": "LMSYS-Chat-1M",
+"names": [
+"LMSYS-Chat-1M"
+],
+"chs": [
+"11"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://arxiv.org/abs/2604.22750",
+"name": "How Do AI Agents Spend Your Money?",
+"names": [
+"How Do AI Agents Spend Your Money?"
+],
+"chs": [
+"11"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://simonwillison.net/2026/May/27/product-market-fit/",
+"name": "Simon Willison, 27 May 2026",
+"names": [
+"Simon Willison, 27 May 2026"
+],
+"chs": [
+"11"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://simonwillison.net/2026/Jun/3/uber-caps-usage/",
+"name": "Simon Willison: Uber caps usage",
+"names": [
+"Simon Willison: Uber caps usage"
+],
+"chs": [
+"11"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://techcrunch.com/2026/06/10/ai-pilled-firms-spend-7500-per-employee-each-month-on-ai/",
+"name": "TechCrunch",
+"names": [
+"TechCrunch"
+],
+"chs": [
+"11"
+],
+"status": "web",
+"added": false
+},
+{
+"url": "https://blog.google/alphabet/investor-presentation-june-2026/",
+"name": "Alphabet investor presentation",
+"names": [
+"Alphabet investor presentation"
+],
+"chs": [
+"11"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://docs.github.com/en/copilot/get-started/plans",
+"name": "GitHub Docs: plans",
+"names": [
+"GitHub Docs: plans"
+],
+"chs": [
+"11"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://cursor.com/blog/june-2025-pricing",
+"name": "Cursor: Clarifying our pricing",
+"names": [
+"Cursor: Clarifying our pricing"
+],
+"chs": [
+"11"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "http://www.shacknews.com/article/149205/google-3-2-quadrillion-monthly-ai-tokens",
+"name": "Shacknews on the I/O keynote",
+"names": [
+"Shacknews on the I/O keynote"
+],
+"chs": [
+"11"
+],
+"status": "web",
+"added": false
+},
+{
+"url": "https://businessanalytics.substack.com/p/openais-api-hits-15-billion-tokens",
+"name": "Business Analytics Review",
+"names": [
+"Business Analytics Review"
+],
+"chs": [
+"11"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://www.ithome.com/0/967/330.htm",
+"name": "IT之家",
+"names": [
+"IT之家"
+],
+"chs": [
+"11"
+],
+"status": "web",
+"added": false
+},
+{
+"url": "https://finance.sina.com.cn/tech/roll/2026-04-02/doc-inhtazrz4446028.shtml",
+"name": "新浪科技",
+"names": [
+"新浪科技"
+],
+"chs": [
+"11"
+],
+"status": "web",
+"added": false
+},
+{
+"url": "https://www.perspectives.plus/p/microsoft-ai-numbers-good-bad-ugly",
+"name": "Perspectives Plus",
+"names": [
+"Perspectives Plus"
+],
+"chs": [
+"11"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://arxiv.org/abs/2401.17644",
+"name": "BurstGPT paper",
+"names": [
+"BurstGPT paper"
+],
+"chs": [
+"11"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://arxiv.org/abs/2505.09999",
+"name": "ServeGen",
+"names": [
+"ServeGen"
+],
+"chs": [
+"11"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://arxiv.org/abs/2408.00741",
+"name": "DynamoLLM",
+"names": [
+"DynamoLLM"
+],
+"chs": [
+"11"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://learn.microsoft.com/en-us/azure/foundry/openai/concepts/provisioned-throughput",
+"name": "PTU concepts",
+"names": [
+"PTU concepts"
+],
+"chs": [
+"11"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://docs.cloud.google.com/gemini-enterprise-agent-platform/models/priority-paygo",
+"name": "Priority PayGo",
+"names": [
+"Priority PayGo"
+],
+"chs": [
+"11"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://docs.litellm.ai/docs/proxy/users",
+"name": "LiteLLM budgets and rate limits",
+"names": [
+"LiteLLM budgets and rate limits"
+],
+"chs": [
+"11"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://docs.litellm.ai/docs/proxy/dynamic_rate_limit",
+"name": "LiteLLM dynamic TPM/RPM allocation, updated 3 Oct 2026",
+"names": [
+"LiteLLM dynamic TPM/RPM allocation, updated 3 Oct 2026"
+],
+"chs": [
+"11"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://github.com/envoyproxy/ai-gateway/blob/main/site/docs/capabilities/traffic/usage-based-ratelimiting.md",
+"name": "Envoy AI Gateway usage-based rate limiting, repo commit 2 Oct 2026",
+"names": [
+"Envoy AI Gateway usage-based rate limiting, repo commit 2 Oct 2026"
+],
+"chs": [
+"11"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://github.com/envoyproxy/ai-gateway/blob/main/site/docs/capabilities/traffic/quota-policy.md",
+"name": "Envoy AI Gateway quota policy",
+"names": [
+"Envoy AI Gateway quota policy"
+],
+"chs": [
+"11"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://github.com/Kong/developer.konghq.com/blob/main/app/_kong_plugins/ai-rate-limiting-advanced/index.md",
+"name": "Kong AI Rate Limiting Advanced",
+"names": [
+"Kong AI Rate Limiting Advanced"
+],
+"chs": [
+"11"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://github.com/Kong/developer.konghq.com/blob/main/app/_how-tos/ai-gateway/enforce-tiered-ai-budgets-with-kong-identity.md",
+"name": "Kong tiered AI budgets how-to",
+"names": [
+"Kong tiered AI budgets how-to"
+],
+"chs": [
+"11"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://github.com/Portkey-AI/docs-core/blob/main/aigw/product/administration/enforce-workspace-budget-and-rate-limits.mdx",
+"name": "Portkey workspace budgets and rate limits",
+"names": [
+"Portkey workspace budgets and rate limits"
+],
+"chs": [
+"11"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://github.com/Portkey-AI/docs-core/blob/main/aigw/product/enterprise-offering/budget-policies.mdx",
+"name": "Portkey usage and rate limit policies",
+"names": [
+"Portkey usage and rate limit policies"
+],
+"chs": [
+"11"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://docs.cloud.google.com/apigee/docs/api-platform/reference/policies/llm-token-quota-policy",
+"name": "Apigee LLMTokenQuota policy, updated 1 Oct 2026",
+"names": [
+"Apigee LLMTokenQuota policy, updated 1 Oct 2026"
+],
+"chs": [
+"11"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://learn.microsoft.com/en-us/azure/api-management/llm-token-limit-policy",
+"name": "Azure API Management llm-token-limit",
+"names": [
+"Azure API Management llm-token-limit"
+],
+"chs": [
+"11"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://code.claude.com/docs/en/claude-apps-gateway-spend-limits",
+"name": "Claude apps gateway spend limits",
+"names": [
+"Claude apps gateway spend limits"
+],
+"chs": [
+"11"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://github.com/llm-d-incubation/llm-d-planner/blob/main/src/planner/specification/traffic_profile.py",
+"name": "traffic_profile.py",
+"names": [
+"traffic_profile.py"
+],
+"chs": [
+"11"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://github.com/llm-d-incubation/llm-d-planner/blob/main/src/planner/data/configuration/usecase_slo_workload.json",
+"name": "usecase_slo_workload.json",
+"names": [
+"usecase_slo_workload.json"
+],
+"chs": [
+"11"
+],
+"status": "local",
+"added": false
+},
+{
+"url": "https://en.wikipedia.org/wiki/Erlang_(unit)",
+"name": "Erlang (unit)",
+"names": [
+"Erlang (unit)"
+],
+"chs": [
+"11"
+],
+"status": "local",
+"added": false
+}
+]

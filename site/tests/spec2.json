@@ -1,0 +1,11 @@
+[
+ {"url":"index.html","name":"home-desktop","w":1440,"h":1000},
+ {"url":"index.html#s2","name":"home-findings","w":1440,"h":1000,"full":true},
+ {"url":"01-silicon.html","name":"ch1-top","w":1440,"h":1000},
+ {"url":"01-silicon.html#s2-3","name":"ch1-s2-3","w":1440,"h":1000},
+ {"url":"08-metrics.html#s3","name":"ch8-score","w":1440,"h":1000},
+ {"url":"03-architectures.html#s1-2","name":"ch3-matrix","w":1440,"h":1000},
+ {"url":"07-long-context.html#s2","name":"ch7-kv","w":1440,"h":1000,"full":true},
+ {"url":"07-long-context.html#s3","name":"ch7-ttft","w":1440,"h":1000,"full":true},
+ {"url":"index.html","name":"home-phone","w":390,"h":844,"dpr":2,"full":true}
+]

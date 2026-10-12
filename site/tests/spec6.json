@@ -1,0 +1,6 @@
+[
+ {"url": "09-deployment.html#s3", "name": "v6-ch9-tree", "w": 1440, "h": 1300},
+ {"url": "09-deployment.html#s3", "name": "v6-ch9-tree-phone", "w": 390, "h": 1500, "dpr": 2, "eval": ["document.querySelector('ol.tree').scrollIntoView()"]},
+ {"url": "04-open-models.html#s3", "name": "v6-ch4-grid-phone", "w": 390, "h": 900, "dpr": 2, "eval": ["document.querySelector('#shg').scrollIntoView()", "document.querySelector('#shg .hm-scroll').scrollLeft = 260"]},
+ {"url": "07-long-context.html", "name": "v6-ch7-phone-ctx", "w": 390, "h": 1200, "dpr": 2, "eval": ["document.querySelector('.widget').scrollIntoView()"]}
+]

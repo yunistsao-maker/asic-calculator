@@ -1,0 +1,3365 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>容量計算器 · Inference ASIC Atlas</title>
+<meta name="description" content="輸入人數、角色組合與用量級，得到 P95 平日尖峰分鐘的 RPM、三類 TPM、同時在途請求數，以及各平台要申請的數字。結果全部是本文推算 D，每個參數的出處在第 11 章。">
+<meta name="color-scheme" content="light dark">
+<link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&amp;display=swap">
+<link rel="stylesheet" href="assets/site.css">
+<link rel="stylesheet" href="assets/katex/katex.min.css">
+<script>(function(){var d=document.documentElement;d.classList.add('js');try{var t=localStorage.getItem('ia-theme');if(t==='light'||t==='dark')d.setAttribute('data-theme',t)}catch(e){}})();</script>
+</head>
+<body><a class="skip" href="#sheet">跳到內容</a><header class="hdr"><div class="hdr-in"><a class="brand" href="index.html"><svg width="32" height="32" viewBox="0 0 32 32" aria-hidden="true"><rect class="k" x="7" y="7" width="18" height="18"></rect><circle cx="11" cy="11" r="1.6" fill="#F2B544"></circle><path class="p" d="M11 2v5M16 2v5M21 2v5M11 25v5M16 25v5M21 25v5M2 11h5M2 16h5M2 21h5M25 11h5M25 16h5M25 21h5" stroke-width="2" fill="none"></path></svg><span class="brand-t"><span class="brand-en">INFERENCE ASIC ATLAS</span><span class="brand-zh">推論晶片圖鑑</span></span></a><button type="button" class="hbtn menu-btn" id="menu-btn" aria-expanded="false" aria-controls="idx"><svg width="18" height="18" viewBox="0 0 18 18" aria-hidden="true"><path d="M2 4.5h14M2 9h14M2 13.5h14" stroke="currentColor" stroke-width="1.8" fill="none"></path></svg><span>章節</span></button><div class="hdr-tools"><span class="rev">REV 2026-10-05 · 12 SHEETS · 777 SOURCES</span><form id="hsearch" class="hsearch" action="search.html" method="get" role="search"><input name="q" type="search" placeholder="搜尋全站" aria-label="搜尋全站"><button type="submit" aria-label="搜尋"><svg width="18" height="18" viewBox="0 0 18 18" aria-hidden="true"><circle cx="7.5" cy="7.5" r="5" fill="none" stroke="currentColor" stroke-width="1.8"></circle><path d="M11.5 11.5L16 16" stroke="currentColor" stroke-width="1.8"></path></svg></button></form><button type="button" class="hbtn" id="theme-btn" aria-label="切換深色模式"><svg width="18" height="18" viewBox="0 0 18 18" aria-hidden="true"><circle cx="9" cy="9" r="7" fill="none" stroke="currentColor" stroke-width="1.6"></circle><path d="M9 2a7 7 0 0 1 0 14z" fill="currentColor"></path></svg></button></div></div></header>
+<div class="wrap">
+<nav class="idx" id="idx" aria-label="章節"><a href="index.html"><span class="n">00</span><span>總覽</span></a><div class="grp"><span class="grp-t">硬體 HARDWARE</span><a href="01-silicon.html"><span class="n">01</span><span>晶片與系統規格</span></a></div><div class="grp"><span class="grp-t">軟體 SOFTWARE</span><a href="02-engines.html"><span class="n">02</span><span>推論引擎</span></a><a href="06-technique-matrix.html"><span class="n">06</span><span>技術支援矩陣</span></a></div><div class="grp"><span class="grp-t">模型 MODELS</span><a href="03-architectures.html"><span class="n">03</span><span>模型架構支援</span></a><a href="04-open-models.html"><span class="n">04</span><span>開源模型效能</span></a><a href="05-proprietary-models.html"><span class="n">05</span><span>私有模型效能</span></a></div><div class="grp"><span class="grp-t">情境 SCENARIOS</span><a href="07-long-context.html"><span class="n">07</span><span>長上下文 200K / 1M</span></a><a href="08-metrics.html"><span class="n">08</span><span>效能與成本</span></a><a href="09-deployment.html"><span class="n">09</span><span>部署模式</span></a></div><div class="grp"><span class="grp-t">規劃 PLANNING</span><a href="10-capacity.html" aria-current="page"><span class="n">10</span><span>容量計算器</span></a><a href="11-evidence.html"><span class="n">11</span><span>估算依據</span></a><a href="12-sources.html"><span class="n">12</span><span>來源</span></a></div><div class="grp"><span class="grp-t">附錄 APPENDIX</span><a href="factcheck.html"><span class="n">A</span><span>查核紀錄</span></a></div></nav>
+<main id="sheet">
+<section class="sheet-head"><span class="sheet-code">SHEET 10 / 12 · CAPACITY PLANNER</span><h1>從員工數算到尖峰 RPM 與 TPM</h1><p class="lead">輸入人數、角色組合與用量級，得到 P95 平日尖峰分鐘的 RPM、三類 TPM、同時在途請求數，以及各平台要申請的數字。結果全部是本文推算 <span class="g g-d" title="等級 D：本文推算，附算式">D</span>，每個參數的出處在<a class="xref" href="11-evidence.html">第 11 章</a>。</p><div class="conv prose"><p>資料日：2026-10-04。本章的模型數字全部是 <code>calc/capacity_model.py</code> 的輸出（等級 <span class="g g-d" title="等級 D：本文推算，附算式">D</span>，算式列在第一節）；公開證據的逐項出處與等級在<a class="xref" href="11-evidence.html">第 11 章</a>。</p>
+</div></section>
+<div class="tabs"><div class="tablist" role="tablist" aria-label="本章的小節"><button type="button" class="tab" role="tab" id="tab-calc" aria-controls="calc" aria-selected="true"><span class="n">10.1</span><span>計算器</span></button><button type="button" class="tab" role="tab" id="tab-s1" aria-controls="s1" aria-selected="false"><span class="n">10.2</span><span>方法與公式</span></button><button type="button" class="tab" role="tab" id="tab-s2" aria-controls="s2" aria-selected="false"><span class="n">10.3</span><span>每人用量</span></button><button type="button" class="tab" role="tab" id="tab-s3" aria-controls="s3" aria-selected="false"><span class="n">10.4</span><span>情境</span></button><button type="button" class="tab" role="tab" id="tab-s4" aria-controls="s4" aria-selected="false"><span class="n">10.5</span><span>模型組合</span></button><button type="button" class="tab" role="tab" id="tab-s5" aria-controls="s5" aria-selected="false"><span class="n">10.6</span><span>敏感度</span></button><button type="button" class="tab" role="tab" id="tab-s6" aria-controls="s6" aria-selected="false"><span class="n">10.7</span><span>交叉檢查</span></button></div>
+<section class="panel on" role="tabpanel" id="calc" aria-labelledby="tab-calc"><div class="panel-head"><h2>容量計算器</h2></div>
+<div class="widget" style="gap:28px"><div id="planner" class="widget" style="gap:28px"><noscript><p class="wnote">計算器需要 JavaScript。靜態的情境表在「情境」與「模型組合」兩個分頁。</p></noscript></div><section class="block"><h3 style="font-size:22px">算式</h3><div class="eqs"><div class="eq"><code>C_i = N · p_i · a_i · r_i</code><span>角色 i 的平日呼叫數</span></div><div class="eq"><code>m = Σ C_i · s ÷ 60 · d</code><span>busy hour 的平均每分鐘請求數，以 P95 平日計</span></div><div class="eq"><code>k = max(1.15, 1 + 3 ÷ √m)</code><span>尖峰分鐘係數，以共用同一份配額的合併流量計算</span></div><div class="eq"><code>RPM = m · k</code><span>尖峰 RPM，與延遲無關</span></div><div class="eq"><code>TPM_x = RPM · tokens_x · f_x</code><span>x 為未快取輸入、cache read、輸出三類；f 是 token 比請求更尖的修正</span></div><div class="eq"><code>W = TTFT + o ÷ v</code><span>一次呼叫的總時間；工具執行時間不計入</span></div><div class="eq"><code>L = RPM ÷ 60 · W</code><span>同時在途請求數，Little’s law</span></div><div class="eq"><code>L99.9 = L + 3.1 · √L</code><span>Poisson 餘裕</span></div></div><p class="wnote">沒有算進去的三件事：被限流的請求會重試；用量逐年成長；會預扣 max_tokens 的平台，在途請求佔住的配額是併發 ×（輸入 + max_tokens）。算式的來歷在「方法與公式」分頁，每個參數的證據在<a href="11-evidence.html">第 11 章</a>。計算器與第 10 章的表用同一組算式：100,000 人、組合 B、base、單一時區的結果是 4,764 RPM。</p></section></div></section>
+<section class="panel" role="tabpanel" id="s1" aria-labelledby="tab-s1"><div class="panel-head"><h2>估算方法與公式</h2><div class="sec-lead prose"><p id="b1">從員工數到尖峰 RPM / TPM 是一條連乘鏈；以 100,000 人、角色組合 B、base 用量、單一時區為例，結果是尖峰 4,764 RPM、未快取輸入 24.5M TPM、cache read 212M TPM、輸出 3.13M TPM，同時在途請求 779（99.9% 為 865）<span class="g g-d" title="等級 D：本文推算，附算式">D</span>。同一份流量換成各平台自己的「TPM」定義後相差 3.4–9.8 倍，要申請的數字必須照平台的計法算。</p>
+</div></div>
+<div class="subtabs"><div class="subtablist" role="tablist" aria-label="估算方法與公式"><button type="button" class="subtab" role="tab" id="tab-s1-1" aria-controls="s1-1" aria-selected="true">計算鏈</button><button type="button" class="subtab" role="tab" id="tab-s1-2" aria-controls="s1-2" aria-selected="false">為什麼這樣建模</button><button type="button" class="subtab" role="tab" id="tab-s1-3" aria-controls="s1-3" aria-selected="false">「TPM」不是單一數量</button></div><div class="subpanel on" role="tabpanel" id="s1-1" aria-labelledby="tab-s1-1"><div class="prose"><h3>計算鏈</h3><p id="b2">角色 i 的平日呼叫數，由員工數、角色占比、活躍占比與每活躍日呼叫數相乘：</p>
+<div class="formula"><span class="katex-display"><span class="katex"><span class="katex-mathml"><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>C</mi><mi>i</mi></msub><mo>=</mo><mi>N</mi><mo>⋅</mo><msub><mi>p</mi><mi>i</mi></msub><mo>⋅</mo><msub><mi>a</mi><mi>i</mi></msub><mo>⋅</mo><msub><mi>r</mi><mi>i</mi></msub></mrow><annotation encoding="application/x-tex">C_i = N \cdot p_i \cdot a_i \cdot r_i</annotation></semantics></math></span><span aria-hidden="true" class="katex-html"><span class="katex-base"><span class="katex-strut" style="height:0.8333em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.0715em;">C</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3117em;"><span style="top:-2.55em;margin-left:-0.0715em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">i</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.109em;">N</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">⋅</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6389em;vertical-align:-0.1944em;"></span><span class="mord"><span class="mord mathnormal">p</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3117em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">i</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">⋅</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.5945em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathnormal">a</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3117em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">i</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">⋅</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.5806em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.0278em;">r</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3117em;"><span style="top:-2.55em;margin-left:-0.0278em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">i</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span></span></div>
+<p id="b3">busy hour（一日中最忙的一小時）的平均每分鐘請求數，以 P95 平日計：</p>
+<div class="formula"><span class="katex-display"><span class="katex"><span class="katex-mathml"><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>m</mi><mi>i</mi></msub><mo>=</mo><mfrac><mrow><msub><mi>C</mi><mi>i</mi></msub><mo>⋅</mo><mi>s</mi></mrow><mn>60</mn></mfrac><mo>⋅</mo><mi>d</mi></mrow><annotation encoding="application/x-tex">m_i = \frac{C_i \cdot s}{60} \cdot d</annotation></semantics></math></span><span aria-hidden="true" class="katex-html"><span class="katex-base"><span class="katex-strut" style="height:0.5806em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathnormal">m</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3117em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">i</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:2.0463em;vertical-align:-0.686em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.3603em;"><span style="top:-2.314em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord">60</span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.677em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord"><span class="mord mathnormal" style="margin-right:0.0715em;">C</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3117em;"><span style="top:-2.55em;margin-left:-0.0715em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">i</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">⋅</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mord mathnormal">s</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.686em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">⋅</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6944em;"></span><span class="mord mathnormal">d</span></span></span></span></span></div>
+<p id="b4">共用同一個端點或同一份配額的流量先加總，再套尖峰分鐘係數：</p>
+<div class="formula"><span class="katex-display"><span class="katex"><span class="katex-mathml"><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>m</mi><mo>=</mo><munder><mo>∑</mo><mi>i</mi></munder><msub><mi>m</mi><mi>i</mi></msub></mrow><annotation encoding="application/x-tex">m = \sum_i m_i</annotation></semantics></math></span><span aria-hidden="true" class="katex-html"><span class="katex-base"><span class="katex-strut" style="height:0.4306em;"></span><span class="mord mathnormal">m</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:2.3277em;vertical-align:-1.2777em;"></span><span class="mop op-limits"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.05em;"><span style="top:-1.8723em;margin-left:0em;"><span class="pstrut" style="height:3.05em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">i</span></span></span><span style="top:-3.05em;"><span class="pstrut" style="height:3.05em;"></span><span><span class="mop op-symbol large-op">∑</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:1.2777em;"><span></span></span></span></span></span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord"><span class="mord mathnormal">m</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3117em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">i</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span></span></div>
+<div class="formula"><span class="katex-display"><span class="katex"><span class="katex-mathml"><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>k</mi><mo>=</mo><mi>max</mi><mo>⁡</mo><mrow><mo fence="true">(</mo><mn>1.15</mn><mo separator="true">,</mo><mtext> </mtext><mn>1</mn><mo>+</mo><mfrac><mn>3</mn><msqrt><mi>m</mi></msqrt></mfrac><mo fence="true">)</mo></mrow></mrow><annotation encoding="application/x-tex">k = \max\left(1.15,\ 1 + \frac{3}{\sqrt{m}}\right)</annotation></semantics></math></span><span aria-hidden="true" class="katex-html"><span class="katex-base"><span class="katex-strut" style="height:0.6944em;"></span><span class="mord mathnormal" style="margin-right:0.0315em;">k</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:2.4em;vertical-align:-0.95em;"></span><span class="mop">max</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="minner"><span class="mopen delimcenter" style="top:0em;"><span class="delimsizing size3">(</span></span><span class="mord">1.15</span><span class="mpunct">,</span><span class="mspace"> </span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord">1</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.3214em;"><span style="top:-2.3097em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord sqrt"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.8003em;"><span class="svg-align" style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="mord" style="padding-left:0.833em;"><span class="mord mathnormal">m</span></span></span><span style="top:-2.7603em;"><span class="pstrut" style="height:3em;"></span><span class="hide-tail" style="min-width:0.853em;height:1.08em;"><svg height="1.08em" preserveaspectratio="xMinYMin slice" viewbox="0 0 400000 1080" width="400em" xmlns="http://www.w3.org/2000/svg"><path d="M95,702
+c-2.7,0,-7.17,-2.7,-13.5,-8c-5.8,-5.3,-9.5,-10,-9.5,-14
+c0,-2,0.3,-3.3,1,-4c1.3,-2.7,23.83,-20.7,67.5,-54
+c44.2,-33.3,65.8,-50.3,66.5,-51c1.3,-1.3,3,-2,5,-2c4.7,0,8.7,3.3,12,10
+s173,378,173,378c0.7,0,35.3,-71,104,-213c68.7,-142,137.5,-285,206.5,-429
+c69,-144,104.5,-217.7,106.5,-221
+l0 -0
+c5.3,-9.3,12,-14,20,-14
+H400000v40H845.2724
+s-225.272,467,-225.272,467s-235,486,-235,486c-2.7,4.7,-9,7,-19,7
+c-6,0,-10,-1,-12,-3s-194,-422,-194,-422s-65,47,-65,47z
+M834 80h400000v40h-400000z"></path></svg></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2397em;"><span></span></span></span></span></span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.677em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord">3</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.93em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span><span class="mclose delimcenter" style="top:0em;"><span class="delimsizing size3">)</span></span></span></span></span></span></span></div>
+<div class="formula"><span class="katex-display"><span class="katex"><span class="katex-mathml"><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mrow><mi mathvariant="normal">R</mi><mi mathvariant="normal">P</mi><mi mathvariant="normal">M</mi></mrow><mrow><mi mathvariant="normal">p</mi><mi mathvariant="normal">e</mi><mi mathvariant="normal">a</mi><mi mathvariant="normal">k</mi></mrow></msub><mo>=</mo><mi>m</mi><mo>⋅</mo><mi>k</mi></mrow><annotation encoding="application/x-tex">\mathrm{RPM}_{\mathrm{peak}} = m \cdot k</annotation></semantics></math></span><span aria-hidden="true" class="katex-html"><span class="katex-base"><span class="katex-strut" style="height:0.9694em;vertical-align:-0.2861em;"></span><span class="mord"><span class="mord"><span class="mord mathrm">RPM</span></span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3361em;"><span style="top:-2.55em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight"><span class="mord mathrm mtight">peak</span></span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2861em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.4445em;"></span><span class="mord mathnormal">m</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">⋅</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6944em;"></span><span class="mord mathnormal" style="margin-right:0.0315em;">k</span></span></span></span></span></div>
+<p id="b5">三類 token 的尖峰 TPM（x 分別代入 u、c、o）：</p>
+<div class="formula"><span class="katex-display"><span class="katex"><span class="katex-mathml"><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mrow><mi mathvariant="normal">T</mi><mi mathvariant="normal">P</mi><mi mathvariant="normal">M</mi></mrow><mi>x</mi></msub><mo>=</mo><mi>k</mi><mo>⋅</mo><msub><mi>f</mi><mi>x</mi></msub><mo>⋅</mo><munder><mo>∑</mo><mi>i</mi></munder><msub><mi>m</mi><mi>i</mi></msub><mo>⋅</mo><msub><mi>x</mi><mi>i</mi></msub></mrow><annotation encoding="application/x-tex">\mathrm{TPM}_x = k \cdot f_x \cdot \sum_i m_i \cdot x_i</annotation></semantics></math></span><span aria-hidden="true" class="katex-html"><span class="katex-base"><span class="katex-strut" style="height:0.8333em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord"><span class="mord mathrm">TPM</span></span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.1514em;"><span style="top:-2.55em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">x</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6944em;"></span><span class="mord mathnormal" style="margin-right:0.0315em;">k</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">⋅</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.8889em;vertical-align:-0.1944em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.1076em;">f</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.1514em;"><span style="top:-2.55em;margin-left:-0.1076em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">x</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">⋅</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:2.3277em;vertical-align:-1.2777em;"></span><span class="mop op-limits"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.05em;"><span style="top:-1.8723em;margin-left:0em;"><span class="pstrut" style="height:3.05em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">i</span></span></span><span style="top:-3.05em;"><span class="pstrut" style="height:3.05em;"></span><span><span class="mop op-symbol large-op">∑</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:1.2777em;"><span></span></span></span></span></span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord"><span class="mord mathnormal">m</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3117em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">i</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">⋅</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.5806em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathnormal">x</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3117em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">i</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span></span></div>
+<p id="b6">一次呼叫的總時間與同時在途請求數：</p>
+<div class="formula"><span class="katex-display"><span class="katex"><span class="katex-mathml"><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>W</mi><mi>i</mi></msub><mo>=</mo><msub><mrow><mi mathvariant="normal">T</mi><mi mathvariant="normal">T</mi><mi mathvariant="normal">F</mi><mi mathvariant="normal">T</mi></mrow><mi>i</mi></msub><mo>+</mo><mfrac><msub><mi>o</mi><mi>i</mi></msub><mi>v</mi></mfrac></mrow><annotation encoding="application/x-tex">W_i = \mathrm{TTFT}_i + \frac{o_i}{v}</annotation></semantics></math></span><span aria-hidden="true" class="katex-html"><span class="katex-base"><span class="katex-strut" style="height:0.8333em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.1389em;">W</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3117em;"><span style="top:-2.55em;margin-left:-0.1389em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">i</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.8333em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord"><span class="mord mathrm">TTFT</span></span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3117em;"><span style="top:-2.55em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">i</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1.7936em;vertical-align:-0.686em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.1076em;"><span style="top:-2.314em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.0359em;">v</span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.677em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord"><span class="mord mathnormal">o</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3117em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">i</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.686em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span></span></span></span></span></div>
+<div class="formula"><span class="katex-display"><span class="katex"><span class="katex-mathml"><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>L</mi><mo>=</mo><munder><mo>∑</mo><mi>i</mi></munder><mfrac><mrow><msub><mi>m</mi><mi>i</mi></msub><mo>⋅</mo><mi>k</mi></mrow><mn>60</mn></mfrac><mo>⋅</mo><msub><mi>W</mi><mi>i</mi></msub></mrow><annotation encoding="application/x-tex">L = \sum_i \frac{m_i \cdot k}{60} \cdot W_i</annotation></semantics></math></span><span aria-hidden="true" class="katex-html"><span class="katex-base"><span class="katex-strut" style="height:0.6833em;"></span><span class="mord mathnormal">L</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:2.6491em;vertical-align:-1.2777em;"></span><span class="mop op-limits"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.05em;"><span style="top:-1.8723em;margin-left:0em;"><span class="pstrut" style="height:3.05em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">i</span></span></span><span style="top:-3.05em;"><span class="pstrut" style="height:3.05em;"></span><span><span class="mop op-symbol large-op">∑</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:1.2777em;"><span></span></span></span></span></span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.3714em;"><span style="top:-2.314em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord">60</span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.677em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord"><span class="mord mathnormal">m</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3117em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">i</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">⋅</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mord mathnormal" style="margin-right:0.0315em;">k</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.686em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">⋅</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.8333em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.1389em;">W</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3117em;"><span style="top:-2.55em;margin-left:-0.1389em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">i</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span></span></div>
+<div class="formula"><span class="katex-display"><span class="katex"><span class="katex-mathml"><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>L</mi><mn>99.9</mn></msub><mo>=</mo><mi>L</mi><mo>+</mo><mn>3.1</mn><msqrt><mi>L</mi></msqrt></mrow><annotation encoding="application/x-tex">L_{99.9} = L + 3.1 \sqrt{L}</annotation></semantics></math></span><span aria-hidden="true" class="katex-html"><span class="katex-base"><span class="katex-strut" style="height:0.8333em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathnormal">L</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3011em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">99.9</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.7667em;vertical-align:-0.0833em;"></span><span class="mord mathnormal">L</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1.04em;vertical-align:-0.0645em;"></span><span class="mord">3.1</span><span class="mord sqrt"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.9755em;"><span class="svg-align" style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="mord" style="padding-left:0.833em;"><span class="mord mathnormal">L</span></span></span><span style="top:-2.9355em;"><span class="pstrut" style="height:3em;"></span><span class="hide-tail" style="min-width:0.853em;height:1.08em;"><svg height="1.08em" preserveaspectratio="xMinYMin slice" viewbox="0 0 400000 1080" width="400em" xmlns="http://www.w3.org/2000/svg"><path d="M95,702
+c-2.7,0,-7.17,-2.7,-13.5,-8c-5.8,-5.3,-9.5,-10,-9.5,-14
+c0,-2,0.3,-3.3,1,-4c1.3,-2.7,23.83,-20.7,67.5,-54
+c44.2,-33.3,65.8,-50.3,66.5,-51c1.3,-1.3,3,-2,5,-2c4.7,0,8.7,3.3,12,10
+s173,378,173,378c0.7,0,35.3,-71,104,-213c68.7,-142,137.5,-285,206.5,-429
+c69,-144,104.5,-217.7,106.5,-221
+l0 -0
+c5.3,-9.3,12,-14,20,-14
+H400000v40H845.2724
+s-225.272,467,-225.272,467s-235,486,-235,486c-2.7,4.7,-9,7,-19,7
+c-6,0,-10,-1,-12,-3s-194,-422,-194,-422s-65,47,-65,47z
+M834 80h400000v40h-400000z"></path></svg></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.0645em;"><span></span></span></span></span></span></span></span></span></span></div>
+<p id="b7">每授權席次的平日、每週、每月 token（w 為週末係數）：</p>
+<div class="formula"><span class="katex-display"><span class="katex"><span class="katex-mathml"><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>T</mi><mrow><mi mathvariant="normal">w</mi><mi mathvariant="normal">e</mi><mi mathvariant="normal">e</mi><mi mathvariant="normal">k</mi><mi mathvariant="normal">d</mi><mi mathvariant="normal">a</mi><mi mathvariant="normal">y</mi></mrow></msub><mo>=</mo><mi>a</mi><mo>⋅</mo><mi>r</mi><mo>⋅</mo><mo stretchy="false">(</mo><mi>u</mi><mo>+</mo><mi>c</mi><mo>+</mo><mi>o</mi><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">T_{\mathrm{weekday}} = a \cdot r \cdot (u + c + o)</annotation></semantics></math></span><span aria-hidden="true" class="katex-html"><span class="katex-base"><span class="katex-strut" style="height:0.9694em;vertical-align:-0.2861em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.1389em;">T</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3361em;"><span style="top:-2.55em;margin-left:-0.1389em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight"><span class="mord mathrm mtight" style="margin-right:0.0139em;">weekday</span></span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2861em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.4445em;"></span><span class="mord mathnormal">a</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">⋅</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.4445em;"></span><span class="mord mathnormal" style="margin-right:0.0278em;">r</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">⋅</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mopen">(</span><span class="mord mathnormal">u</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6667em;vertical-align:-0.0833em;"></span><span class="mord mathnormal">c</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal">o</span><span class="mclose">)</span></span></span></span></span></div>
+<div class="formula"><span class="katex-display"><span class="katex"><span class="katex-mathml"><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>T</mi><mrow><mi mathvariant="normal">w</mi><mi mathvariant="normal">e</mi><mi mathvariant="normal">e</mi><mi mathvariant="normal">k</mi></mrow></msub><mo>=</mo><msub><mi>T</mi><mrow><mi mathvariant="normal">w</mi><mi mathvariant="normal">e</mi><mi mathvariant="normal">e</mi><mi mathvariant="normal">k</mi><mi mathvariant="normal">d</mi><mi mathvariant="normal">a</mi><mi mathvariant="normal">y</mi></mrow></msub><mo>⋅</mo><mo stretchy="false">(</mo><mn>5</mn><mo>+</mo><mn>2</mn><mi>w</mi><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">T_{\mathrm{week}} = T_{\mathrm{weekday}} \cdot (5 + 2w)</annotation></semantics></math></span><span aria-hidden="true" class="katex-html"><span class="katex-base"><span class="katex-strut" style="height:0.8333em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.1389em;">T</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3361em;"><span style="top:-2.55em;margin-left:-0.1389em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight"><span class="mord mathrm mtight">week</span></span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.9694em;vertical-align:-0.2861em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.1389em;">T</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3361em;"><span style="top:-2.55em;margin-left:-0.1389em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight"><span class="mord mathrm mtight" style="margin-right:0.0139em;">weekday</span></span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2861em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">⋅</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mopen">(</span><span class="mord">5</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord">2</span><span class="mord mathnormal" style="margin-right:0.0269em;">w</span><span class="mclose">)</span></span></span></span></span></div>
+<div class="formula"><span class="katex-display"><span class="katex"><span class="katex-mathml"><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>T</mi><mrow><mi mathvariant="normal">m</mi><mi mathvariant="normal">o</mi><mi mathvariant="normal">n</mi><mi mathvariant="normal">t</mi><mi mathvariant="normal">h</mi></mrow></msub><mo>=</mo><msub><mi>T</mi><mrow><mi mathvariant="normal">w</mi><mi mathvariant="normal">e</mi><mi mathvariant="normal">e</mi><mi mathvariant="normal">k</mi></mrow></msub><mo>⋅</mo><mfrac><mn>52.14</mn><mn>12</mn></mfrac></mrow><annotation encoding="application/x-tex">T_{\mathrm{month}} = T_{\mathrm{week}} \cdot \frac{52.14}{12}</annotation></semantics></math></span><span aria-hidden="true" class="katex-html"><span class="katex-base"><span class="katex-strut" style="height:0.8333em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.1389em;">T</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3361em;"><span style="top:-2.55em;margin-left:-0.1389em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight"><span class="mord mathrm mtight">month</span></span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.8333em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.1389em;">T</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3361em;"><span style="top:-2.55em;margin-left:-0.1389em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight"><span class="mord mathrm mtight">week</span></span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">⋅</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:2.0074em;vertical-align:-0.686em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.3214em;"><span style="top:-2.314em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord">12</span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.677em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord">52.14</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.686em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span></span></span></span></span></div>
+<figure class="tbl" data-cols="4" data-rows="12"><div aria-label="資料表" class="tbl-scroll" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th scope="col">符號</th>
+<th class="w2" scope="col">意義</th>
+<th class="w1" scope="col">預設值</th>
+<th class="w2" scope="col">依據</th>
+</tr>
+</thead>
+<tbody>
+<tr id="b8">
+<td class="rowhead">N、p_i</td>
+<td>員工數（每位員工一個授權席次）；角色 i 的人數占比</td>
+<td>情境輸入</td>
+<td>八種角色組合是情境設定，不是量測</td>
+</tr>
+<tr id="b9">
+<td class="rowhead">a</td>
+<td>平日有使用的授權席次占比</td>
+<td>12%–75%，依角色與用量級</td>
+<td>見「每人用量基準」；逐項佐證在<a class="xref" href="11-evidence.html">第 11 章</a></td>
+</tr>
+<tr id="b10">
+<td class="rowhead">r</td>
+<td>每位活躍使用者每個活躍日的模型呼叫數（全體平均）</td>
+<td class="num">4–540</td>
+<td class="muted">同上</td>
+</tr>
+<tr id="b11">
+<td class="rowhead">u、c、o</td>
+<td>每次呼叫的未快取輸入（含 cache write）、cache read 輸入、輸出（含 reasoning）tokens</td>
+<td>依角色與用量級</td>
+<td class="muted">同上</td>
+</tr>
+<tr id="b12">
+<td class="rowhead">s</td>
+<td>busy-hour 占比：平日最忙一小時占全日請求的比例</td>
+<td>0.11（單一時區）；0.065（全球分散）</td>
+<td>單一站點 10.6–12.4%、9.3%；全球混合 5.2–5.8%、6.8–7.0% [<span class="g g-a" title="等級 A：獨立第三方量測">A</span>，筆記實算] <a href="https://github.com/HPMLL/BurstGPT" rel="noopener" target="_blank">BurstGPT</a>、<a href="https://github.com/Azure/AzurePublicDataset/blob/master/AzureLLMInferenceDataset2024.md" rel="noopener" target="_blank">Azure 2024 trace</a>、<a href="https://github.com/Azure/AzurePublicDataset/blob/master/GitHubCopilotCodingAgentDataset2026.md" rel="noopener" target="_blank">Copilot agent trace</a></td>
+</tr>
+<tr id="b13">
+<td class="rowhead">d</td>
+<td>P95 平日 ÷ 平均平日</td>
+<td class="num">1.2</td>
+<td>BurstGPT 三個檔為 1.20、1.28、1.80（60–110 天）[<span class="g g-a" title="等級 A：獨立第三方量測">A</span>，筆記實算] <a href="https://github.com/HPMLL/BurstGPT" rel="noopener" target="_blank">BurstGPT</a></td>
+</tr>
+<tr id="b14">
+<td class="rowhead">k</td>
+<td>尖峰分鐘 ÷ busy hour 的平均分鐘</td>
+<td>max(1.15, 1 + 3 ÷ √m)</td>
+<td>大流量 trace 為 1.09–1.30；每分鐘 4–5 個請求時中位 2.4–2.5 [<span class="g g-a" title="等級 A：獨立第三方量測">A</span>，筆記實算；公式為 D]</td>
+</tr>
+<tr id="b15">
+<td class="rowhead">f_u、f_c、f_o</td>
+<td>token 尖峰相對請求尖峰的修正</td>
+<td class="num">1.18、1.04、1.06</td>
+<td>Copilot busy hour 內：未快取輸入 1.29、全部 token 1.13、輸出 1.15，呼叫數 1.09 [<span class="g g-a" title="等級 A：獨立第三方量測">A</span>，筆記實算]</td>
+</tr>
+<tr id="b16">
+<td class="rowhead">TTFT_i</td>
+<td>估算呼叫時間用的 TTFT</td>
+<td>OA 1.0 s；coding 2.0 s；R&amp;D 2.5 s</td>
+<td>判斷值，無直接量測</td>
+</tr>
+<tr id="b17">
+<td class="rowhead">v</td>
+<td>每條串流的輸出速度</td>
+<td class="num">80 tokens/s</td>
+<td>判斷值；Azure PTU 的延遲目標為 99% 高於 40–100 tokens/s <span class="g g-b" title="等級 B：廠商或夥伴公布，且揭露方法">B</span> <a href="https://learn.microsoft.com/en-us/azure/foundry/openai/how-to/provisioned-throughput-sizing" rel="noopener" target="_blank">PTU sizing</a></td>
+</tr>
+<tr id="b18">
+<td class="num rowhead">3.1</td>
+<td>99.9% 的 Poisson 分位係數 z</td>
+<td class="num">3.1</td>
+<td>Copilot busy hour 量到 p99.9 ÷ 平均 1.12–1.20，Poisson 為 1.16–1.18 [<span class="g g-a" title="等級 A：獨立第三方量測">A</span>，筆記實算]</td>
+</tr>
+<tr id="b19">
+<td class="rowhead">w</td>
+<td>週末日相對平日的量</td>
+<td>OA 0.45；coding 0.25；R&amp;D 0.35</td>
+<td>chat trace 0.36–0.57；coding trace 0.21–0.32；R&amp;D 為判斷值</td>
+</tr>
+</tbody>
+</table></div></figure>
+</div></div><div class="subpanel" role="tabpanel" id="s1-2" aria-labelledby="tab-s1-2"><div class="prose"><h3>為什麼這樣建模</h3><p id="b20"><strong>用全體平均，不用中位數使用者。</strong> 用量分布重尾：Copilot coding agent 每位使用者每週的 prompt tokens 中位數 3.2M、平均 14.0M（44.9T ÷ 3.2M 人）、P90 38M（2026-06 第一週）<span class="g g-a" title="等級 A：獨立第三方量測">A</span> <a href="https://arxiv.org/abs/2608.00101" rel="noopener" target="_blank">Agentic Coding in the Wild</a>；OpenAI 的企業資料中 P95 員工的訊息量是中位數的 6 倍（2025-12）<span class="g g-b" title="等級 B：廠商或夥伴公布，且揭露方法">B</span> <a href="https://cdn.openai.com/pdf/7ef17d82-96bf-4dd1-9df2-228f7f377a29/the-state-of-enterprise-ai_2025-report.pdf" rel="noopener" target="_blank">OpenAI, The state of enterprise AI 2025</a>。容量等於人數乘平均值，拿中位數乘人數會低估約 4.4 倍（14.0M ÷ 3.2M）。所以 r、u、c、o 一律定義為「活躍使用者日的全體平均」，low、base、high 是三種全體平均的情境，不是使用者的百分位。</p>
+<p id="b21"><strong>busy-hour 占比 s。</strong> s 把一日的量壓到最忙的一小時：完全平坦的一日是 4.2%（1 ÷ 24），單一時區取 0.11 等於 busy hour 的速率是 24 小時平均的 2.64 倍，全球分散取 0.065 則為 1.56 倍 [<span class="g g-d" title="等級 D：本文推算，附算式">D</span>：24 × s]。量測值：單一站點的聊天服務 10.6–12.4%（BurstGPT，超過 3,000 位使用者，2023–2024）、以美國為主的 code completion 9.3%（Azure，2024-05）；全球混合的 Azure conversation 5.2–5.8%、Copilot agent 6.8–7.0%（2026-06）[<span class="g g-a" title="等級 A：獨立第三方量測">A</span>，筆記實算]。</p>
+<p id="b22"><strong>P95 平日係數 d。</strong> 一週的 trace 看不到日與日之間的波動；BurstGPT 60–110 天的資料中，P95 平日是平均平日的 1.20–1.80 倍。模型取 1.2，所以所有尖峰值都是「P95 平日」的尖峰。月底、release 週等季節性沒有任何公開 trace 涵蓋，另以 d = 1.5 做敏感度。</p>
+<p id="b23"><strong>尖峰分鐘係數 k 隨合併流量縮小。</strong> 一分鐘內的到達數近似 Poisson，標準差是 √m，相對波動隨 1 ÷ √m 縮小，所以合併的流量越大、每人分到的尖峰越低。量測與公式對照：m ≈ 4.1 時尖峰分鐘是 busy hour 平均分鐘的 2.4–2.5 倍（BurstGPT 中位數），公式給 2.5；m ≈ 1,300 時量到 1.09–1.12（Copilot 取樣），公式給 1.08 [<span class="g g-a" title="等級 A：獨立第三方量測">A</span>，筆記實算]。下限 1.15 取自大流量 trace 的 1.09–1.30（到達的變異係數大於 1，實測值在 Poisson 下限之上）；k 以「共用同一份配額的合併流量」計算，把流量拆到多個模型池時每池的 k 會升高。</p>
+<p id="b24"><strong>token 的尖峰比請求數更尖。</strong> Copilot agent 在 busy hour 內的尖峰分鐘 ÷ 平均分鐘：呼叫數 1.09、全部 token 1.13、輸出 1.15、未快取輸入 1.29（cache miss 成批出現）[<span class="g g-a" title="等級 A：獨立第三方量測">A</span>，筆記實算] <a href="https://github.com/Azure/AzurePublicDataset/blob/master/GitHubCopilotCodingAgentDataset2026.md" rel="noopener" target="_blank">Copilot agent trace</a>。模型取比值：f_u = 1.29 ÷ 1.09 = 1.18，f_c = 1.13 ÷ 1.09 = 1.04（以全部 token 代表 cache read），f_o = 1.15 ÷ 1.09 = 1.06。</p>
+<p id="b25"><strong>RPM 由到達決定，同時在途數由呼叫總時間決定。</strong> RPM 只取決於人數、活躍占比、呼叫數與 s、d、k，與延遲無關；同時在途請求數依 Little's law 是到達率乘上一次呼叫的總時間 W，而 W = TTFT + 輸出 tokens ÷ 每條串流的速度。TTFT 不能單獨當服務時間：本例若以 TTFT 取代 W，在途數會由 779 算成 164，低估 4.8 倍；反過來用「同時連線數 ÷ TTFT」回推 RPM，則高估 4.8 倍 <span class="g g-d" title="等級 D：本文推算，附算式">D</span>。agent 的工具執行時間不計入 W，因為工具在兩次呼叫之間執行。</p>
+<p id="b26"><strong>Little's law 在 trace 上成立。</strong> Copilot agent 整週量到的平均在途呼叫數 179.5，λW = 15.38/s × 11.88 s = 182.7（差 1.8%）；最忙的八個小時量測值是 λW 的 1.00–1.12 倍 [<span class="g g-a" title="等級 A：獨立第三方量測">A</span>，筆記實算] <a href="https://github.com/Azure/AzurePublicDataset/blob/master/GitHubCopilotCodingAgentDataset2026.md" rel="noopener" target="_blank">Copilot agent trace</a>、<a href="https://en.wikipedia.org/wiki/Little%27s_law" rel="noopener" target="_blank">Little's law</a>。模型的 L 以尖峰分鐘的到達率（m × k）計算，是「P95 平日尖峰分鐘內」的在途數；busy hour 的平均在途數是 L ÷ k。</p>
+<p id="b27"><strong>Poisson 餘裕。</strong> 99.9% 的在途數取 L + 3.1√L：Copilot 平日 busy hour（平均在途 328–398）量到的 p99.9 ÷ 平均是 1.12–1.20，同均值的 Poisson 是 1.16–1.18 [<span class="g g-a" title="等級 A：獨立第三方量測">A</span>，筆記實算]。小規模不能用倍數：BurstGPT 的站點在最高併發的小時平均在途約 0.5，實測 p99.9 為 13、最多到達的小時為 10，Poisson 只有 4，這種規模應直接用絕對併發數（該站每日最大併發中位 4、P90 9、最大 18）[<span class="g g-a" title="等級 A：獨立第三方量測">A</span>，筆記實算] <a href="https://github.com/HPMLL/BurstGPT" rel="noopener" target="_blank">BurstGPT</a>。程式化的 API / batch 流量不服從 Poisson（p99 為 66–71，Poisson 為 13–15），應給獨立的 key 或 tier。</p>
+<p id="b28"><strong>模型沒有算進去的三件事。</strong> 被限流的請求會重試（Azure 與 OpenAI 的 SDK 預設重試 2 次），配額剛好等於量測尖峰時，送達的負載會高於量測值 <span class="g g-b" title="等級 B：廠商或夥伴公布，且揭露方法">B</span> <a href="https://developers.openai.com/api/docs/guides/rate-limits" rel="noopener" target="_blank">OpenAI rate limits</a>。用量逐年成長：聊天的每席次用量每年增加 30–100% <span class="g g-d" title="等級 D：本文推算，附算式">D</span>，企業的 token 用量在 2025-01 至 2026-04 之間成長 1,001% <span class="g g-b" title="等級 B：廠商或夥伴公布，且揭露方法">B</span> <a href="https://ramp.com/blog/ai-token-cost-for-businesses" rel="noopener" target="_blank">Ramp</a>。<code>max_tokens</code> 的入場預扣見下一小節。</p>
+</div></div><div class="subpanel" role="tabpanel" id="s1-3" aria-labelledby="tab-s1-3"><div class="prose"><h3>「TPM」不是單一數量</h3><p id="b29">平台在四件事上不同：cache read 是否計入、output 的權重、<code>max_tokens</code> 是否在入場時預扣、執行的時間視窗。同一份流量（上例）的全部 token 是 240M TPM，Anthropic 計 24.5M ITPM 加 3.13M OTPM，Bedrock 對 Opus 5.5 計 55.8M TPM <span class="g g-d" title="等級 D：本文推算，附算式">D</span>。</p>
+<figure class="tbl" data-cols="8" data-rows="13"><div aria-label="資料表" class="tbl-scroll" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th class="w1" scope="col">平台 / 配額</th>
+<th class="w2" scope="col">計入的 token</th>
+<th scope="col">cache read</th>
+<th class="w2" scope="col">output 權重</th>
+<th class="w2" scope="col"><code>max_tokens</code> 入場預扣</th>
+<th class="w2" scope="col">視窗與演算法</th>
+<th scope="col">等級</th>
+<th class="src" scope="col">來源</th>
+</tr>
+</thead>
+<tbody>
+<tr id="b30">
+<td class="rowhead">Anthropic API</td>
+<td>ITPM = 未快取輸入 + cache write；OTPM 另計；RPM</td>
+<td>不計（Haiku 3.5 例外）</td>
+<td class="num">1×，獨立 bucket</td>
+<td>不預扣；ITPM 在請求開始時估計、之後修正</td>
+<td>token bucket，連續補充；60 RPM 可能以每秒 1 個請求執行</td>
+<td><span class="g g-b" title="等級 B：廠商或夥伴公布，且揭露方法">B</span></td>
+<td class="src"><a href="https://platform.claude.com/docs/en/api/rate-limits" rel="noopener" target="_blank">Anthropic rate limits</a></td>
+</tr>
+<tr id="b31">
+<td class="rowhead">Bedrock runtime</td>
+<td>單一 TPM：輸入 + cache write + 輸出 × burndown；部分模型另有 RPM；另有每日 token 上限</td>
+<td>不計</td>
+<td>Claude 5×、10× 或 15×；GPT-5.6 10×；其餘 1×</td>
+<td>入場先扣「輸入 + <code>max_tokens</code>」，過程中調整，結束時回補</td>
+<td>每分鐘配額（AWS 部落格描述為 60 秒視窗）</td>
+<td><span class="g g-b" title="等級 B：廠商或夥伴公布，且揭露方法">B</span></td>
+<td class="src"><a href="https://docs.aws.amazon.com/bedrock/latest/userguide/quotas-token-burndown.html" rel="noopener" target="_blank">How tokens are counted in Amazon Bedrock</a></td>
+</tr>
+<tr id="b32">
+<td class="rowhead">Bedrock mantle</td>
+<td>input TPM 與 output TPM 分開；無 RPM</td>
+<td>不計</td>
+<td class="num">1×，獨立 bucket</td>
+<td>入場以「輸入 + <code>max_tokens</code>」（未設則取模型上限）對 input TPM 檢查</td>
+<td>每分鐘</td>
+<td><span class="g g-b" title="等級 B：廠商或夥伴公布，且揭露方法">B</span></td>
+<td class="src"><a href="https://docs.aws.amazon.com/bedrock/latest/userguide/quotas-mantle.html" rel="noopener" target="_blank">Bedrock mantle quotas</a></td>
+</tr>
+<tr id="b33">
+<td class="rowhead">Azure standard 部署</td>
+<td>以估計 token 計的 TPM；RPM 與 TPM 成固定比例</td>
+<td>所讀頁面未載明</td>
+<td class="num">1×</td>
+<td>計入：收到請求時以 prompt + <code>max_tokens</code> 估計</td>
+<td>token 計數每分鐘重置；RPM 以 1 或 10 秒切片評估</td>
+<td><span class="g g-b" title="等級 B：廠商或夥伴公布，且揭露方法">B</span></td>
+<td class="src"><a href="https://learn.microsoft.com/en-us/azure/foundry-classic/openai/how-to/quota" rel="noopener" target="_blank">Azure quota how-to (classic), updated May 2026</a></td>
+</tr>
+<tr id="b34">
+<td class="rowhead">Azure PTU</td>
+<td>已部署 PTU 的使用率</td>
+<td>不計（GPT-6 系列權重 0.1）</td>
+<td class="num">4–8×（GPT-6 系列 5–7.5）</td>
+<td>以 prompt（扣除 cached）+ <code>max_tokens</code> 估計，完成時修正</td>
+<td>leaky bucket 的變形，連續排空</td>
+<td><span class="g g-b" title="等級 B：廠商或夥伴公布，且揭露方法">B</span></td>
+<td class="src"><a href="https://learn.microsoft.com/en-us/azure/foundry/openai/how-to/provisioned-get-started" rel="noopener" target="_blank">Operate provisioned deployments</a></td>
+</tr>
+<tr id="b35">
+<td class="rowhead">OpenAI API</td>
+<td>RPM、TPM（另有 RPD、TPD），依 organization 與 project</td>
+<td class="muted"><span class="chip chip-na">查無公開資料</span></td>
+<td class="num">1×</td>
+<td>計入：取 <code>max_tokens</code> 與依字元數估計值的較大者</td>
+<td>每分鐘；約 1M input TPM 以上另有爬升速率限制</td>
+<td><span class="g g-b" title="等級 B：廠商或夥伴公布，且揭露方法">B</span></td>
+<td class="src"><a href="https://developers.openai.com/api/docs/guides/rate-limits" rel="noopener" target="_blank">OpenAI rate limits</a></td>
+</tr>
+<tr id="b36">
+<td class="rowhead">OpenAI Scale Tier</td>
+<td>預購的「token units」：新機型（GPT-5.4、GPT-5.5）是 input 與 output 合併的 TPM；較舊機型分列 input 與 output 單位</td>
+<td class="muted"><span class="chip chip-na">查無公開資料</span></td>
+<td>合併單位中 output 依牌價比加權（GPT-5.4 為 6×）；分列單位為獨立 bucket</td>
+<td>頁面未記載</td>
+<td>以整點對齊的 15 分鐘區間平均</td>
+<td><span class="g g-b" title="等級 B：廠商或夥伴公布，且揭露方法">B</span>（2026-10-05 重讀）</td>
+<td class="src"><a href="https://openai.com/api-scale-tier/" rel="noopener" target="_blank">OpenAI Scale Tier</a></td>
+</tr>
+<tr id="b37">
+<td class="rowhead">Google Standard PayGo</td>
+<td>每模型、organization 層級的基準 TPM；無 RPM</td>
+<td class="muted">未載明</td>
+<td class="muted">未載明</td>
+<td>筆記未記載</td>
+<td>每分鐘；超過基準的部分為 best-effort</td>
+<td><span class="g g-b" title="等級 B：廠商或夥伴公布，且揭露方法">B</span></td>
+<td class="src"><a href="https://docs.cloud.google.com/gemini-enterprise-agent-platform/models/standard-paygo" rel="noopener" target="_blank">Standard PayGo</a></td>
+</tr>
+<tr id="b38">
+<td class="rowhead">Google PT</td>
+<td>burndown 後的 tokens/s（每 GSU）</td>
+<td>權重 0.025–0.2</td>
+<td>Gemini 與 open models 3–9×；Claude 5×</td>
+<td>入場估計輸出大小，事後對帳</td>
+<td>動態視窗：3 GSU 以下 40–120 秒；50 GSU 以下 5–30 秒；50 GSU 以上 1–5 秒</td>
+<td><span class="g g-b" title="等級 B：廠商或夥伴公布，且揭露方法">B</span></td>
+<td class="src"><a href="https://docs.cloud.google.com/gemini-enterprise-agent-platform/models/provisioned-throughput/use-provisioned-throughput" rel="noopener" target="_blank">Use Provisioned Throughput</a></td>
+</tr>
+<tr id="b39">
+<td class="rowhead">Gemini API</td>
+<td>RPM、input TPM、RPD（每 project）；每 10 分鐘的花費上限</td>
+<td class="muted">未載明</td>
+<td>輸出不計入 TPM</td>
+<td>筆記未記載</td>
+<td>每分鐘；花費以滾動 10 分鐘視窗</td>
+<td><span class="g g-b" title="等級 B：廠商或夥伴公布，且揭露方法">B</span></td>
+<td class="src"><a href="https://ai.google.dev/gemini-api/docs/rate-limits" rel="noopener" target="_blank">Gemini API rate limits</a></td>
+</tr>
+<tr id="b40">
+<td class="rowhead">Databricks pay-per-token</td>
+<td>ITPM、OTPM、每小時 queries</td>
+<td class="muted">未載明</td>
+<td class="num">1×，獨立 bucket</td>
+<td><code>max_tokens</code> 先對 OTPM 預扣，差額回補</td>
+<td>sliding window 加 token bucket</td>
+<td><span class="g g-b" title="等級 B：廠商或夥伴公布，且揭露方法">B</span></td>
+<td class="src"><a href="https://docs.databricks.com/aws/en/machine-learning/foundation-model-apis/limits" rel="noopener" target="_blank">Databricks limits</a></td>
+</tr>
+<tr id="b41">
+<td class="rowhead">Cerebras</td>
+<td>未快取 TPM 與 total TPM（未快取的 3 倍）、RPM</td>
+<td>只計入 total bucket</td>
+<td class="num">1×</td>
+<td>估計值 = 輸入 + <code>max_completion_tokens</code></td>
+<td>token bucket，連續補充</td>
+<td><span class="g g-b" title="等級 B：廠商或夥伴公布，且揭露方法">B</span></td>
+<td class="src"><a href="https://inference-docs.cerebras.ai/support/rate-limits" rel="noopener" target="_blank">Cerebras rate limits</a></td>
+</tr>
+<tr id="b42">
+<td class="rowhead">Groq</td>
+<td>RPM、RPD、TPM、TPD；可另設 ITPM / OTPM</td>
+<td>不計</td>
+<td class="num">1×</td>
+<td class="muted">未載明</td>
+<td>每分鐘 / 每日</td>
+<td><span class="g g-b" title="等級 B：廠商或夥伴公布，且揭露方法">B</span></td>
+<td class="src"><a href="https://console.groq.com/docs/rate-limits" rel="noopener" target="_blank">Groq rate limits</a></td>
+</tr>
+</tbody>
+</table></div></figure>
+<p id="b43">把上例的三類尖峰 TPM（U = 24.5M、C = 212M、O = 3.13M）代入各平台的定義 [<span class="g g-d" title="等級 D：本文推算，附算式">D</span>；係數出處見<a class="xref" href="11-evidence.html">第 11 章</a>「平台單位」]：</p>
+<figure class="tbl" data-cols="5" data-rows="10"><div aria-label="資料表" class="tbl-scroll" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th class="w1" scope="col">平台單位</th>
+<th class="w1" scope="col">算式</th>
+<th scope="col">結果</th>
+<th scope="col">全部 token ÷ 平台計量</th>
+<th class="w2" scope="col">對照預設配額或備註</th>
+</tr>
+</thead>
+<tbody>
+<tr id="b44">
+<td><span class="rh">全部 token</span><span class="rh-sub"><span class="vh">（</span>不分類別<span class="vh">）</span></span></td>
+<td>U + C + O</td>
+<td class="num">240M TPM</td>
+<td class="num">1.0</td>
+<td>只有 Cerebras 的 total bucket 這樣計</td>
+</tr>
+<tr id="b45">
+<td class="rowhead">Anthropic API</td>
+<td>ITPM = U；OTPM = O</td>
+<td class="num">24.5M ITPM + 3.13M OTPM</td>
+<td class="num">9.8（對 ITPM）</td>
+<td>Scale tier 10M ITPM 的 2.45 倍、2M OTPM 的 1.57 倍</td>
+</tr>
+<tr id="b46">
+<td class="rowhead">Bedrock runtime，burndown 5×</td>
+<td>U + 5 × O</td>
+<td class="num">40.1M TPM</td>
+<td class="num">6.0</td>
+<td>Sonnet 4.6 預設 6M 的 6.7 倍</td>
+</tr>
+<tr id="b47">
+<td class="rowhead">Bedrock runtime，burndown 10×</td>
+<td>U + 10 × O</td>
+<td class="num">55.8M TPM</td>
+<td class="num">4.3</td>
+<td>Opus 5.5 預設 30M 的 1.86 倍</td>
+</tr>
+<tr id="b48">
+<td class="rowhead">Bedrock runtime，burndown 15×</td>
+<td>U + 15 × O</td>
+<td class="num">71.4M TPM</td>
+<td class="num">3.4</td>
+<td>Opus 4.8 預設 30M 的 2.38 倍</td>
+</tr>
+<tr id="b49">
+<td><span class="rh">Bedrock runtime，open-weight</span><span class="rh-sub"><span class="vh">（</span>1×<span class="vh">）</span></span></td>
+<td>U + O</td>
+<td class="num">27.6M TPM</td>
+<td class="num">8.7</td>
+<td>Kimi K3 預設 10M 的 2.76 倍；100M 類別的 0.28 倍</td>
+</tr>
+<tr id="b50">
+<td><span class="rh">Azure PTU</span><span class="rh-sub"><span class="vh">（</span>gpt-6.1-sol<span class="vh">）</span></span></td>
+<td>（U + 0.1 × C + 5 × O） ÷ 3,000</td>
+<td class="num">20,444 PTU</td>
+<td class="num">3.9</td>
+<td>normalised TPM = 61.3M</td>
+</tr>
+<tr id="b51">
+<td><span class="rh">Google GSU</span><span class="rh-sub"><span class="vh">（</span>Claude Opus 5.5<span class="vh">）</span></span></td>
+<td>（U + 0.05 × C + 5 × O） ÷ 60 ÷ 261</td>
+<td class="num">3,239 GSU</td>
+<td class="num">4.7</td>
+<td>burndown 後 845K tokens/s</td>
+</tr>
+<tr id="b52">
+<td><span class="rh">Google GSU</span><span class="rh-sub"><span class="vh">（</span>Gemini 3.8 Flash<span class="vh">）</span></span></td>
+<td>（U + 0.1 × C + 5 × O） ÷ 60 ÷ 675</td>
+<td class="num">1,514 GSU</td>
+<td class="num">3.9</td>
+<td>burndown 後 1.02M tokens/s</td>
+</tr>
+<tr id="b53">
+<td class="rowhead">Cerebras</td>
+<td>未快取 bucket = U + O；total bucket = U + C + O</td>
+<td class="num">27.6M + 240M TPM</td>
+<td>8.7（對未快取 bucket）</td>
+<td>total 是未快取的 8.7 倍，超過 3 倍的上限，total bucket 先滿</td>
+</tr>
+</tbody>
+</table></div></figure>
+<ul>
+<li id="b54"><strong>入場預扣。</strong> 會預扣的平台，在途請求佔住的配額是併發 ×（輸入 + <code>max_tokens</code>），不是實際 token。AWS 的例子：3,000 輸入、1,000 cache write、1,000 輸出、<code>max_tokens</code> 32,000 的請求入場時扣 36,000，結算後為 9,000（5× burndown）<span class="g g-b" title="等級 B：廠商或夥伴公布，且揭露方法">B</span> <a href="https://docs.aws.amazon.com/bedrock/latest/userguide/quotas-token-burndown.html" rel="noopener" target="_blank">How tokens are counted in Amazon Bedrock</a>。以上例 99.9% 在途 865、同樣的 <code>max_tokens</code> 與實際輸出計，瞬間被佔住而未消耗的配額約 865 × 31,000 ≈ 26.8M tokens <span class="g g-d" title="等級 D：本文推算，附算式">D</span>；Azure 的建議是把 <code>max_tokens</code> 設得盡量接近實際生成長度 <span class="g g-b" title="等級 B：廠商或夥伴公布，且揭露方法">B</span> <a href="https://learn.microsoft.com/en-us/azure/foundry/openai/how-to/provisioned-get-started" rel="noopener" target="_blank">Operate provisioned deployments</a>。</li>
+<li id="b55"><strong>執行視窗。</strong> 模型輸出的是尖峰分鐘值，對應 Anthropic（連續補充的 token bucket）與 Bedrock（每分鐘配額）的定義。Azure standard 以 1 或 10 秒切片檢查 RPM（600 RPM 的部署每秒超過 10 個請求即限流），要用尖峰秒估；OpenAI Scale Tier 以 15 分鐘平均計，應以尖峰 15 分鐘的平均估；Google PT 在 50 GSU 以上以 1–5 秒視窗執行 <span class="g g-b" title="等級 B：廠商或夥伴公布，且揭露方法">B</span> <a href="https://learn.microsoft.com/en-us/azure/foundry-classic/openai/how-to/quota" rel="noopener" target="_blank">Azure quota how-to (classic), updated May 2026</a>、<a href="https://openai.com/api-scale-tier/" rel="noopener" target="_blank">OpenAI Scale Tier</a>、<a href="https://docs.cloud.google.com/gemini-enterprise-agent-platform/models/provisioned-throughput/use-provisioned-throughput" rel="noopener" target="_blank">Use Provisioned Throughput</a>。</li>
+</ul>
+</div></div></div>
+<details class="srcs"><summary>本節來源（21）</summary><ul><li><a href="https://github.com/HPMLL/BurstGPT" target="_blank" rel="noopener">BurstGPT</a></li><li><a href="https://github.com/Azure/AzurePublicDataset/blob/master/AzureLLMInferenceDataset2024.md" target="_blank" rel="noopener">Azure 2024 trace</a></li><li><a href="https://github.com/Azure/AzurePublicDataset/blob/master/GitHubCopilotCodingAgentDataset2026.md" target="_blank" rel="noopener">Copilot agent trace</a></li><li><a href="https://learn.microsoft.com/en-us/azure/foundry/openai/how-to/provisioned-throughput-sizing" target="_blank" rel="noopener">PTU sizing</a></li><li><a href="https://arxiv.org/abs/2608.00101" target="_blank" rel="noopener">Agentic Coding in the Wild</a></li><li><a href="https://cdn.openai.com/pdf/7ef17d82-96bf-4dd1-9df2-228f7f377a29/the-state-of-enterprise-ai_2025-report.pdf" target="_blank" rel="noopener">OpenAI, The state of enterprise AI 2025</a></li><li><a href="https://en.wikipedia.org/wiki/Little%27s_law" target="_blank" rel="noopener">Little&#x27;s law</a></li><li><a href="https://developers.openai.com/api/docs/guides/rate-limits" target="_blank" rel="noopener">OpenAI rate limits</a></li><li><a href="https://ramp.com/blog/ai-token-cost-for-businesses" target="_blank" rel="noopener">Ramp</a></li><li><a href="https://platform.claude.com/docs/en/api/rate-limits" target="_blank" rel="noopener">Anthropic rate limits</a></li><li><a href="https://docs.aws.amazon.com/bedrock/latest/userguide/quotas-token-burndown.html" target="_blank" rel="noopener">How tokens are counted in Amazon Bedrock</a></li><li><a href="https://docs.aws.amazon.com/bedrock/latest/userguide/quotas-mantle.html" target="_blank" rel="noopener">Bedrock mantle quotas</a></li><li><a href="https://learn.microsoft.com/en-us/azure/foundry-classic/openai/how-to/quota" target="_blank" rel="noopener">Azure quota how-to (classic), updated May 2026</a></li><li><a href="https://learn.microsoft.com/en-us/azure/foundry/openai/how-to/provisioned-get-started" target="_blank" rel="noopener">Operate provisioned deployments</a></li><li><a href="https://openai.com/api-scale-tier/" target="_blank" rel="noopener">OpenAI Scale Tier</a></li><li><a href="https://docs.cloud.google.com/gemini-enterprise-agent-platform/models/standard-paygo" target="_blank" rel="noopener">Standard PayGo</a></li><li><a href="https://docs.cloud.google.com/gemini-enterprise-agent-platform/models/provisioned-throughput/use-provisioned-throughput" target="_blank" rel="noopener">Use Provisioned Throughput</a></li><li><a href="https://ai.google.dev/gemini-api/docs/rate-limits" target="_blank" rel="noopener">Gemini API rate limits</a></li><li><a href="https://docs.databricks.com/aws/en/machine-learning/foundation-model-apis/limits" target="_blank" rel="noopener">Databricks limits</a></li><li><a href="https://inference-docs.cerebras.ai/support/rate-limits" target="_blank" rel="noopener">Cerebras rate limits</a></li><li><a href="https://console.groq.com/docs/rate-limits" target="_blank" rel="noopener">Groq rate limits</a></li></ul></details></section>
+<section class="panel" role="tabpanel" id="s2" aria-labelledby="tab-s2"><div class="panel-head"><h2>每人用量基準</h2><div class="sec-lead prose"><p id="b56">base 用量下，每個授權席次每月的 token 是 OA 350K、coding 168M、R&amp;D 6.16M，一個 coding 席次等於 481 個 OA 席次 <span class="g g-d" title="等級 D：本文推算，附算式">D</span>。coding 的輸入 token 約 93% 是 cache read，換到不計 cache read 的平台後只剩約十三分之一。</p>
+</div></div>
+<div class="prose"><p id="b57">每次呼叫的假設與活躍度（模型參數）：</p>
+<figure class="tbl" data-cols="8" data-rows="9"><div aria-label="資料表" class="tbl-scroll" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th scope="col">角色</th>
+<th scope="col">用量級</th>
+<th scope="col">平日活躍席次占比 a</th>
+<th scope="col">每活躍日呼叫數 r</th>
+<th scope="col">未快取輸入 u（tokens/呼叫）</th>
+<th scope="col">cache read c（tokens/呼叫）</th>
+<th scope="col">輸出 o（tokens/呼叫）</th>
+<th scope="col">cache read 占輸入</th>
+</tr>
+</thead>
+<tbody>
+<tr id="b58">
+<td class="rowhead">OA</td>
+<td>low</td>
+<td class="num">12%</td>
+<td class="num">4</td>
+<td class="num">900</td>
+<td class="num">100</td>
+<td class="num">125</td>
+<td class="num">10.0%</td>
+</tr>
+<tr id="b59">
+<td class="rowhead">OA</td>
+<td>base</td>
+<td class="num">35%</td>
+<td class="num">10</td>
+<td class="num">1,750</td>
+<td class="num">1,750</td>
+<td class="num">400</td>
+<td class="num">50.0%</td>
+</tr>
+<tr id="b60">
+<td class="rowhead">OA</td>
+<td>high</td>
+<td class="num">50%</td>
+<td class="num">30</td>
+<td class="num">3,000</td>
+<td class="num">9,000</td>
+<td class="num">800</td>
+<td class="num">75.0%</td>
+</tr>
+<tr id="b61">
+<td class="rowhead">Coding</td>
+<td>low</td>
+<td class="num">30%</td>
+<td class="num">20</td>
+<td class="num">5,000</td>
+<td class="num">63,000</td>
+<td class="num">250</td>
+<td class="num">92.6%</td>
+</tr>
+<tr id="b62">
+<td class="rowhead">Coding</td>
+<td>base</td>
+<td class="num">45%</td>
+<td class="num">170</td>
+<td class="num">6,500</td>
+<td class="num">85,000</td>
+<td class="num">600</td>
+<td class="num">92.9%</td>
+</tr>
+<tr id="b63">
+<td class="rowhead">Coding</td>
+<td>high</td>
+<td class="num">75%</td>
+<td class="num">400</td>
+<td class="num">8,500</td>
+<td class="num">120,000</td>
+<td class="num">700</td>
+<td class="num">93.4%</td>
+</tr>
+<tr id="b64">
+<td class="rowhead">R&amp;D</td>
+<td>low</td>
+<td class="num">28%</td>
+<td class="num">26</td>
+<td class="num">2,615</td>
+<td class="num">1,615</td>
+<td class="num">615</td>
+<td class="num">38.2%</td>
+</tr>
+<tr id="b65">
+<td class="rowhead">R&amp;D</td>
+<td>base</td>
+<td class="num">40%</td>
+<td class="num">100</td>
+<td class="num">2,500</td>
+<td class="num">3,000</td>
+<td class="num">720</td>
+<td class="num">54.5%</td>
+</tr>
+<tr id="b66">
+<td class="rowhead">R&amp;D</td>
+<td>high</td>
+<td class="num">55%</td>
+<td class="num">540</td>
+<td class="num">2,640</td>
+<td class="num">6,805</td>
+<td class="num">611</td>
+<td class="num">72.0%</td>
+</tr>
+</tbody>
+</table></div></figure>
+<p id="b67">每活躍使用者日，以及每授權席次的平日與每週（每席次 = 每活躍使用者日 × a；每週 = 平日 ×（5 + 2w））：</p>
+<figure class="tbl" data-cols="7" data-rows="9"><div aria-label="資料表" class="tbl-scroll" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th scope="col">角色 / 用量級</th>
+<th scope="col">呼叫數 / 活躍使用者日</th>
+<th scope="col">tokens / 活躍使用者日</th>
+<th scope="col">呼叫數 / 席次 / 平日</th>
+<th scope="col">tokens / 席次 / 平日</th>
+<th scope="col">呼叫數 / 席次 / 週</th>
+<th scope="col">tokens / 席次 / 週</th>
+</tr>
+</thead>
+<tbody>
+<tr id="b68">
+<td class="rowhead">OA low</td>
+<td class="num">4</td>
+<td class="num">4.5K</td>
+<td class="num">0.48</td>
+<td class="num">540</td>
+<td class="num">2.83</td>
+<td class="num">3.19K</td>
+</tr>
+<tr id="b69">
+<td class="rowhead">OA base</td>
+<td class="num">10</td>
+<td class="num">39K</td>
+<td class="num">3.5</td>
+<td class="num">13.6K</td>
+<td class="num">20.7</td>
+<td class="num">80.5K</td>
+</tr>
+<tr id="b70">
+<td class="rowhead">OA high</td>
+<td class="num">30</td>
+<td class="num">384K</td>
+<td class="num">15</td>
+<td class="num">192K</td>
+<td class="num">88.5</td>
+<td class="num">1.13M</td>
+</tr>
+<tr id="b71">
+<td class="rowhead">Coding low</td>
+<td class="num">20</td>
+<td class="num">1.36M</td>
+<td class="num">6</td>
+<td class="num">410K</td>
+<td class="num">33</td>
+<td class="num">2.25M</td>
+</tr>
+<tr id="b72">
+<td class="rowhead">Coding base</td>
+<td class="num">170</td>
+<td class="num">15.7M</td>
+<td class="num">76.5</td>
+<td class="num">7.05M</td>
+<td class="num">421</td>
+<td class="num">38.8M</td>
+</tr>
+<tr id="b73">
+<td class="rowhead">Coding high</td>
+<td class="num">400</td>
+<td class="num">51.7M</td>
+<td class="num">300</td>
+<td class="num">38.8M</td>
+<td class="num">1.65K</td>
+<td class="num">213M</td>
+</tr>
+<tr id="b74">
+<td class="rowhead">R&amp;D low</td>
+<td class="num">26</td>
+<td class="num">126K</td>
+<td class="num">7.28</td>
+<td class="num">35.3K</td>
+<td class="num">41.5</td>
+<td class="num">201K</td>
+</tr>
+<tr id="b75">
+<td class="rowhead">R&amp;D base</td>
+<td class="num">100</td>
+<td class="num">622K</td>
+<td class="num">40</td>
+<td class="num">249K</td>
+<td class="num">228</td>
+<td class="num">1.42M</td>
+</tr>
+<tr id="b76">
+<td class="rowhead">R&amp;D high</td>
+<td class="num">540</td>
+<td class="num">5.43M</td>
+<td class="num">297</td>
+<td class="num">2.99M</td>
+<td class="num">1.69K</td>
+<td class="num">17M</td>
+</tr>
+</tbody>
+</table></div></figure>
+<p id="b77">每授權席次每月（= 每週 × 4.345）與 token 類別拆分；成本以 2026-04 觀測的混合實付均價 $0.72/M 計 <span class="g g-b" title="等級 B：廠商或夥伴公布，且揭露方法">B</span> <a href="https://ramp.com/blog/ai-token-cost-for-businesses" rel="noopener" target="_blank">Ramp: AI token cost for businesses</a>：</p>
+<figure class="tbl" data-cols="8" data-rows="9"><div aria-label="資料表" class="tbl-scroll" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th scope="col">角色 / 用量級</th>
+<th scope="col">呼叫數 / 席次 / 月</th>
+<th scope="col">tokens / 席次 / 月</th>
+<th scope="col">其中未快取輸入</th>
+<th scope="col">其中 cache read</th>
+<th scope="col">其中輸出</th>
+<th scope="col">cache read 占全部 token</th>
+<th scope="col">每席次每月成本（$0.72/M）</th>
+</tr>
+</thead>
+<tbody>
+<tr id="b78">
+<td class="rowhead">OA low</td>
+<td class="num">12.3</td>
+<td class="num">13.8K</td>
+<td class="num">11.1K</td>
+<td class="num">1.23K</td>
+<td class="num">1.54K</td>
+<td class="num">8.9%</td>
+<td class="num">$0.01</td>
+</tr>
+<tr id="b79">
+<td class="rowhead">OA base</td>
+<td class="num">89.7</td>
+<td class="num">350K</td>
+<td class="num">157K</td>
+<td class="num">157K</td>
+<td class="num">35.9K</td>
+<td class="num">44.9%</td>
+<td class="num">$0.25</td>
+</tr>
+<tr id="b80">
+<td class="rowhead">OA high</td>
+<td class="num">385</td>
+<td class="num">4.92M</td>
+<td class="num">1.15M</td>
+<td class="num">3.46M</td>
+<td class="num">308K</td>
+<td class="num">70.3%</td>
+<td class="num">$3.54</td>
+</tr>
+<tr id="b81">
+<td class="rowhead">Coding low</td>
+<td class="num">143</td>
+<td class="num">9.79M</td>
+<td class="num">717K</td>
+<td class="num">9.03M</td>
+<td class="num">35.8K</td>
+<td class="num">92.3%</td>
+<td class="num">$7.05</td>
+</tr>
+<tr id="b82">
+<td class="rowhead">Coding base</td>
+<td class="num">1.83K</td>
+<td class="num">168M</td>
+<td class="num">11.9M</td>
+<td class="num">155M</td>
+<td class="num">1.1M</td>
+<td class="num">92.3%</td>
+<td class="num">$121</td>
+</tr>
+<tr id="b83">
+<td class="rowhead">Coding high</td>
+<td class="num">7.17K</td>
+<td class="num">926M</td>
+<td class="num">60.9M</td>
+<td class="num">860M</td>
+<td class="num">5.02M</td>
+<td class="num">92.9%</td>
+<td class="num">$667</td>
+</tr>
+<tr id="b84">
+<td class="rowhead">R&amp;D low</td>
+<td class="num">180</td>
+<td class="num">874K</td>
+<td class="num">471K</td>
+<td class="num">291K</td>
+<td class="num">111K</td>
+<td class="num">33.3%</td>
+<td class="num">$0.63</td>
+</tr>
+<tr id="b85">
+<td class="rowhead">R&amp;D base</td>
+<td class="num">991</td>
+<td class="num">6.16M</td>
+<td class="num">2.48M</td>
+<td class="num">2.97M</td>
+<td class="num">713K</td>
+<td class="num">48.2%</td>
+<td class="num">$4.44</td>
+</tr>
+<tr id="b86">
+<td class="rowhead">R&amp;D high</td>
+<td class="num">7.36K</td>
+<td class="num">74M</td>
+<td class="num">19.4M</td>
+<td class="num">50.1M</td>
+<td class="num">4.49M</td>
+<td class="num">67.7%</td>
+<td class="num">$53.3</td>
+</tr>
+</tbody>
+</table></div></figure>
+<p id="b87"><strong>OA（辦公助理）。</strong> low 是早期 Copilot 式的聊天：12% 席次每日活躍、每活躍日 4 次呼叫、每次約 1,000 輸入與 125 輸出 tokens，對應 ChatGPT 每位 WAU 每日 3.7 則訊息（2025-07，18B 則/週 ÷ 700M 人）<span class="g g-b" title="等級 B：廠商或夥伴公布，且揭露方法">B</span> <a href="https://cdn.openai.com/pdf/a253471f-8260-40c6-a2cc-aa93fe9f142e/economic-research-chatgpt-usage-paper.pdf" rel="noopener" target="_blank">OpenAI/NBER "How People Use ChatGPT"</a> 與 Azure 2024 conversation trace 的輸入中位 928、輸出平均 105.5 tokens <span class="g g-a" title="等級 A：獨立第三方量測">A</span> <a href="https://github.com/Azure/AzurePublicDataset/blob/master/AzureLLMInferenceDataset2024.md" rel="noopener" target="_blank">AzureLLMInferenceDataset2024</a>。base 是導入成熟的通用助理：35% 每日活躍（英國政府 20,000 席試驗中 34% 每日在 Teams 使用，2024-12）<span class="g g-a" title="等級 A：獨立第三方量測">A</span> <a href="https://www.gov.uk/government/publications/microsoft-365-copilot-experiment-cross-government-findings-report/microsoft-365-copilot-experiment-cross-government-findings-report-html" rel="noopener" target="_blank">GOV.UK findings report</a>、10 次呼叫（ChatGPT 每位 DAU 7.5 則 × 企業版員工年增 30%）、每次 3,500 輸入與 400 輸出，其中 50% cache read 是假設，沒有公開量測。high 是 office agent 成為主流：50% 每日活躍（JPMorgan「about half use it daily」，2025-10）<span class="g g-c" title="等級 C：廠商宣稱或規格，未揭露方法">C</span> <a href="https://connect.cefpro.com/article/view/inside-jpmorgan-llm-suite-as-ai-agents-spread-across-the-bank" rel="noopener" target="_blank">CeFPro Connect</a>、30 次呼叫、每次 12K 輸入（75% cache read）與 800 輸出，每活躍日 384K tokens，是 base 的 9.8 倍，落在 Anthropic 所說 agent 約為 chat 的 4 倍、multi-agent 約 15 倍之間（2025-06-13）<span class="g g-c" title="等級 C：廠商宣稱或規格，未揭露方法">C</span> <a href="https://www.anthropic.com/engineering/multi-agent-research-system" rel="noopener" target="_blank">Anthropic: multi-agent research system</a>。</p>
+<p id="b88"><strong>Coding（軟體工程）。</strong> low 是偶爾使用 agent 或 IDE 助理的團隊：30% 每日活躍（假設，無直接來源）、20 次呼叫，每次呼叫的形狀取 Copilot agent 非企業使用者的中位數，即 prompt 68K（其中 63K 來自快取）與輸出 247 tokens（2026-06）<span class="g g-a" title="等級 A：獨立第三方量測">A</span> <a href="https://arxiv.org/abs/2608.00101" rel="noopener" target="_blank">Agentic Coding in the Wild</a>。base 是已把 coding agent 標準化的企業：45% 每日活躍（2026-04 調查：40% 的開發者每日使用 agent，軟體業 44%）<span class="g g-a" title="等級 A：獨立第三方量測">A</span> <a href="https://stackoverflow.blog/2026/05/27/agents-on-a-leash-agentic-ai-remains-mostly-monitored-at-work/" rel="noopener" target="_blank">Stack Overflow blog</a>、170 次呼叫、每次 6.5K 未快取 + 85K cache read + 600 輸出，每活躍日 15.7M tokens，落在 Anthropic「每位開發者每活躍日約 $13」以實付均價 $0.573–1.00/M 換算的 13–23M 之內 [<span class="g g-c" title="等級 C：廠商宣稱或規格，未揭露方法">C</span>，換算為 D] <a href="https://code.claude.com/docs/en/costs" rel="noopener" target="_blank">Claude Code docs: Manage costs effectively</a>。high 是平行或長時間執行的 agent：75% 每日活躍、400 次呼叫、每次 129.2K tokens，每活躍日 51.7M，貼著同一文件「90% 的使用者低於每活躍日 $30」換算的 30–52M 上緣。</p>
+<p id="b89"><strong>coding 的輸入約 93% 是 cache read。</strong> 三個用量級的 cache read 占輸入 92.6%、92.9%、93.4%（占全部 token 92.3–92.9%）；公開量測為 85.7%（Copilot 公開樣本）、95.7%（TraceLab）、99.3%（Pegatron 的 Claude Code + Opus）、86.4%（地端 vLLM prefix caching）[<span class="g g-a" title="等級 A：獨立第三方量測">A</span>，比例為筆記換算] <a href="https://github.com/Azure/AzurePublicDataset/blob/master/GitHubCopilotCodingAgentDataset2026.md" rel="noopener" target="_blank">GitHub Copilot Coding Agent Traces 2026</a>、<a href="https://arxiv.org/abs/2606.30560" rel="noopener" target="_blank">TraceLab</a>、<a href="https://arxiv.org/abs/2607.13080" rel="noopener" target="_blank">Inference Economics of Enterprise Coding Agents</a>。對容量有三個後果：</p>
+<ul>
+<li id="b90">配額：不計 cache read 的平台（Anthropic ITPM、Bedrock）只看到每次呼叫約 7.1K tokens（6.5K 未快取 + 0.6K 輸出），不是 92.1K，相差 13 倍。</li>
+<li id="b91">自建：cache read 不是免費的，它要求該 session 的 prefix KV 仍留在 HBM 或 DRAM 層；prefix cache 失效時這 93% 變回 prefill，敏感度分析中未快取輸入 TPM 變成 10.84 倍。</li>
+<li id="b92">分開估：輸出只占 coding 全部 token 的 0.65%（base），decode 容量與 prefill / KV 容量必須各自估算。</li>
+</ul>
+<p id="b93"><strong>R&amp;D（研發 / 研究）。</strong> 沒有任何公開的每位研究人員用量遙測，三個用量級是由「文件請求」加「deep research run」組合出來的：low 為每活躍日 10 次文件請求（6K 輸入、400 輸出）加 0.2 次 run，base 為 20 次（15K、600）加 1 次，high 為 60 次（40K、1.5K）加 3 次 Max run。每次 run 的大小取 Google 文件的估計，標準約 250K 輸入（50–70% cached）、60K 輸出、80 次搜尋，Max 約 900K、80K、160 次（文件更新 2026-09-23）<span class="g g-c" title="等級 C：廠商宣稱或規格，未揭露方法">C</span> <a href="https://ai.google.dev/gemini-api/docs/deep-research" rel="noopener" target="_blank">Gemini Deep Research agent docs</a>；文件請求的輸入以 PDF 每頁 1,500–3,000 tokens 換算 <span class="g g-b" title="等級 B：廠商或夥伴公布，且揭露方法">B</span> <a href="https://platform.claude.com/docs/en/build-with-claude/pdf-support" rel="noopener" target="_blank">Claude PDF support docs</a>。活躍占比 low 的 28% 是學術研究者每日使用 agent 的比例（2026-04）<span class="g g-a" title="等級 A：獨立第三方量測">A</span> <a href="https://stackoverflow.blog/2026/05/27/agents-on-a-leash-agentic-ai-remains-mostly-monitored-at-work/" rel="noopener" target="_blank">Stack Overflow pulse survey</a>，base 40% 與 high 55% 是類比開發者與 fintech 的判斷值。</p>
+<ul>
+<li id="b94">R&amp;D 的呼叫多而小（base 每活躍日 100 次、每次 6.2K tokens），對 RPM 與輸出 TPM 的貢獻遠大於對 token 總量的貢獻。</li>
+<li id="b95">以 coding agent 做模擬、資料分析或 EDA scripting 的研發人員，應算進 coding 角色（base 每活躍日 15.7M tokens），不是 R&amp;D 角色（622K）。</li>
+<li id="b96">OA 的 high 不等於用量筆記範圍表的 High 欄（60 次、30K 輸入、每活躍日 1.9M tokens）：那一欄描述 P95 使用者，不能當全體平均。</li>
+</ul>
+</div>
+<details class="srcs"><summary>本節來源（14）</summary><ul><li><a href="https://ramp.com/blog/ai-token-cost-for-businesses" target="_blank" rel="noopener">Ramp: AI token cost for businesses</a></li><li><a href="https://cdn.openai.com/pdf/a253471f-8260-40c6-a2cc-aa93fe9f142e/economic-research-chatgpt-usage-paper.pdf" target="_blank" rel="noopener">OpenAI/NBER &quot;How People Use ChatGPT&quot;</a></li><li><a href="https://github.com/Azure/AzurePublicDataset/blob/master/AzureLLMInferenceDataset2024.md" target="_blank" rel="noopener">AzureLLMInferenceDataset2024</a></li><li><a href="https://www.gov.uk/government/publications/microsoft-365-copilot-experiment-cross-government-findings-report/microsoft-365-copilot-experiment-cross-government-findings-report-html" target="_blank" rel="noopener">GOV.UK findings report</a></li><li><a href="https://connect.cefpro.com/article/view/inside-jpmorgan-llm-suite-as-ai-agents-spread-across-the-bank" target="_blank" rel="noopener">CeFPro Connect</a></li><li><a href="https://www.anthropic.com/engineering/multi-agent-research-system" target="_blank" rel="noopener">Anthropic: multi-agent research system</a></li><li><a href="https://arxiv.org/abs/2608.00101" target="_blank" rel="noopener">Agentic Coding in the Wild</a></li><li><a href="https://stackoverflow.blog/2026/05/27/agents-on-a-leash-agentic-ai-remains-mostly-monitored-at-work/" target="_blank" rel="noopener">Stack Overflow blog</a></li><li><a href="https://code.claude.com/docs/en/costs" target="_blank" rel="noopener">Claude Code docs: Manage costs effectively</a></li><li><a href="https://github.com/Azure/AzurePublicDataset/blob/master/GitHubCopilotCodingAgentDataset2026.md" target="_blank" rel="noopener">GitHub Copilot Coding Agent Traces 2026</a></li><li><a href="https://arxiv.org/abs/2606.30560" target="_blank" rel="noopener">TraceLab</a></li><li><a href="https://arxiv.org/abs/2607.13080" target="_blank" rel="noopener">Inference Economics of Enterprise Coding Agents</a></li><li><a href="https://ai.google.dev/gemini-api/docs/deep-research" target="_blank" rel="noopener">Gemini Deep Research agent docs</a></li><li><a href="https://platform.claude.com/docs/en/build-with-claude/pdf-support" target="_blank" rel="noopener">Claude PDF support docs</a></li></ul></details></section>
+<section class="panel" role="tabpanel" id="s3" aria-labelledby="tab-s3"><div class="panel-head"><h2>情境計算</h2><div class="sec-lead prose"><p id="b97">同樣 10,000 人、base 用量，五種混合角色組合的尖峰落在 257–1,100 RPM、未快取輸入 1.36M–7.79M TPM、全部 token 14.3M–94.4M TPM；純 OA 與純 coding 的未快取輸入 TPM 相差 69 倍（213K 對 14.8M）<span class="g g-d" title="等級 D：本文推算，附算式">D</span>。超過約 10,000 人後 k 已在下限 1.15，RPM 與 TPM 隨人數線性放大，100,000 人的值是 10,000 人的 9.5–10.0 倍。</p>
+</div></div>
+<div class="subtabs"><div class="subtablist" role="tablist" aria-label="情境計算"><button type="button" class="subtab" role="tab" id="tab-s3-1" aria-controls="s3-1" aria-selected="true">總表</button><button type="button" class="subtab" role="tab" id="tab-s3-2" aria-controls="s3-2" aria-selected="false">10,000 人</button><button type="button" class="subtab" role="tab" id="tab-s3-3" aria-controls="s3-3" aria-selected="false">100,000 人</button><button type="button" class="subtab" role="tab" id="tab-s3-4" aria-controls="s3-4" aria-selected="false">規模效應</button><button type="button" class="subtab" role="tab" id="tab-s3-5" aria-controls="s3-5" aria-selected="false">要讀出的六件事</button></div><div class="subpanel on" role="tabpanel" id="s3-1" aria-labelledby="tab-s3-1"><div class="prose"><h3 class="ph">總表</h3><p id="b98">設定：單一時區（s = 0.11）、d = 1.2、所有角色共用一個端點（一份配額）；八種角色組合如下。</p>
+<figure class="tbl" data-cols="5" data-rows="8"><div aria-label="資料表" class="tbl-scroll" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th scope="col">代號</th>
+<th class="w1" scope="col">角色組合</th>
+<th scope="col">OA</th>
+<th scope="col">coding</th>
+<th scope="col">R&amp;D</th>
+</tr>
+</thead>
+<tbody>
+<tr id="b99">
+<td class="rowhead">A</td>
+<td>辦公為主（服務業、零售總部）</td>
+<td class="num">90%</td>
+<td class="num">7%</td>
+<td class="num">3%</td>
+</tr>
+<tr id="b100">
+<td class="rowhead">B</td>
+<td>製造 / 硬體（ODM、EMS、半導體）</td>
+<td class="num">70%</td>
+<td class="num">12%</td>
+<td class="num">18%</td>
+</tr>
+<tr id="b101">
+<td class="rowhead">C</td>
+<td>金融服務</td>
+<td class="num">80%</td>
+<td class="num">15%</td>
+<td class="num">5%</td>
+</tr>
+<tr id="b102">
+<td class="rowhead">D</td>
+<td>軟體 / 網路公司</td>
+<td class="num">40%</td>
+<td class="num">50%</td>
+<td class="num">10%</td>
+</tr>
+<tr id="b103">
+<td class="rowhead">E</td>
+<td>研發為主（IC 設計、研究機構）</td>
+<td class="num">35%</td>
+<td class="num">25%</td>
+<td class="num">40%</td>
+</tr>
+<tr id="b104">
+<td class="rowhead">純 OA</td>
+<td class="num">100% OA</td>
+<td class="num">100%</td>
+<td class="num">0%</td>
+<td class="num">0%</td>
+</tr>
+<tr id="b105">
+<td class="rowhead">純 coding</td>
+<td class="num">100% coding</td>
+<td class="num">0%</td>
+<td class="num">100%</td>
+<td class="num">0%</td>
+</tr>
+<tr id="b106">
+<td class="rowhead">純 R&amp;D</td>
+<td class="num">100% R&amp;D</td>
+<td class="num">0%</td>
+<td class="num">0%</td>
+<td class="num">100%</td>
+</tr>
+</tbody>
+</table></div></figure>
+</div></div><div class="subpanel" role="tabpanel" id="s3-2" aria-labelledby="tab-s3-2"><div class="prose"><h3>10,000 人</h3><p id="b107">尖峰分鐘的請求與 token（Bedrock 式 TPM 以 Opus 5.5 的 10× burndown 計；Bedrock 預設配額為 30M TPM）：</p>
+<figure class="tbl" data-cols="8" data-rows="24"><div aria-label="資料表" class="tbl-scroll" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th scope="col">組合 / 用量級</th>
+<th scope="col">尖峰 RPM</th>
+<th scope="col">未快取輸入 TPM（= Anthropic ITPM）</th>
+<th scope="col">cache read TPM</th>
+<th scope="col">輸出 TPM（= OTPM）</th>
+<th scope="col">全部 token TPM</th>
+<th scope="col">Bedrock 式 TPM（U + 10 × O）</th>
+<th scope="col">k</th>
+</tr>
+</thead>
+<tbody>
+<tr id="b108">
+<td class="rowhead">A low</td>
+<td class="num">38.1</td>
+<td class="num">129K</td>
+<td class="num">994K</td>
+<td class="num">11.1K</td>
+<td class="num">1.13M</td>
+<td class="num">239K</td>
+<td class="num">1.62</td>
+</tr>
+<tr id="b109">
+<td class="rowhead">A base</td>
+<td class="num">257</td>
+<td class="num">1.36M</td>
+<td class="num">12.8M</td>
+<td class="num">150K</td>
+<td class="num">14.3M</td>
+<td class="num">2.86M</td>
+<td class="num">1.21</td>
+</tr>
+<tr id="b110">
+<td class="rowhead">A high</td>
+<td class="num">1.1K</td>
+<td class="num">7.24M</td>
+<td class="num">71.1M</td>
+<td class="num">830K</td>
+<td class="num">79.2M</td>
+<td class="num">15.5M</td>
+<td class="num">1.15</td>
+</tr>
+<tr id="b111">
+<td class="rowhead">B low</td>
+<td class="num">73.7</td>
+<td class="num">269K</td>
+<td class="num">1.54M</td>
+<td class="num">33.9K</td>
+<td class="num">1.84M</td>
+<td class="num">609K</td>
+<td class="num">1.42</td>
+</tr>
+<tr id="b112">
+<td class="rowhead">B base</td>
+<td class="num">476</td>
+<td class="num">2.45M</td>
+<td class="num">21.2M</td>
+<td class="num">313K</td>
+<td class="num">24M</td>
+<td class="num">5.58M</td>
+<td class="num">1.15</td>
+</tr>
+<tr id="b113">
+<td class="rowhead">B high</td>
+<td class="num">2.53K</td>
+<td class="num">14.3M</td>
+<td class="num">126M</td>
+<td class="num">1.78M</td>
+<td class="num">142M</td>
+<td class="num">32.1M</td>
+<td class="num">1.15</td>
+</tr>
+<tr id="b114">
+<td class="rowhead">C low</td>
+<td class="num">54.3</td>
+<td class="num">225K</td>
+<td class="num">1.97M</td>
+<td class="num">17.4K</td>
+<td class="num">2.21M</td>
+<td class="num">399K</td>
+<td class="num">1.50</td>
+</tr>
+<tr id="b115">
+<td class="rowhead">C base</td>
+<td class="num">415</td>
+<td class="num">2.54M</td>
+<td class="num">26.1M</td>
+<td class="num">255K</td>
+<td class="num">28.9M</td>
+<td class="num">5.09M</td>
+<td class="num">1.16</td>
+</tr>
+<tr id="b116">
+<td class="rowhead">C high</td>
+<td class="num">1.82K</td>
+<td class="num">13.7M</td>
+<td class="num">148M</td>
+<td class="num">1.35M</td>
+<td class="num">163M</td>
+<td class="num">27.1M</td>
+<td class="num">1.15</td>
+</tr>
+<tr id="b117">
+<td class="rowhead">D low</td>
+<td class="num">114</td>
+<td class="num">587K</td>
+<td class="num">5.76M</td>
+<td class="num">37.7K</td>
+<td class="num">6.38M</td>
+<td class="num">963K</td>
+<td class="num">1.32</td>
+</tr>
+<tr id="b118">
+<td class="rowhead">D base</td>
+<td class="num">1.1K</td>
+<td class="num">7.79M</td>
+<td class="num">85.9M</td>
+<td class="num">708K</td>
+<td class="num">94.4M</td>
+<td class="num">14.9M</td>
+<td class="num">1.15</td>
+</tr>
+<tr id="b119">
+<td class="rowhead">D high</td>
+<td class="num">4.7K</td>
+<td class="num">40.9M</td>
+<td class="num">480M</td>
+<td class="num">3.43M</td>
+<td class="num">525M</td>
+<td class="num">75.3M</td>
+<td class="num">1.15</td>
+</tr>
+<tr id="b120">
+<td class="rowhead">E low</td>
+<td class="num">131</td>
+<td class="num">515K</td>
+<td class="num">2.95M</td>
+<td class="num">66.2K</td>
+<td class="num">3.53M</td>
+<td class="num">1.18M</td>
+<td class="num">1.30</td>
+</tr>
+<tr id="b121">
+<td class="rowhead">E base</td>
+<td class="num">920</td>
+<td class="num">4.97M</td>
+<td class="num">44.1M</td>
+<td class="num">630K</td>
+<td class="num">49.7M</td>
+<td class="num">11.3M</td>
+<td class="num">1.15</td>
+</tr>
+<tr id="b122">
+<td class="rowhead">E high</td>
+<td class="num">5.04K</td>
+<td class="num">28.9M</td>
+<td class="num">259M</td>
+<td class="num">3.47M</td>
+<td class="num">292M</td>
+<td class="num">63.5M</td>
+<td class="num">1.15</td>
+</tr>
+<tr id="b123">
+<td class="rowhead">純 OA low</td>
+<td class="num">20.3</td>
+<td class="num">21.6K</td>
+<td class="num">2.11K</td>
+<td class="num">2.69K</td>
+<td class="num">26.4K</td>
+<td class="num">48.5K</td>
+<td class="num">1.92</td>
+</tr>
+<tr id="b124">
+<td class="rowhead">純 OA base</td>
+<td class="num">103</td>
+<td class="num">213K</td>
+<td class="num">188K</td>
+<td class="num">43.8K</td>
+<td class="num">445K</td>
+<td class="num">651K</td>
+<td class="num">1.34</td>
+</tr>
+<tr id="b125">
+<td class="rowhead">純 OA high</td>
+<td class="num">384</td>
+<td class="num">1.36M</td>
+<td class="num">3.6M</td>
+<td class="num">326K</td>
+<td class="num">5.29M</td>
+<td class="num">4.62M</td>
+<td class="num">1.17</td>
+</tr>
+<tr id="b126">
+<td class="rowhead">純 coding low</td>
+<td class="num">166</td>
+<td class="num">982K</td>
+<td class="num">10.9M</td>
+<td class="num">44.1K</td>
+<td class="num">11.9M</td>
+<td class="num">1.42M</td>
+<td class="num">1.26</td>
+</tr>
+<tr id="b127">
+<td class="rowhead">純 coding base</td>
+<td class="num">1.94K</td>
+<td class="num">14.8M</td>
+<td class="num">171M</td>
+<td class="num">1.23M</td>
+<td class="num">187M</td>
+<td class="num">27.2M</td>
+<td class="num">1.15</td>
+</tr>
+<tr id="b128">
+<td class="rowhead">純 coding high</td>
+<td class="num">7.59K</td>
+<td class="num">76.1M</td>
+<td class="num">947M</td>
+<td class="num">5.63M</td>
+<td class="num">1.03B</td>
+<td class="num">132M</td>
+<td class="num">1.15</td>
+</tr>
+<tr id="b129">
+<td class="rowhead">純 R&amp;D low</td>
+<td class="num">198</td>
+<td class="num">611K</td>
+<td class="num">333K</td>
+<td class="num">129K</td>
+<td class="num">1.07M</td>
+<td class="num">1.9M</td>
+<td class="num">1.24</td>
+</tr>
+<tr id="b130">
+<td class="rowhead">純 R&amp;D base</td>
+<td class="num">1.01K</td>
+<td class="num">2.99M</td>
+<td class="num">3.16M</td>
+<td class="num">772K</td>
+<td class="num">6.92M</td>
+<td class="num">10.7M</td>
+<td class="num">1.15</td>
+</tr>
+<tr id="b131">
+<td class="rowhead">純 R&amp;D high</td>
+<td class="num">7.51K</td>
+<td class="num">23.4M</td>
+<td class="num">53.2M</td>
+<td class="num">4.87M</td>
+<td class="num">81.5M</td>
+<td class="num">72.1M</td>
+<td class="num">1.15</td>
+</tr>
+</tbody>
+</table></div></figure>
+<p id="b132">併發、用量與成本（同時在途以 v = 80 tokens/s 計；月成本以混合實付均價 $0.72/M 計）：</p>
+<figure class="tbl" data-cols="8" data-rows="24"><div aria-label="資料表" class="tbl-scroll" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th scope="col">組合 / 用量級</th>
+<th scope="col">同時在途（平均）</th>
+<th scope="col">同時在途（99.9%）</th>
+<th scope="col">tokens / 平日</th>
+<th scope="col">tokens / 月</th>
+<th scope="col">tokens / 員工 / 月</th>
+<th scope="col">coding 占 token</th>
+<th scope="col">月成本（$0.72/M）</th>
+</tr>
+</thead>
+<tbody>
+<tr id="b133">
+<td class="rowhead">A low</td>
+<td class="num">3.25</td>
+<td class="num">8.85</td>
+<td class="num">302M</td>
+<td class="num">7.24B</td>
+<td class="num">724K</td>
+<td class="num">95%</td>
+<td class="num">$5.21K</td>
+</tr>
+<tr id="b134">
+<td class="rowhead">A base</td>
+<td class="num">36.9</td>
+<td class="num">55.8</td>
+<td class="num">5.13B</td>
+<td class="num">123B</td>
+<td class="num">12.3M</td>
+<td class="num">96%</td>
+<td class="num">$88.5K</td>
+</tr>
+<tr id="b135">
+<td class="rowhead">A high</td>
+<td class="num">196</td>
+<td class="num">239</td>
+<td class="num">29.8B</td>
+<td class="num">715B</td>
+<td class="num">71.5M</td>
+<td class="num">91%</td>
+<td class="num">$515K</td>
+</tr>
+<tr id="b136">
+<td class="rowhead">B low</td>
+<td class="num">9.29</td>
+<td class="num">18.7</td>
+<td class="num">559M</td>
+<td class="num">13.4B</td>
+<td class="num">1.34M</td>
+<td class="num">88%</td>
+<td class="num">$9.66K</td>
+</tr>
+<tr id="b137">
+<td class="rowhead">B base</td>
+<td class="num">77.9</td>
+<td class="num">105</td>
+<td class="num">9B</td>
+<td class="num">216B</td>
+<td class="num">21.6M</td>
+<td class="num">94%</td>
+<td class="num">$155K</td>
+</tr>
+<tr id="b138">
+<td class="rowhead">B high</td>
+<td class="num">440</td>
+<td class="num">505</td>
+<td class="num">53.2B</td>
+<td class="num">1.28T</td>
+<td class="num">128M</td>
+<td class="num">87%</td>
+<td class="num">$921K</td>
+</tr>
+<tr id="b139">
+<td class="rowhead">C low</td>
+<td class="num">5.11</td>
+<td class="num">12.1</td>
+<td class="num">636M</td>
+<td class="num">15.2B</td>
+<td class="num">1.52M</td>
+<td class="num">97%</td>
+<td class="num">$11K</td>
+</tr>
+<tr id="b140">
+<td class="rowhead">C base</td>
+<td class="num">63.2</td>
+<td class="num">87.9</td>
+<td class="num">10.8B</td>
+<td class="num">258B</td>
+<td class="num">25.8M</td>
+<td class="num">98%</td>
+<td class="num">$186K</td>
+</tr>
+<tr id="b141">
+<td class="rowhead">C high</td>
+<td class="num">323</td>
+<td class="num">379</td>
+<td class="num">61.2B</td>
+<td class="num">1.47T</td>
+<td class="num">147M</td>
+<td class="num">95%</td>
+<td class="num">$1.06M</td>
+</tr>
+<tr id="b142">
+<td class="rowhead">D low</td>
+<td class="num">11.3</td>
+<td class="num">21.7</td>
+<td class="num">2.08B</td>
+<td class="num">49.9B</td>
+<td class="num">4.99M</td>
+<td class="num">98%</td>
+<td class="num">$35.9K</td>
+</tr>
+<tr id="b143">
+<td class="rowhead">D base</td>
+<td class="num">176</td>
+<td class="num">217</td>
+<td class="num">35.5B</td>
+<td class="num">849B</td>
+<td class="num">84.9M</td>
+<td class="num">99%</td>
+<td class="num">$612K</td>
+</tr>
+<tr id="b144">
+<td class="rowhead">D high</td>
+<td class="num">835</td>
+<td class="num">924</td>
+<td class="num">198B</td>
+<td class="num">4.72T</td>
+<td class="num">472M</td>
+<td class="num">98%</td>
+<td class="num">$3.4M</td>
+</tr>
+<tr id="b145">
+<td class="rowhead">E low</td>
+<td class="num">18</td>
+<td class="num">31.1</td>
+<td class="num">1.17B</td>
+<td class="num">28B</td>
+<td class="num">2.8M</td>
+<td class="num">88%</td>
+<td class="num">$20.2K</td>
+</tr>
+<tr id="b146">
+<td class="rowhead">E base</td>
+<td class="num">157</td>
+<td class="num">196</td>
+<td class="num">18.7B</td>
+<td class="num">447B</td>
+<td class="num">44.7M</td>
+<td class="num">94%</td>
+<td class="num">$322K</td>
+</tr>
+<tr id="b147">
+<td class="rowhead">E high</td>
+<td class="num">872</td>
+<td class="num">964</td>
+<td class="num">110B</td>
+<td class="num">2.63T</td>
+<td class="num">263M</td>
+<td class="num">88%</td>
+<td class="num">$1.89M</td>
+</tr>
+<tr id="b148">
+<td class="rowhead">純 OA low</td>
+<td class="num">0.87</td>
+<td class="num">3.75</td>
+<td class="num">5.4M</td>
+<td class="num">138M</td>
+<td class="num">13.8K</td>
+<td class="num">0%</td>
+<td class="num">$99.7</td>
+</tr>
+<tr id="b149">
+<td class="rowhead">純 OA base</td>
+<td class="num">10.3</td>
+<td class="num">20.3</td>
+<td class="num">136M</td>
+<td class="num">3.5B</td>
+<td class="num">350K</td>
+<td class="num">0%</td>
+<td class="num">$2.52K</td>
+</tr>
+<tr id="b150">
+<td class="rowhead">純 OA high</td>
+<td class="num">70.5</td>
+<td class="num">96.5</td>
+<td class="num">1.92B</td>
+<td class="num">49.2B</td>
+<td class="num">4.92M</td>
+<td class="num">0%</td>
+<td class="num">$35.4K</td>
+</tr>
+<tr id="b151">
+<td class="rowhead">純 coding low</td>
+<td class="num">14.2</td>
+<td class="num">25.9</td>
+<td class="num">4.1B</td>
+<td class="num">97.9B</td>
+<td class="num">9.79M</td>
+<td class="num">100%</td>
+<td class="num">$70.5K</td>
+</tr>
+<tr id="b152">
+<td class="rowhead">純 coding base</td>
+<td class="num">306</td>
+<td class="num">361</td>
+<td class="num">70.5B</td>
+<td class="num">1.68T</td>
+<td class="num">168M</td>
+<td class="num">100%</td>
+<td class="num">$1.21M</td>
+</tr>
+<tr id="b153">
+<td class="rowhead">純 coding high</td>
+<td class="num">1.36K</td>
+<td class="num">1.47K</td>
+<td class="num">388B</td>
+<td class="num">9.26T</td>
+<td class="num">926M</td>
+<td class="num">100%</td>
+<td class="num">$6.67M</td>
+</tr>
+<tr id="b154">
+<td class="rowhead">純 R&amp;D low</td>
+<td class="num">33.6</td>
+<td class="num">51.6</td>
+<td class="num">353M</td>
+<td class="num">8.74B</td>
+<td class="num">874K</td>
+<td class="num">0%</td>
+<td class="num">$6.29K</td>
+</tr>
+<tr id="b155">
+<td class="rowhead">純 R&amp;D base</td>
+<td class="num">194</td>
+<td class="num">237</td>
+<td class="num">2.49B</td>
+<td class="num">61.6B</td>
+<td class="num">6.16M</td>
+<td class="num">0%</td>
+<td class="num">$44.4K</td>
+</tr>
+<tr id="b156">
+<td class="rowhead">純 R&amp;D high</td>
+<td class="num">1.27K</td>
+<td class="num">1.38K</td>
+<td class="num">29.9B</td>
+<td class="num">740B</td>
+<td class="num">74M</td>
+<td class="num">0%</td>
+<td class="num">$533K</td>
+</tr>
+</tbody>
+</table></div></figure>
+</div></div><div class="subpanel" role="tabpanel" id="s3-3" aria-labelledby="tab-s3-3"><div class="prose"><h3>100,000 人</h3><figure class="tbl" data-cols="8" data-rows="24"><div aria-label="資料表" class="tbl-scroll" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th scope="col">組合 / 用量級</th>
+<th scope="col">尖峰 RPM</th>
+<th scope="col">未快取輸入 TPM（= Anthropic ITPM）</th>
+<th scope="col">cache read TPM</th>
+<th scope="col">輸出 TPM（= OTPM）</th>
+<th scope="col">全部 token TPM</th>
+<th scope="col">Bedrock 式 TPM（U + 10 × O）</th>
+<th scope="col">k</th>
+</tr>
+</thead>
+<tbody>
+<tr id="b157">
+<td class="rowhead">A low</td>
+<td class="num">282</td>
+<td class="num">950K</td>
+<td class="num">7.35M</td>
+<td class="num">81.8K</td>
+<td class="num">8.38M</td>
+<td class="num">1.77M</td>
+<td class="num">1.20</td>
+</tr>
+<tr id="b158">
+<td class="rowhead">A base</td>
+<td class="num">2.46K</td>
+<td class="num">12.9M</td>
+<td class="num">122M</td>
+<td class="num">1.43M</td>
+<td class="num">137M</td>
+<td class="num">27.2M</td>
+<td class="num">1.15</td>
+</tr>
+<tr id="b159">
+<td class="rowhead">A high</td>
+<td class="num">11K</td>
+<td class="num">72.4M</td>
+<td class="num">711M</td>
+<td class="num">8.3M</td>
+<td class="num">792M</td>
+<td class="num">155M</td>
+<td class="num">1.15</td>
+</tr>
+<tr id="b160">
+<td class="rowhead">B low</td>
+<td class="num">599</td>
+<td class="num">2.19M</td>
+<td class="num">12.5M</td>
+<td class="num">276K</td>
+<td class="num">15M</td>
+<td class="num">4.94M</td>
+<td class="num">1.15</td>
+</tr>
+<tr id="b161">
+<td class="rowhead">B base</td>
+<td class="num">4.76K</td>
+<td class="num">24.5M</td>
+<td class="num">212M</td>
+<td class="num">3.13M</td>
+<td class="num">240M</td>
+<td class="num">55.8M</td>
+<td class="num">1.15</td>
+</tr>
+<tr id="b162">
+<td class="rowhead">B high</td>
+<td class="num">25.3K</td>
+<td class="num">143M</td>
+<td class="num">1.26B</td>
+<td class="num">17.8M</td>
+<td class="num">1.42B</td>
+<td class="num">321M</td>
+<td class="num">1.15</td>
+</tr>
+<tr id="b163">
+<td class="rowhead">C low</td>
+<td class="num">420</td>
+<td class="num">1.74M</td>
+<td class="num">15.2M</td>
+<td class="num">134K</td>
+<td class="num">17.1M</td>
+<td class="num">3.08M</td>
+<td class="num">1.16</td>
+</tr>
+<tr id="b164">
+<td class="rowhead">C base</td>
+<td class="num">4.12K</td>
+<td class="num">25.2M</td>
+<td class="num">260M</td>
+<td class="num">2.53M</td>
+<td class="num">287M</td>
+<td class="num">50.6M</td>
+<td class="num">1.15</td>
+</tr>
+<tr id="b165">
+<td class="rowhead">C high</td>
+<td class="num">18.2K</td>
+<td class="num">137M</td>
+<td class="num">1.48B</td>
+<td class="num">13.5M</td>
+<td class="num">1.63B</td>
+<td class="num">271M</td>
+<td class="num">1.15</td>
+</tr>
+<tr id="b166">
+<td class="rowhead">D low</td>
+<td class="num">992</td>
+<td class="num">5.1M</td>
+<td class="num">50M</td>
+<td class="num">328K</td>
+<td class="num">55.5M</td>
+<td class="num">8.37M</td>
+<td class="num">1.15</td>
+</tr>
+<tr id="b167">
+<td class="rowhead">D base</td>
+<td class="num">11K</td>
+<td class="num">77.9M</td>
+<td class="num">859M</td>
+<td class="num">7.08M</td>
+<td class="num">944M</td>
+<td class="num">149M</td>
+<td class="num">1.15</td>
+</tr>
+<tr id="b168">
+<td class="rowhead">D high</td>
+<td class="num">47K</td>
+<td class="num">409M</td>
+<td class="num">4.8B</td>
+<td class="num">34.3M</td>
+<td class="num">5.25B</td>
+<td class="num">753M</td>
+<td class="num">1.15</td>
+</tr>
+<tr id="b169">
+<td class="rowhead">E low</td>
+<td class="num">1.16K</td>
+<td class="num">4.56M</td>
+<td class="num">26.1M</td>
+<td class="num">586K</td>
+<td class="num">31.3M</td>
+<td class="num">10.4M</td>
+<td class="num">1.15</td>
+</tr>
+<tr id="b170">
+<td class="rowhead">E base</td>
+<td class="num">9.2K</td>
+<td class="num">49.7M</td>
+<td class="num">441M</td>
+<td class="num">6.3M</td>
+<td class="num">497M</td>
+<td class="num">113M</td>
+<td class="num">1.15</td>
+</tr>
+<tr id="b171">
+<td class="rowhead">E high</td>
+<td class="num">50.4K</td>
+<td class="num">289M</td>
+<td class="num">2.59B</td>
+<td class="num">34.7M</td>
+<td class="num">2.92B</td>
+<td class="num">635M</td>
+<td class="num">1.15</td>
+</tr>
+<tr id="b172">
+<td class="rowhead">純 OA low</td>
+<td class="num">136</td>
+<td class="num">145K</td>
+<td class="num">14.2K</td>
+<td class="num">18.1K</td>
+<td class="num">177K</td>
+<td class="num">326K</td>
+<td class="num">1.29</td>
+</tr>
+<tr id="b173">
+<td class="rowhead">純 OA base</td>
+<td class="num">885</td>
+<td class="num">1.83M</td>
+<td class="num">1.61M</td>
+<td class="num">375K</td>
+<td class="num">3.82M</td>
+<td class="num">5.58M</td>
+<td class="num">1.15</td>
+</tr>
+<tr id="b174">
+<td class="rowhead">純 OA high</td>
+<td class="num">3.79K</td>
+<td class="num">13.4M</td>
+<td class="num">35.5M</td>
+<td class="num">3.22M</td>
+<td class="num">52.2M</td>
+<td class="num">45.6M</td>
+<td class="num">1.15</td>
+</tr>
+<tr id="b175">
+<td class="rowhead">純 coding low</td>
+<td class="num">1.52K</td>
+<td class="num">8.96M</td>
+<td class="num">99.5M</td>
+<td class="num">402K</td>
+<td class="num">109M</td>
+<td class="num">13M</td>
+<td class="num">1.15</td>
+</tr>
+<tr id="b176">
+<td class="rowhead">純 coding base</td>
+<td class="num">19.4K</td>
+<td class="num">148M</td>
+<td class="num">1.71B</td>
+<td class="num">12.3M</td>
+<td class="num">1.87B</td>
+<td class="num">272M</td>
+<td class="num">1.15</td>
+</tr>
+<tr id="b177">
+<td class="rowhead">純 coding high</td>
+<td class="num">75.9K</td>
+<td class="num">761M</td>
+<td class="num">9.47B</td>
+<td class="num">56.3M</td>
+<td class="num">10.3B</td>
+<td class="num">1.32B</td>
+<td class="num">1.15</td>
+</tr>
+<tr id="b178">
+<td class="rowhead">純 R&amp;D low</td>
+<td class="num">1.84K</td>
+<td class="num">5.68M</td>
+<td class="num">3.09M</td>
+<td class="num">1.2M</td>
+<td class="num">9.98M</td>
+<td class="num">17.7M</td>
+<td class="num">1.15</td>
+</tr>
+<tr id="b179">
+<td class="rowhead">純 R&amp;D base</td>
+<td class="num">10.1K</td>
+<td class="num">29.9M</td>
+<td class="num">31.6M</td>
+<td class="num">7.72M</td>
+<td class="num">69.2M</td>
+<td class="num">107M</td>
+<td class="num">1.15</td>
+</tr>
+<tr id="b180">
+<td class="rowhead">純 R&amp;D high</td>
+<td class="num">75.1K</td>
+<td class="num">234M</td>
+<td class="num">532M</td>
+<td class="num">48.7M</td>
+<td class="num">815M</td>
+<td class="num">721M</td>
+<td class="num">1.15</td>
+</tr>
+</tbody>
+</table></div></figure>
+<figure class="tbl" data-cols="8" data-rows="24"><div aria-label="資料表" class="tbl-scroll" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th scope="col">組合 / 用量級</th>
+<th scope="col">同時在途（平均）</th>
+<th scope="col">同時在途（99.9%）</th>
+<th scope="col">tokens / 平日</th>
+<th scope="col">tokens / 月</th>
+<th scope="col">tokens / 員工 / 月</th>
+<th scope="col">coding 占 token</th>
+<th scope="col">月成本（$0.72/M）</th>
+</tr>
+</thead>
+<tbody>
+<tr id="b181">
+<td class="rowhead">A low</td>
+<td class="num">24</td>
+<td class="num">39.2</td>
+<td class="num">3.02B</td>
+<td class="num">72.4B</td>
+<td class="num">724K</td>
+<td class="num">95%</td>
+<td class="num">$52.1K</td>
+</tr>
+<tr id="b182">
+<td class="rowhead">A base</td>
+<td class="num">352</td>
+<td class="num">411</td>
+<td class="num">51.3B</td>
+<td class="num">1.23T</td>
+<td class="num">12.3M</td>
+<td class="num">96%</td>
+<td class="num">$885K</td>
+</tr>
+<tr id="b183">
+<td class="rowhead">A high</td>
+<td class="num">1.96K</td>
+<td class="num">2.1K</td>
+<td class="num">298B</td>
+<td class="num">7.15T</td>
+<td class="num">71.5M</td>
+<td class="num">91%</td>
+<td class="num">$5.15M</td>
+</tr>
+<tr id="b184">
+<td class="rowhead">B low</td>
+<td class="num">75.5</td>
+<td class="num">102</td>
+<td class="num">5.59B</td>
+<td class="num">134B</td>
+<td class="num">1.34M</td>
+<td class="num">88%</td>
+<td class="num">$96.6K</td>
+</tr>
+<tr id="b185">
+<td class="rowhead">B base</td>
+<td class="num">779</td>
+<td class="num">865</td>
+<td class="num">90B</td>
+<td class="num">2.16T</td>
+<td class="num">21.6M</td>
+<td class="num">94%</td>
+<td class="num">$1.55M</td>
+</tr>
+<tr id="b186">
+<td class="rowhead">B high</td>
+<td class="num">4.4K</td>
+<td class="num">4.61K</td>
+<td class="num">532B</td>
+<td class="num">12.8T</td>
+<td class="num">128M</td>
+<td class="num">87%</td>
+<td class="num">$9.21M</td>
+</tr>
+<tr id="b187">
+<td class="rowhead">C low</td>
+<td class="num">39.5</td>
+<td class="num">59</td>
+<td class="num">6.36B</td>
+<td class="num">152B</td>
+<td class="num">1.52M</td>
+<td class="num">97%</td>
+<td class="num">$110K</td>
+</tr>
+<tr id="b188">
+<td class="rowhead">C base</td>
+<td class="num">627</td>
+<td class="num">705</td>
+<td class="num">108B</td>
+<td class="num">2.58T</td>
+<td class="num">25.8M</td>
+<td class="num">98%</td>
+<td class="num">$1.86M</td>
+</tr>
+<tr id="b189">
+<td class="rowhead">C high</td>
+<td class="num">3.23K</td>
+<td class="num">3.41K</td>
+<td class="num">612B</td>
+<td class="num">14.7T</td>
+<td class="num">147M</td>
+<td class="num">95%</td>
+<td class="num">$10.6M</td>
+</tr>
+<tr id="b190">
+<td class="rowhead">D low</td>
+<td class="num">98.2</td>
+<td class="num">129</td>
+<td class="num">20.8B</td>
+<td class="num">499B</td>
+<td class="num">4.99M</td>
+<td class="num">98%</td>
+<td class="num">$359K</td>
+</tr>
+<tr id="b191">
+<td class="rowhead">D base</td>
+<td class="num">1.76K</td>
+<td class="num">1.89K</td>
+<td class="num">355B</td>
+<td class="num">8.49T</td>
+<td class="num">84.9M</td>
+<td class="num">99%</td>
+<td class="num">$6.12M</td>
+</tr>
+<tr id="b192">
+<td class="rowhead">D high</td>
+<td class="num">8.35K</td>
+<td class="num">8.63K</td>
+<td class="num">1.98T</td>
+<td class="num">47.2T</td>
+<td class="num">472M</td>
+<td class="num">98%</td>
+<td class="num">$34M</td>
+</tr>
+<tr id="b193">
+<td class="rowhead">E low</td>
+<td class="num">159</td>
+<td class="num">198</td>
+<td class="num">11.7B</td>
+<td class="num">280B</td>
+<td class="num">2.8M</td>
+<td class="num">88%</td>
+<td class="num">$202K</td>
+</tr>
+<tr id="b194">
+<td class="rowhead">E base</td>
+<td class="num">1.57K</td>
+<td class="num">1.7K</td>
+<td class="num">187B</td>
+<td class="num">4.47T</td>
+<td class="num">44.7M</td>
+<td class="num">94%</td>
+<td class="num">$3.22M</td>
+</tr>
+<tr id="b195">
+<td class="rowhead">E high</td>
+<td class="num">8.72K</td>
+<td class="num">9.01K</td>
+<td class="num">1.1T</td>
+<td class="num">26.3T</td>
+<td class="num">263M</td>
+<td class="num">88%</td>
+<td class="num">$18.9M</td>
+</tr>
+<tr id="b196">
+<td class="rowhead">純 OA low</td>
+<td class="num">5.83</td>
+<td class="num">13.3</td>
+<td class="num">54M</td>
+<td class="num">1.38B</td>
+<td class="num">13.8K</td>
+<td class="num">0%</td>
+<td class="num">$997</td>
+</tr>
+<tr id="b197">
+<td class="rowhead">純 OA base</td>
+<td class="num">88.5</td>
+<td class="num">118</td>
+<td class="num">1.36B</td>
+<td class="num">35B</td>
+<td class="num">350K</td>
+<td class="num">0%</td>
+<td class="num">$25.2K</td>
+</tr>
+<tr id="b198">
+<td class="rowhead">純 OA high</td>
+<td class="num">696</td>
+<td class="num">778</td>
+<td class="num">19.2B</td>
+<td class="num">492B</td>
+<td class="num">4.92M</td>
+<td class="num">0%</td>
+<td class="num">$354K</td>
+</tr>
+<tr id="b199">
+<td class="rowhead">純 coding low</td>
+<td class="num">130</td>
+<td class="num">165</td>
+<td class="num">41B</td>
+<td class="num">979B</td>
+<td class="num">9.79M</td>
+<td class="num">100%</td>
+<td class="num">$705K</td>
+</tr>
+<tr id="b200">
+<td class="rowhead">純 coding base</td>
+<td class="num">3.06K</td>
+<td class="num">3.24K</td>
+<td class="num">705B</td>
+<td class="num">16.8T</td>
+<td class="num">168M</td>
+<td class="num">100%</td>
+<td class="num">$12.1M</td>
+</tr>
+<tr id="b201">
+<td class="rowhead">純 coding high</td>
+<td class="num">13.6K</td>
+<td class="num">14K</td>
+<td class="num">3.88T</td>
+<td class="num">92.6T</td>
+<td class="num">926M</td>
+<td class="num">100%</td>
+<td class="num">$66.7M</td>
+</tr>
+<tr id="b202">
+<td class="rowhead">純 R&amp;D low</td>
+<td class="num">313</td>
+<td class="num">368</td>
+<td class="num">3.53B</td>
+<td class="num">87.4B</td>
+<td class="num">874K</td>
+<td class="num">0%</td>
+<td class="num">$62.9K</td>
+</tr>
+<tr id="b203">
+<td class="rowhead">純 R&amp;D base</td>
+<td class="num">1.94K</td>
+<td class="num">2.08K</td>
+<td class="num">24.9B</td>
+<td class="num">616B</td>
+<td class="num">6.16M</td>
+<td class="num">0%</td>
+<td class="num">$444K</td>
+</tr>
+<tr id="b204">
+<td class="rowhead">純 R&amp;D high</td>
+<td class="num">12.7K</td>
+<td class="num">13K</td>
+<td class="num">299B</td>
+<td class="num">7.4T</td>
+<td class="num">74M</td>
+<td class="num">0%</td>
+<td class="num">$5.33M</td>
+</tr>
+</tbody>
+</table></div></figure>
+</div></div><div class="subpanel" role="tabpanel" id="s3-4" aria-labelledby="tab-s3-4"><div class="prose"><h3>規模效應</h3><p id="b205">1,000 與 50,000 人的 48 列在 <code>calc/out/matrix.csv</code>（全部 96 列，另含 Bedrock 5× / 15×、Azure PTU、Google GSU、Cerebras 欄位）。下表是組合 B、base 用量在不同人數下的每人尖峰；300 與 3,000 人兩列是以同一模組補算的 <span class="g g-d" title="等級 D：本文推算，附算式">D</span>：</p>
+<figure class="tbl" data-cols="8" data-rows="6"><div aria-label="資料表" class="tbl-scroll" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th scope="col">員工數</th>
+<th scope="col">busy hour 平均 RPM（m）</th>
+<th scope="col">k</th>
+<th scope="col">尖峰 RPM</th>
+<th scope="col">每員工尖峰 RPM</th>
+<th scope="col">每員工未快取輸入 TPM</th>
+<th scope="col">同時在途（99.9%）</th>
+<th scope="col">99.9% ÷ 平均</th>
+</tr>
+</thead>
+<tbody>
+<tr id="b206">
+<td class="num"><span class="rh">300</span><span class="rh-sub"><span class="vh">（</span>補算<span class="vh">）</span></span></td>
+<td class="num">12.4</td>
+<td class="num">1.85</td>
+<td class="num">23</td>
+<td class="num">0.0767</td>
+<td class="num">394</td>
+<td class="num">9.77</td>
+<td class="num">2.60</td>
+</tr>
+<tr id="b207">
+<td class="num rowhead">1,000</td>
+<td class="num">41.4</td>
+<td class="num">1.47</td>
+<td class="num">60.7</td>
+<td class="num">0.0607</td>
+<td class="num">312</td>
+<td class="num">19.7</td>
+<td class="num">1.98</td>
+</tr>
+<tr id="b208">
+<td class="num"><span class="rh">3,000</span><span class="rh-sub"><span class="vh">（</span>補算<span class="vh">）</span></span></td>
+<td class="num">124</td>
+<td class="num">1.27</td>
+<td class="num">158</td>
+<td class="num">0.0526</td>
+<td class="num">270</td>
+<td class="num">41.5</td>
+<td class="num">1.61</td>
+</tr>
+<tr id="b209">
+<td class="num rowhead">10,000</td>
+<td class="num">414</td>
+<td class="num">1.15</td>
+<td class="num">476</td>
+<td class="num">0.0476</td>
+<td class="num">245</td>
+<td class="num">105</td>
+<td class="num">1.35</td>
+</tr>
+<tr id="b210">
+<td class="num rowhead">50,000</td>
+<td class="num">2.07K</td>
+<td class="num">1.15</td>
+<td class="num">2.38K</td>
+<td class="num">0.0476</td>
+<td class="num">245</td>
+<td class="num">451</td>
+<td class="num">1.16</td>
+</tr>
+<tr id="b211">
+<td class="num rowhead">100,000</td>
+<td class="num">4.14K</td>
+<td class="num">1.15</td>
+<td class="num">4.76K</td>
+<td class="num">0.0476</td>
+<td class="num">245</td>
+<td class="num">865</td>
+<td class="num">1.11</td>
+</tr>
+</tbody>
+</table></div></figure>
+<p id="b212">每員工每月 token（21.6M）與每員工 busy hour 平均 RPM 與人數無關，是線性的。每員工的尖峰 RPM 與 TPM 在 m 低於 400（組合 B、base 約 9,700 人）時隨人數下降，之後持平；同時在途的 99.9% 餘裕則持續縮小，由 1,000 人的 1.98 倍降到 100,000 人的 1.11 倍。</p>
+</div></div><div class="subpanel" role="tabpanel" id="s3-5" aria-labelledby="tab-s3-5"><div class="prose"><h3>規劃時要讀出的六件事</h3><ol>
+<li id="b213"><strong>哪個角色主導，取決於看哪一類 token。</strong> 組合 B、base：coding 只占人數 12%，卻占全部 token 的 94.0%、未快取輸入的 72.8%，但只占呼叫數的 48.8% 與輸出的 47.2%；R&amp;D（人數 18%）占 token 5.0%，卻占呼叫數 38.2% 與輸出 44.4%；OA（人數 70%）占 token 1.1%、呼叫數 13.0%。KV 與輸入配額跟著 coding 人數走，RPM 與 decode 容量要同時看 R&amp;D。</li>
+<li id="b214"><strong>同一批人，在不同平台要申請的數字不同。</strong> 100,000 人、組合 B、base：全部 token 240M TPM，Anthropic 計 24.5M ITPM，Bedrock（10×）計 55.8M，open-weight（1×）計 27.6M。五種混合組合的「全部 token ÷ 平台計量」為 6.8–12.8（Anthropic ITPM）與 3.0–7.0（Bedrock 10×）；以全部 token 計量的 gateway 會比供應商早 3–13 倍限流。</li>
+<li id="b215"><strong>預設配額何時不夠（全部流量在同一個模型類別時）。</strong> Bedrock 的 Opus 5.5 預設 30M TPM：組合 B、base 在約 53,800 人用滿，約 43,000 人到達 AWS 建議設告警的 80% <span class="g g-b" title="等級 B：廠商或夥伴公布，且揭露方法">B</span> <a href="https://aws.amazon.com/blogs/machine-learning/optimize-your-applications-for-scale-and-reliability-on-amazon-bedrock/" rel="noopener" target="_blank">AWS ML blog</a>。Anthropic Scale tier 先被 ITPM（10M）卡住，約 40,900 人；OTPM（2M）約 63,900 人；RPM（10,000）要到約 210,000 人 <span class="g g-d" title="等級 D：本文推算，附算式">D</span>。10,000 人、base 的五種混合組合都在 Bedrock 預設內（2.86M–14.9M，即 0.10–0.50 倍）；同樣 10,000 人升到 high，B、D、E 即超過（32.1M、75.3M、63.5M）。</li>
+<li id="b216"><strong>RPM 很少是瓶頸。</strong> 尖峰時每個請求平均帶 5.1K 未快取輸入 tokens（24.5M ÷ 4,764），而 Anthropic Scale tier 的 ITPM 與 RPM 之比是每請求 1,000 tokens（10M ÷ 10,000），所以 ITPM 比 RPM 早 5 倍用滿。Bedrock 的 open-weight 類別相反：100M TPM 配 10,000 RPM（不可調），每請求超過 10,000 tokens 才會先碰到 TPM。</li>
+<li id="b217"><strong>併發餘裕隨規模縮小，合併成一個池比較省。</strong> 每 1,000 名員工的 99.9% 在途數由 1,000 人時的 19.7 降到 100,000 人時的 8.65（組合 B、base），相差 2.3 倍。把同樣的人拆成多個各自保留尖峰的小池，併發槽與 hot KV 都要多備。</li>
+<li id="b218"><strong>月用量與成本的量級。</strong> 10,000 人、base 的五種混合組合每月 123B–849B tokens，以 $0.72/M 計為 $88.5K–$612K，即每員工每月 $8.85–$61.2；Ramp 同期的每員工每月 AI token 支出中位數是 $46（中間 50% 為 $3–$352）<span class="g g-b" title="等級 B：廠商或夥伴公布，且揭露方法">B</span> <a href="https://ramp.com/blog/ai-token-cost-for-businesses" rel="noopener" target="_blank">Ramp: AI token cost for businesses</a>。週末只有平日的 25–45%，以平日尖峰買的容量在週末有 55–75% 閒置。</li>
+</ol>
+</div></div></div>
+<details class="srcs"><summary>本節來源（2）</summary><ul><li><a href="https://aws.amazon.com/blogs/machine-learning/optimize-your-applications-for-scale-and-reliability-on-amazon-bedrock/" target="_blank" rel="noopener">AWS ML blog</a></li><li><a href="https://ramp.com/blog/ai-token-cost-for-businesses" target="_blank" rel="noopener">Ramp: AI token cost for businesses</a></li></ul></details></section>
+<section class="panel" role="tabpanel" id="s4" aria-labelledby="tab-s4"><div class="panel-head"><h2>模型組合情境</h2><div class="sec-lead prose"><p id="b219">100,000 人、組合 B、base 用量下，四種路由的自建 GPU 線性需求（decode 受限、Blackwell 級、使用率 0.8）是 MX2 134 顆（另有一個 Opus API 池）、MX3 257 顆、MX4 480 顆；MX1 全走 API，Sonnet 5.5 池的 Bedrock 計量 TPM 是預設配額的 3.35 倍 <span class="g g-d" title="等級 D：本文推算，附算式">D</span>。10,000 人時線性需求只有 16–48 顆，但每個模型至少要一個操作點大小的部署，MX2 與 MX3 取整後都是 58 顆，反而高於單一模型的 MX4（48 顆）。</p>
+</div></div>
+<div class="subtabs"><div class="subtablist" role="tablist" aria-label="模型組合情境"><button type="button" class="subtab" role="tab" id="tab-s4-1" aria-controls="s4-1" aria-selected="true">路由情境與操作點</button><button type="button" class="subtab" role="tab" id="tab-s4-2" aria-controls="s4-2" aria-selected="false">GPU 與 KV 的推算方式</button><button type="button" class="subtab" role="tab" id="tab-s4-3" aria-controls="s4-3" aria-selected="false">10,000 人、組合 B、base</button><button type="button" class="subtab" role="tab" id="tab-s4-4" aria-controls="s4-4" aria-selected="false">100,000 人、組合 B、base</button><button type="button" class="subtab" role="tab" id="tab-s4-5" aria-controls="s4-5" aria-selected="false">另外兩個案例</button><button type="button" class="subtab" role="tab" id="tab-s4-6" aria-controls="s4-6" aria-selected="false">讀出的重點</button><button type="button" class="subtab" role="tab" id="tab-s4-7" aria-controls="s4-7" aria-selected="false">不能換算的部分</button></div><div class="subpanel on" role="tabpanel" id="s4-1" aria-labelledby="tab-s4-1"><div class="prose"><h3>路由情境與操作點</h3><p id="b220">每個角色的呼叫依下表的比例分到各模型池；每個池各自計算 k、TPM 與在途數。MX1 的 Opus 占比取自 Anthropic 的揭露（chat / Cowork 對話 10% 由 Opus 處理，Claude Code session 為 54%，2026-06-26）<span class="g g-b" title="等級 B：廠商或夥伴公布，且揭露方法">B</span> <a href="https://www.anthropic.com/research/economic-index-june-2026-report" rel="noopener" target="_blank">Anthropic Economic Index: Cadences</a>；R&amp;D 的 50% 與 MX2–MX4 的比例是情境設定。</p>
+<figure class="tbl" data-cols="4" data-rows="4"><div aria-label="資料表" class="tbl-scroll" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th class="w1" scope="col">情境</th>
+<th class="w1" scope="col">OA 的呼叫</th>
+<th class="w1" scope="col">coding 的呼叫</th>
+<th class="w1" scope="col">R&amp;D 的呼叫</th>
+</tr>
+</thead>
+<tbody>
+<tr id="b221">
+<td class="rowhead">MX1 只用 frontier API</td>
+<td>Opus 5.5 10%；Sonnet 5.5 90%</td>
+<td>Opus 5.5 54%；Sonnet 5.5 46%</td>
+<td>Opus 5.5 50%；Sonnet 5.5 50%</td>
+</tr>
+<tr id="b222">
+<td class="rowhead">MX2 分層路由</td>
+<td>V4.1-Flash 80%；GLM-5.3 20%</td>
+<td>Kimi K3 40%；V4-Pro 30%；Opus 5.5 30%</td>
+<td>V4-Pro 50%；Opus 5.5 30%；V4.1-Flash 20%</td>
+</tr>
+<tr id="b223">
+<td class="rowhead">MX3 只用 open-weight</td>
+<td>V4.1-Flash 100%</td>
+<td>GLM-5.3 50%；Kimi K3 50%</td>
+<td>V4-Pro 100%</td>
+</tr>
+<tr id="b224">
+<td class="rowhead">MX4 單一 open flagship</td>
+<td>Kimi K3 100%</td>
+<td>Kimi K3 100%</td>
+<td>Kimi K3 100%</td>
+</tr>
+</tbody>
+</table></div></figure>
+<p id="b225">open-weight 模型池的自建操作點，全部取自 InferenceX 的 AgentX（agentic coding trace 重播）在 2026-10-04 的快照 <span class="g g-a" title="等級 A：獨立第三方量測">A</span>；KV bytes 與價格的出處列在表後：</p>
+<figure class="tbl" data-cols="8" data-rows="4"><div aria-label="資料表" class="tbl-scroll" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th class="w1" scope="col">模型池</th>
+<th class="w3" scope="col">操作點：硬體；引擎；精度；layout；併發；GPU 數（量測日）</th>
+<th scope="col">output tokens/s per GPU</th>
+<th scope="col">每使用者 tokens/s（中位 / P90）</th>
+<th scope="col">TTFT（中位 / P90，s）</th>
+<th class="w1" scope="col">KV bytes / token</th>
+<th class="w1" scope="col">Bedrock 預設 TPM（burndown）</th>
+<th class="w1" scope="col">list price（$/M：輸入 / cached / 輸出）</th>
+</tr>
+</thead>
+<tbody>
+<tr id="b226">
+<td class="rowhead">Kimi K3</td>
+<td>GB300 NVL72；dynamo-vllm；MXFP4；TP8；c48；8 顆；KV offload 到 DRAM 160 GB（2026-09-15）</td>
+<td class="num">136</td>
+<td class="num">38 / 26</td>
+<td class="num">1.15 / 2.88</td>
+<td>13.8 KB，另加每序列 434 MB 的 recurrent state</td>
+<td class="num">10M（1×）</td>
+<td class="num">3.00 / 0.30 / 15.00</td>
+</tr>
+<tr id="b227">
+<td><span class="rh">GLM-5.3</span><span class="rh-sub"><span class="vh">（</span>以 GLM-5.2 的量測代表<span class="vh">）</span></span></td>
+<td>GB300 NVL72；dynamo-sglang；FP4；P/D disagg（P TP8/EP8/DPA × 2 + D TP16/EP16/DPA）；c128；32 顆；DRAM 721 GB（2026-10-02）</td>
+<td class="num">149</td>
+<td class="num">101 / 90</td>
+<td class="num">2.33 / 5.81</td>
+<td class="num">44.9 KB</td>
+<td>100M（1×；借用同類別的值）</td>
+<td class="num">1.40 / 0.26 / 4.40</td>
+</tr>
+<tr id="b228">
+<td class="rowhead">DeepSeek V4-Pro</td>
+<td>B300；sglang；FP4；TP8/EP8/DPA；c384；8 顆；DRAM 2,849 GB（2026-09-29）</td>
+<td class="num">739</td>
+<td class="num">37 / 34</td>
+<td class="num">2.94 / 12.66</td>
+<td class="num">5.0 KB</td>
+<td>100M（1×；借用同類別的值）</td>
+<td>1.32 / 0.044 / 3.96（尖峰時段）</td>
+</tr>
+<tr id="b229">
+<td class="rowhead">DeepSeek V4.1-Flash</td>
+<td>B300；vllm；FP4；TP2/EP2/DPA；c192；2 顆；無 KV offload（2026-10-02）</td>
+<td class="num">3,059</td>
+<td class="num">60 / 41</td>
+<td class="num">0.25 / 0.81</td>
+<td class="num">0.89 KB（global KV）</td>
+<td>100M（1×；借用同類別的值）</td>
+<td>0.30 / 0.006 / 1.20（尖峰時段）</td>
+</tr>
+</tbody>
+</table></div></figure>
+<ul>
+<li id="b230">操作點：<a href="https://inferencex.semianalysis.com/api/v1/benchmarks?model=Kimi-K3" rel="noopener" target="_blank">InferenceX API, model=Kimi-K3, pulled 4 Oct 2026</a>、<a href="https://inferencex.semianalysis.com/api/v1/benchmarks?model=GLM-5.2" rel="noopener" target="_blank">InferenceX API, model=GLM-5.2, pulled 4 Oct 2026</a>、<a href="https://inferencex.semianalysis.com/api/v1/benchmarks?model=DeepSeek-V4-Pro" rel="noopener" target="_blank">InferenceX API, model=DeepSeek-V4-Pro, pulled 4 Oct 2026</a>、<a href="https://inferencex.semianalysis.com/api/v1/benchmarks?model=DeepSeek-V4.1-Flash" rel="noopener" target="_blank">InferenceX API, model=DeepSeek-V4.1-Flash, pulled 4 Oct 2026</a>。四個點都開了 speculative decoding（K3 用 DSpark draft，其餘用 MTP）。</li>
+<li id="b231">KV bytes：Kimi K3 為 24 層 MLA × 576 個 FP8 元素 = 13,824 bytes <span class="g g-d" title="等級 D：本文推算，附算式">D</span>，InferenceX 的紀錄 42.23 GiB / 3,249,215 tokens = 13,955 bytes <span class="g g-a" title="等級 A：獨立第三方量測">A</span> <a href="https://github.com/SemiAnalysisAI/InferenceX/blob/main/inferencex-e2e/perf-changelog.yaml" rel="noopener" target="_blank">InferenceX perf-changelog</a>；recurrent state 為 TP8 下每 rank 約 54 MB × 8 <span class="g g-b" title="等級 B：廠商或夥伴公布，且揭露方法">B</span> <a href="https://www.lmsys.org/blog/2026-07-27-kimi-k3-day0-support/" rel="noopener" target="_blank">LMSYS blog, 27 Jul 2026</a>。GLM-5.2「about 44 KB of KV state per token」<span class="g g-b" title="等級 B：廠商或夥伴公布，且揭露方法">B</span> <a href="https://llm-d.ai/blog/serving-glm-5-2-agentic-workloads-on-llm-d" rel="noopener" target="_blank">llm-d blog, 22 Jul 2026</a>。V4-Pro 為 1M tokens 約 9.62 GiB（BF16）再以 FP8 / FP4 快取約減半 [<span class="g g-b" title="等級 B：廠商或夥伴公布，且揭露方法">B</span>，換算為 D] <a href="https://github.com/vllm-project/vllm-project.github.io/blob/main/_posts/2026-04-24-deepseek-v4.md" rel="noopener" target="_blank">vLLM blog, 24 Apr 2026</a>。V4.1-Flash 為廠商規格 890 bytes <span class="g g-c" title="等級 C：廠商宣稱或規格，未揭露方法">C</span> <a href="https://huggingface.co/deepseek-ai/DeepSeek-V4.1-Flash" rel="noopener" target="_blank">V4.1-Flash card</a>。</li>
+<li id="b232">Bedrock 配額：<a href="https://docs.aws.amazon.com/general/latest/gr/bedrock.html" rel="noopener" target="_blank">Amazon Bedrock endpoints and quotas</a> <span class="g g-b" title="等級 B：廠商或夥伴公布，且揭露方法">B</span>。筆記沒有找到 GLM-5.3、DeepSeek V4-Pro、V4.1-Flash 的 Bedrock 配額列，模型借用 DeepSeek V3.2、GLM 5 等 open-weight 模型的 100M TPM（另有不可調的 10,000 RPM）。</li>
+<li id="b233">價格：<a href="https://platform.kimi.ai/docs/pricing/chat" rel="noopener" target="_blank">Kimi pricing</a>、<a href="https://docs.z.ai/guides/overview/pricing" rel="noopener" target="_blank">Z.ai pricing</a>、<a href="https://api-docs.deepseek.com/quick_start/pricing" rel="noopener" target="_blank">DeepSeek pricing</a> [<span class="g g-c" title="等級 C：廠商宣稱或規格，未揭露方法">C</span>；2026-10-04 經摘要工具讀取，引用前需重查]。DeepSeek 離峰時段為半價。</li>
+</ul>
+<p id="b234">只走 API 的模型池：</p>
+<figure class="tbl" data-cols="5" data-rows="2"><div aria-label="資料表" class="tbl-scroll" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th class="w1" scope="col">模型池</th>
+<th class="w1" scope="col">Bedrock 預設 TPM</th>
+<th class="w2" scope="col">output burndown</th>
+<th class="w1" scope="col">呼叫時間用的 v</th>
+<th class="w1" scope="col">價格</th>
+</tr>
+</thead>
+<tbody>
+<tr id="b235">
+<td class="rowhead">Claude Opus 5.5</td>
+<td>30M（cross-Region 與 global）</td>
+<td class="num">10×</td>
+<td class="num">80 tokens/s（假設）</td>
+<td>價格見<a class="xref" href="05-proprietary-models.html">第 5 章</a></td>
+</tr>
+<tr id="b236">
+<td class="rowhead">Claude Sonnet 5.5</td>
+<td class="num">6M</td>
+<td>5×（AWS 文字未點名 Sonnet 5.5；Sonnet 5 為 10×、4.7 以下為 5×，模型沿用 5×）</td>
+<td class="num">80 tokens/s（假設）</td>
+<td>價格見<a class="xref" href="05-proprietary-models.html">第 5 章</a></td>
+</tr>
+</tbody>
+</table></div></figure>
+</div></div><div class="subpanel" role="tabpanel" id="s4-2" aria-labelledby="tab-s4-2"><div class="prose"><h3>GPU 與 KV 的推算方式</h3><p id="b237">GPU 數只看 decode：該池的尖峰輸出 tokens/s，除以操作點的 output tokens/s per GPU（g），再除以使用率上限 0.8：</p>
+<div class="formula"><span class="katex-display"><span class="katex"><span class="katex-mathml"><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>G</mi><mrow><mi mathvariant="normal">d</mi><mi mathvariant="normal">e</mi><mi mathvariant="normal">c</mi><mi mathvariant="normal">o</mi><mi mathvariant="normal">d</mi><mi mathvariant="normal">e</mi></mrow></msub><mo>=</mo><mfrac><mrow><msub><mrow><mi mathvariant="normal">T</mi><mi mathvariant="normal">P</mi><mi mathvariant="normal">M</mi></mrow><mi>o</mi></msub><mi mathvariant="normal">/</mi><mn>60</mn></mrow><mrow><mi>g</mi><mo>⋅</mo><mn>0.8</mn></mrow></mfrac></mrow><annotation encoding="application/x-tex">G_{\mathrm{decode}} = \frac{\mathrm{TPM}_o / 60}{g \cdot 0.8}</annotation></semantics></math></span><span aria-hidden="true" class="katex-html"><span class="katex-base"><span class="katex-strut" style="height:0.8333em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathnormal">G</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3361em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight"><span class="mord mathrm mtight">decode</span></span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:2.3074em;vertical-align:-0.8804em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.427em;"><span style="top:-2.314em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.0359em;">g</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">⋅</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mord">0.8</span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.677em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord"><span class="mord"><span class="mord mathrm">TPM</span></span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.1514em;"><span style="top:-2.55em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">o</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mord">/60</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.8804em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span></span></span></span></span></div>
+<p id="b238">hot KV 是 99.9% 在途請求的 context，必須放在 HBM；n 是該池每次呼叫的平均 context（u + c + o），b 是 KV bytes per token，b_s 是每序列的固定 state（只有 Kimi K3 不為零）：</p>
+<div class="formula"><span class="katex-display"><span class="katex"><span class="katex-mathml"><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mrow><mi mathvariant="normal">K</mi><mi mathvariant="normal">V</mi></mrow><mrow><mi mathvariant="normal">h</mi><mi mathvariant="normal">o</mi><mi mathvariant="normal">t</mi></mrow></msub><mo>=</mo><msub><mi>L</mi><mn>99.9</mn></msub><mo>⋅</mo><mrow><mo fence="true">(</mo><mover accent="true"><mi>n</mi><mo>ˉ</mo></mover><mo>⋅</mo><mi>b</mi><mo>+</mo><msub><mi>b</mi><mi>s</mi></msub><mo fence="true">)</mo></mrow></mrow><annotation encoding="application/x-tex">\mathrm{KV}_{\mathrm{hot}} = L_{99.9} \cdot \left(\bar{n} \cdot b + b_s\right)</annotation></semantics></math></span><span aria-hidden="true" class="katex-html"><span class="katex-base"><span class="katex-strut" style="height:0.8333em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord"><span class="mord mathrm" style="margin-right:0.0139em;">KV</span></span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3361em;"><span style="top:-2.55em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight"><span class="mord mathrm mtight">hot</span></span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.8333em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathnormal">L</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3011em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">99.9</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">⋅</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="minner"><span class="mopen delimcenter" style="top:0em;">(</span><span class="mord katex-accent"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.5678em;"><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="mord mathnormal">n</span></span><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="accent-body" style="left:-0.25em;"><span class="mord">ˉ</span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">⋅</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mord mathnormal">b</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mord"><span class="mord mathnormal">b</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.1514em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">s</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mclose delimcenter" style="top:0em;">)</span></span></span></span></span></span></div>
+<p id="b239">warm KV 是「為了讓下一次呼叫命中 prefix cache 而保留」的 session，數量取在途數的 16 倍，每個 session 常駐 1.2 倍的平均 context：</p>
+<div class="formula"><span class="katex-display"><span class="katex"><span class="katex-mathml"><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mrow><mi mathvariant="normal">K</mi><mi mathvariant="normal">V</mi></mrow><mrow><mi mathvariant="normal">w</mi><mi mathvariant="normal">a</mi><mi mathvariant="normal">r</mi><mi mathvariant="normal">m</mi></mrow></msub><mo>=</mo><mn>16</mn><mi>L</mi><mo>⋅</mo><mrow><mo fence="true">(</mo><mn>1.2</mn><mtext> </mtext><mover accent="true"><mi>n</mi><mo>ˉ</mo></mover><mo>⋅</mo><mi>b</mi><mo>+</mo><msub><mi>b</mi><mi>s</mi></msub><mo fence="true">)</mo></mrow></mrow><annotation encoding="application/x-tex">\mathrm{KV}_{\mathrm{warm}} = 16 L \cdot \left(1.2\,\bar{n} \cdot b + b_s\right)</annotation></semantics></math></span><span aria-hidden="true" class="katex-html"><span class="katex-base"><span class="katex-strut" style="height:0.8333em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord"><span class="mord mathrm" style="margin-right:0.0139em;">KV</span></span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.1514em;"><span style="top:-2.55em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight"><span class="mord mathrm mtight">warm</span></span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6833em;"></span><span class="mord">16</span><span class="mord mathnormal">L</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">⋅</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="minner"><span class="mopen delimcenter" style="top:0em;">(</span><span class="mord">1.2</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord katex-accent"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.5678em;"><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="mord mathnormal">n</span></span><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="accent-body" style="left:-0.25em;"><span class="mord">ˉ</span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">⋅</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mord mathnormal">b</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mord"><span class="mord mathnormal">b</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.1514em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">s</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mclose delimcenter" style="top:0em;">)</span></span></span></span></span></span></div>
+<ul>
+<li id="b240"><strong>操作點給使用者的體驗。</strong> 上表的每使用者速度與 TTFT 就是該 GPU 數所對應的服務水準：Kimi K3 池每位使用者中位 38 tokens/s、TTFT 1.15 s；V4-Pro 池 37 tokens/s、TTFT 2.94 s（P90 12.66 s）。要更快就得換到同一來源較低併發的點，例如 Kimi K3 在 GB300 的 P/D disagg、c56 是 112 output tokens/s per GPU 與每使用者 61 tokens/s（2026-09-15）<span class="g g-a" title="等級 A：獨立第三方量測">A</span>，GPU 數變成 1.21 倍。自建池的在途數改用操作點的每使用者速度計算 W，API 池用 80 tokens/s。</li>
+<li id="b241"><strong>對 chat 流量保守。</strong> AgentX 重播的是 agentic coding trace（Kimi K3 的 trace 每 turn 中位 142K 輸入、444 輸出；DeepSeek V4 各次重播的輸入 p50 88K、p90 272K）<span class="g g-a" title="等級 A：獨立第三方量測">A</span> <a href="https://inferencex.semianalysis.com/blog/kimi-k3-the-manos-the-mythos-the" rel="noopener" target="_blank">InferenceX blog, 3 Aug 2026</a>、<a href="https://inferencex.semianalysis.com/blog/deepseek-v4-pro-agentx-mi355x-vs-b200-august" rel="noopener" target="_blank">InferenceX blog, 25 Aug 2026</a>。OA 一次呼叫只有 3.5K 輸入配 400 輸出，每個輸出 token 分攤的 prefill 與 KV 遠少於 trace，拿 agentic 操作點估 OA 與 R&amp;D 池會高估 GPU 數 [<span class="g g-d" title="等級 D：本文推算，附算式">D</span>，推論]。</li>
+<li id="b242"><strong>對 speculative decoding 樂觀。</strong> AgentX 把 acceptance length 固定在 SPEED-Bench coding 類別量到的 golden 曲線，不是 trace 上實際達到的值；Kimi K3 的 DSpark 在真實 trace 上量到 1.18–1.68 個 token（golden 為 3.84），併發 4 / 8 時吞吐量退回 20–63% <span class="g g-a" title="等級 A：獨立第三方量測">A</span> <a href="https://github.com/SemiAnalysisAI/InferenceX/blob/main/inferencex-e2e/docs/MODELS.md" rel="noopener" target="_blank">InferenceX MODELS.md</a>、<a href="https://github.com/SemiAnalysisAI/InferenceX/blob/main/inferencex-e2e/perf-changelog.yaml" rel="noopener" target="_blank">InferenceX perf-changelog</a>。同一表中 Kimi K3 不開 speculative decoding 的點（GB200 NVL72、c96）是 71 output tokens/s per GPU、每使用者 12 tokens/s，所以 K3 的 GPU 數應視為下限。</li>
+<li id="b243"><strong>只算 decode，沒有單獨算 prefill。</strong> 操作點是在 trace 的 cache 命中條件下量到的，prefill 的負擔已隱含在內；prefix cache 失效時（未快取輸入變 10.84 倍）這個 GPU 數不成立。GPU 數是線性需求，沒有取整到最小部署單位，也沒有加備援。</li>
+<li id="b244"><strong>hot 與 warm 的差別。</strong> hot KV 是正在 decode 的序列，每一步都要讀，只能在 HBM；warm KV 是使用者閒置中的 session，放在 DRAM 或 flash 層即可，但不在任何一層時下一次呼叫的 cache read 會變回 prefill。16 倍取自 Copilot trace：最忙小時的平均在途呼叫是該小時活躍 session 的 5.3–7.4% [<span class="g g-a" title="等級 A：獨立第三方量測">A</span>，筆記實算]；1.2 倍是以 coding base 校準，92.1K × 1.2 ≈ 110K tokens，對上 InferenceX 與 llm-d 量到的每 session 常駐約 110–112K tokens（43M ÷ 384；14.1M ÷ 128）[<span class="g g-a" title="等級 A：獨立第三方量測">A</span> / B，換算為 D] <a href="https://inferencex.semianalysis.com/blog/deepseek-v4-pro-agentx-b200-vs-b300-kv-working-set" rel="noopener" target="_blank">InferenceX blog, 25 Aug 2026</a>、<a href="https://llm-d.ai/blog/serving-glm-5-2-agentic-workloads-on-llm-d" rel="noopener" target="_blank">llm-d blog, 22 Jul 2026</a>。</li>
+</ul>
+</div></div><div class="subpanel" role="tabpanel" id="s4-3" aria-labelledby="tab-s4-3"><div class="prose"><h3>10,000 人、組合 B、base</h3><figure class="tbl" data-cols="8" data-rows="4"><div aria-label="資料表" class="tbl-scroll" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th scope="col">情境</th>
+<th scope="col">自建 GPU（線性需求）</th>
+<th scope="col">取整到操作點單位</th>
+<th scope="col">hot KV 合計</th>
+<th scope="col">warm KV 合計</th>
+<th class="w1" scope="col">API 池：Bedrock 計量 TPM ÷ 預設配額</th>
+<th class="w1" scope="col">open-weight 月成本（list price）</th>
+<th scope="col">各池 RPM 合計 ÷ 單一池</th>
+</tr>
+</thead>
+<tbody>
+<tr id="b245">
+<td class="rowhead">MX1</td>
+<td class="num">0</td>
+<td class="num">0</td>
+<td class="num">0</td>
+<td class="num">0</td>
+<td>Opus 5.5 0.10×；Sonnet 5.5 0.35×</td>
+<td>價格見<a class="xref" href="05-proprietary-models.html">第 5 章</a></td>
+<td class="num">1.051</td>
+</tr>
+<tr id="b246">
+<td class="rowhead">MX2</td>
+<td class="num">15.6</td>
+<td class="num">58</td>
+<td class="num">104 GB</td>
+<td class="num">1.26 TB</td>
+<td>Opus 5.5 0.06×</td>
+<td>$64.3K + Opus（價格見<a class="xref" href="05-proprietary-models.html">第 5 章</a>）</td>
+<td class="num">1.141</td>
+</tr>
+<tr id="b247">
+<td class="rowhead">MX3</td>
+<td class="num">28.9</td>
+<td class="num">58</td>
+<td class="num">228 GB</td>
+<td class="num">2.64 TB</td>
+<td>無 API 池</td>
+<td class="num">$108K</td>
+<td class="num">1.122</td>
+</tr>
+<tr id="b248">
+<td class="rowhead">MX4</td>
+<td class="num">48.0</td>
+<td class="num">48</td>
+<td class="num">200 GB</td>
+<td class="num">2.86 TB</td>
+<td>無 API 池</td>
+<td class="num">$160K</td>
+<td class="num">1.000</td>
+</tr>
+</tbody>
+</table></div></figure>
+<p id="b249"><strong>MX1 只用 frontier API</strong></p>
+<figure class="tbl" data-cols="8" data-rows="2"><div aria-label="資料表" class="tbl-scroll" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th class="w1" scope="col">模型池</th>
+<th scope="col">尖峰 RPM</th>
+<th scope="col">未快取輸入 TPM</th>
+<th scope="col">輸出 TPM</th>
+<th scope="col">Bedrock 計量 TPM</th>
+<th scope="col">÷ 預設配額</th>
+<th scope="col">同時在途（99.9%）</th>
+<th class="w1" scope="col">月成本（list price）</th>
+</tr>
+</thead>
+<tbody>
+<tr id="b250">
+<td><span class="rh">Claude Opus 5.5</span><span class="rh-sub"><span class="vh">（</span>API<span class="vh">）</span></span></td>
+<td class="num">235</td>
+<td class="num">1.31M</td>
+<td class="num">161K</td>
+<td class="num">2.92M</td>
+<td class="num">0.10×</td>
+<td class="num">59.7</td>
+<td>價格見<a class="xref" href="05-proprietary-models.html">第 5 章</a></td>
+</tr>
+<tr id="b251">
+<td><span class="rh">Claude Sonnet 5.5</span><span class="rh-sub"><span class="vh">（</span>API<span class="vh">）</span></span></td>
+<td class="num">265</td>
+<td class="num">1.26M</td>
+<td class="num">168K</td>
+<td class="num">2.1M</td>
+<td class="num">0.35×</td>
+<td class="num">61.8</td>
+<td>價格見<a class="xref" href="05-proprietary-models.html">第 5 章</a></td>
+</tr>
+</tbody>
+</table></div></figure>
+<p id="b252"><strong>MX2 分層路由</strong>：配額與成本，以及 open-weight 池的自建換算</p>
+<figure class="tbl" data-cols="8" data-rows="5"><div aria-label="資料表" class="tbl-scroll" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th class="w1" scope="col">模型池</th>
+<th scope="col">尖峰 RPM</th>
+<th scope="col">未快取輸入 TPM</th>
+<th scope="col">輸出 TPM</th>
+<th scope="col">Bedrock 計量 TPM</th>
+<th scope="col">÷ 預設配額</th>
+<th scope="col">同時在途（99.9%）</th>
+<th scope="col">月成本（list price）</th>
+</tr>
+</thead>
+<tbody>
+<tr id="b253">
+<td class="rowhead">DeepSeek V4.1-Flash</td>
+<td class="num">101</td>
+<td class="num">246K</td>
+<td class="num">57.2K</td>
+<td class="num">303K</td>
+<td class="num">0.00×</td>
+<td class="num">30.8</td>
+<td class="num">$1.09K</td>
+</tr>
+<tr id="b254">
+<td class="rowhead">GLM-5.3</td>
+<td class="num">20.6</td>
+<td class="num">42.6K</td>
+<td class="num">8.75K</td>
+<td class="num">51.3K</td>
+<td class="num">0.00×</td>
+<td class="num">5.75</td>
+<td class="num">$586</td>
+</tr>
+<tr id="b255">
+<td class="rowhead">Kimi K3</td>
+<td class="num">108</td>
+<td class="num">826K</td>
+<td class="num">68.5K</td>
+<td class="num">895K</td>
+<td class="num">0.09×</td>
+<td class="num">49.5</td>
+<td class="num">$47.4K</td>
+</tr>
+<tr id="b256">
+<td class="rowhead">DeepSeek V4-Pro</td>
+<td class="num">175</td>
+<td class="num">876K</td>
+<td class="num">124K</td>
+<td class="num">1M</td>
+<td class="num">0.01×</td>
+<td class="num">83.3</td>
+<td class="num">$15.3K</td>
+</tr>
+<tr id="b257">
+<td><span class="rh">Claude Opus 5.5</span><span class="rh-sub"><span class="vh">（</span>API<span class="vh">）</span></span></td>
+<td class="num">139</td>
+<td class="num">779K</td>
+<td class="num">96.4K</td>
+<td class="num">1.74M</td>
+<td class="num">0.06×</td>
+<td class="num">39.3</td>
+<td>價格見<a class="xref" href="05-proprietary-models.html">第 5 章</a></td>
+</tr>
+</tbody>
+</table></div></figure>
+<figure class="tbl" data-cols="7" data-rows="4"><div aria-label="資料表" class="tbl-scroll" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th scope="col">模型池</th>
+<th scope="col">尖峰輸出 tokens/s</th>
+<th scope="col">GPU 數（decode 受限）</th>
+<th scope="col">hot KV tokens</th>
+<th scope="col">hot KV</th>
+<th scope="col">warm KV tokens</th>
+<th scope="col">warm KV</th>
+</tr>
+</thead>
+<tbody>
+<tr id="b258">
+<td class="rowhead">DeepSeek V4.1-Flash</td>
+<td class="num">953</td>
+<td class="num">0.39</td>
+<td class="num">150K</td>
+<td class="num">0.13 GB</td>
+<td class="num">1.66M</td>
+<td class="num">1.48 GB</td>
+</tr>
+<tr id="b259">
+<td class="rowhead">GLM-5.3</td>
+<td class="num">146</td>
+<td class="num">1.22</td>
+<td class="num">22.4K</td>
+<td class="num">1.01 GB</td>
+<td class="num">128K</td>
+<td class="num">5.73 GB</td>
+</tr>
+<tr id="b260">
+<td class="rowhead">Kimi K3</td>
+<td class="num">1.14K</td>
+<td class="num">10.5</td>
+<td class="num">4.56M</td>
+<td class="num">84.3 GB</td>
+<td class="num">56.5M</td>
+<td class="num">1 TB</td>
+</tr>
+<tr id="b261">
+<td class="rowhead">DeepSeek V4-Pro</td>
+<td class="num">2.07K</td>
+<td class="num">3.50</td>
+<td class="num">3.62M</td>
+<td class="num">18.1 GB</td>
+<td class="num">49.5M</td>
+<td class="num">248 GB</td>
+</tr>
+</tbody>
+</table></div></figure>
+<p id="b262"><strong>MX3 只用 open-weight</strong></p>
+<figure class="tbl" data-cols="8" data-rows="4"><div aria-label="資料表" class="tbl-scroll" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th scope="col">模型池</th>
+<th scope="col">尖峰 RPM</th>
+<th scope="col">未快取輸入 TPM</th>
+<th scope="col">輸出 TPM</th>
+<th scope="col">Bedrock 計量 TPM</th>
+<th scope="col">÷ 預設配額</th>
+<th scope="col">同時在途（99.9%）</th>
+<th scope="col">月成本（list price）</th>
+</tr>
+</thead>
+<tbody>
+<tr id="b263">
+<td class="rowhead">DeepSeek V4.1-Flash</td>
+<td class="num">75.9</td>
+<td class="num">157K</td>
+<td class="num">32.2K</td>
+<td class="num">189K</td>
+<td class="num">0.00×</td>
+<td class="num">19.4</td>
+<td class="num">$638</td>
+</tr>
+<tr id="b264">
+<td class="rowhead">GLM-5.3</td>
+<td class="num">131</td>
+<td class="num">1.01M</td>
+<td class="num">83.4K</td>
+<td class="num">1.09M</td>
+<td class="num">0.01×</td>
+<td class="num">30.3</td>
+<td class="num">$37.1K</td>
+</tr>
+<tr id="b265">
+<td class="rowhead">Kimi K3</td>
+<td class="num">131</td>
+<td class="num">1.01M</td>
+<td class="num">83.4K</td>
+<td class="num">1.09M</td>
+<td class="num">0.11×</td>
+<td class="num">58.2</td>
+<td class="num">$59.2K</td>
+</tr>
+<tr id="b266">
+<td class="rowhead">DeepSeek V4-Pro</td>
+<td class="num">196</td>
+<td class="num">579K</td>
+<td class="num">150K</td>
+<td class="num">728K</td>
+<td class="num">0.01×</td>
+<td class="num">98.1</td>
+<td class="num">$11.2K</td>
+</tr>
+</tbody>
+</table></div></figure>
+<figure class="tbl" data-cols="7" data-rows="4"><div aria-label="資料表" class="tbl-scroll" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th scope="col">模型池</th>
+<th scope="col">尖峰輸出 tokens/s</th>
+<th scope="col">GPU 數（decode 受限）</th>
+<th scope="col">hot KV tokens</th>
+<th scope="col">hot KV</th>
+<th scope="col">warm KV tokens</th>
+<th scope="col">warm KV</th>
+</tr>
+</thead>
+<tbody>
+<tr id="b267">
+<td class="rowhead">DeepSeek V4.1-Flash</td>
+<td class="num">537</td>
+<td class="num">0.22</td>
+<td class="num">75.5K</td>
+<td class="num">0.07 GB</td>
+<td class="num">726K</td>
+<td class="num">0.65 GB</td>
+</tr>
+<tr id="b268">
+<td class="rowhead">GLM-5.3</td>
+<td class="num">1.39K</td>
+<td class="num">11.7</td>
+<td class="num">2.79M</td>
+<td class="num">125 GB</td>
+<td class="num">30.7M</td>
+<td class="num">1.38 TB</td>
+</tr>
+<tr id="b269">
+<td class="rowhead">Kimi K3</td>
+<td class="num">1.39K</td>
+<td class="num">12.8</td>
+<td class="num">5.36M</td>
+<td class="num">99.2 GB</td>
+<td class="num">68.7M</td>
+<td class="num">1.22 TB</td>
+</tr>
+<tr id="b270">
+<td class="rowhead">DeepSeek V4-Pro</td>
+<td class="num">2.5K</td>
+<td class="num">4.22</td>
+<td class="num">610K</td>
+<td class="num">3.05 GB</td>
+<td class="num">8.57M</td>
+<td class="num">42.9 GB</td>
+</tr>
+</tbody>
+</table></div></figure>
+<p id="b271"><strong>MX4 單一 open flagship（Kimi K3）</strong></p>
+<figure class="tbl" data-cols="8" data-rows="1"><div aria-label="資料表" class="tbl-scroll" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th scope="col">模型池</th>
+<th scope="col">尖峰 RPM</th>
+<th scope="col">未快取輸入 TPM</th>
+<th scope="col">輸出 TPM</th>
+<th scope="col">Bedrock 計量 TPM</th>
+<th scope="col">÷ 預設配額</th>
+<th scope="col">同時在途（99.9%）</th>
+<th scope="col">月成本（list price）</th>
+</tr>
+</thead>
+<tbody>
+<tr id="b272">
+<td class="rowhead">Kimi K3</td>
+<td class="num">476</td>
+<td class="num">2.45M</td>
+<td class="num">313K</td>
+<td class="num">2.76M</td>
+<td class="num">0.28×</td>
+<td class="num">183</td>
+<td class="num">$160K</td>
+</tr>
+</tbody>
+</table></div></figure>
+<figure class="tbl" data-cols="7" data-rows="1"><div aria-label="資料表" class="tbl-scroll" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th scope="col">模型池</th>
+<th scope="col">尖峰輸出 tokens/s</th>
+<th scope="col">GPU 數（decode 受限）</th>
+<th scope="col">hot KV tokens</th>
+<th scope="col">hot KV</th>
+<th scope="col">warm KV tokens</th>
+<th scope="col">warm KV</th>
+</tr>
+</thead>
+<tbody>
+<tr id="b273">
+<td class="rowhead">Kimi K3</td>
+<td class="num">5.22K</td>
+<td class="num">48.0</td>
+<td class="num">8.76M</td>
+<td class="num">200 GB</td>
+<td class="num">134M</td>
+<td class="num">2.86 TB</td>
+</tr>
+</tbody>
+</table></div></figure>
+</div></div><div class="subpanel" role="tabpanel" id="s4-4" aria-labelledby="tab-s4-4"><div class="prose"><h3>100,000 人、組合 B、base</h3><figure class="tbl" data-cols="8" data-rows="4"><div aria-label="資料表" class="tbl-scroll" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th scope="col">情境</th>
+<th scope="col">自建 GPU（線性需求）</th>
+<th scope="col">取整到操作點單位</th>
+<th scope="col">hot KV 合計</th>
+<th scope="col">warm KV 合計</th>
+<th class="w1" scope="col">API 池：Bedrock 計量 TPM ÷ 預設配額</th>
+<th class="w1" scope="col">open-weight 月成本（list price）</th>
+<th scope="col">各池 RPM 合計 ÷ 單一池</th>
+</tr>
+</thead>
+<tbody>
+<tr id="b274">
+<td class="rowhead">MX1</td>
+<td class="num">0</td>
+<td class="num">0</td>
+<td class="num">0</td>
+<td class="num">0</td>
+<td>Opus 5.5 0.92×；Sonnet 5.5 3.35×</td>
+<td>價格見<a class="xref" href="05-proprietary-models.html">第 5 章</a></td>
+<td class="num">1.000</td>
+</tr>
+<tr id="b275">
+<td class="rowhead">MX2</td>
+<td class="num">134</td>
+<td class="num">172</td>
+<td class="num">696 GB</td>
+<td class="num">11 TB</td>
+<td>Opus 5.5 0.52×</td>
+<td>$643K + Opus（價格見<a class="xref" href="05-proprietary-models.html">第 5 章</a>）</td>
+<td class="num">1.003</td>
+</tr>
+<tr id="b276">
+<td class="rowhead">MX3</td>
+<td class="num">257</td>
+<td class="num">290</td>
+<td class="num">1.5 TB</td>
+<td class="num">23.4 TB</td>
+<td>無 API 池</td>
+<td class="num">$1.08M</td>
+<td class="num">1.000</td>
+</tr>
+<tr id="b277">
+<td class="rowhead">MX4</td>
+<td class="num">480</td>
+<td class="num">480</td>
+<td class="num">1.72 TB</td>
+<td class="num">28.6 TB</td>
+<td>無 API 池</td>
+<td class="num">$1.6M</td>
+<td class="num">1.000</td>
+</tr>
+</tbody>
+</table></div></figure>
+<p id="b278"><strong>MX1 只用 frontier API</strong></p>
+<figure class="tbl" data-cols="8" data-rows="2"><div aria-label="資料表" class="tbl-scroll" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th class="w1" scope="col">模型池</th>
+<th scope="col">尖峰 RPM</th>
+<th scope="col">未快取輸入 TPM</th>
+<th scope="col">輸出 TPM</th>
+<th scope="col">Bedrock 計量 TPM</th>
+<th scope="col">÷ 預設配額</th>
+<th scope="col">同時在途（99.9%）</th>
+<th class="w1" scope="col">月成本（list price）</th>
+</tr>
+</thead>
+<tbody>
+<tr id="b279">
+<td><span class="rh">Claude Opus 5.5</span><span class="rh-sub"><span class="vh">（</span>API<span class="vh">）</span></span></td>
+<td class="num">2.23K</td>
+<td class="num">12.4M</td>
+<td class="num">1.52M</td>
+<td class="num">27.6M</td>
+<td class="num">0.92×</td>
+<td class="num">440</td>
+<td>價格見<a class="xref" href="05-proprietary-models.html">第 5 章</a></td>
+</tr>
+<tr id="b280">
+<td><span class="rh">Claude Sonnet 5.5</span><span class="rh-sub"><span class="vh">（</span>API<span class="vh">）</span></span></td>
+<td class="num">2.54K</td>
+<td class="num">12M</td>
+<td class="num">1.61M</td>
+<td class="num">20.1M</td>
+<td class="num">3.35×</td>
+<td class="num">461</td>
+<td>價格見<a class="xref" href="05-proprietary-models.html">第 5 章</a></td>
+</tr>
+</tbody>
+</table></div></figure>
+<p id="b281"><strong>MX2 分層路由</strong></p>
+<figure class="tbl" data-cols="8" data-rows="5"><div aria-label="資料表" class="tbl-scroll" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th class="w1" scope="col">模型池</th>
+<th scope="col">尖峰 RPM</th>
+<th scope="col">未快取輸入 TPM</th>
+<th scope="col">輸出 TPM</th>
+<th scope="col">Bedrock 計量 TPM</th>
+<th scope="col">÷ 預設配額</th>
+<th scope="col">同時在途（99.9%）</th>
+<th scope="col">月成本（list price）</th>
+</tr>
+</thead>
+<tbody>
+<tr id="b282">
+<td class="rowhead">DeepSeek V4.1-Flash</td>
+<td class="num">860</td>
+<td class="num">2.1M</td>
+<td class="num">488K</td>
+<td class="num">2.59M</td>
+<td class="num">0.03×</td>
+<td class="num">190</td>
+<td class="num">$10.9K</td>
+</tr>
+<tr id="b283">
+<td class="rowhead">GLM-5.3</td>
+<td class="num">139</td>
+<td class="num">287K</td>
+<td class="num">58.9K</td>
+<td class="num">346K</td>
+<td class="num">0.00×</td>
+<td class="num">22</td>
+<td class="num">$5.86K</td>
+</tr>
+<tr id="b284">
+<td class="rowhead">Kimi K3</td>
+<td class="num">929</td>
+<td class="num">7.13M</td>
+<td class="num">591K</td>
+<td class="num">7.72M</td>
+<td class="num">0.77×</td>
+<td class="num">327</td>
+<td class="num">$474K</td>
+</tr>
+<tr id="b285">
+<td class="rowhead">DeepSeek V4-Pro</td>
+<td class="num">1.61K</td>
+<td class="num">8.03M</td>
+<td class="num">1.14M</td>
+<td class="num">9.17M</td>
+<td class="num">0.09×</td>
+<td class="num">617</td>
+<td class="num">$153K</td>
+</tr>
+<tr id="b286">
+<td><span class="rh">Claude Opus 5.5</span><span class="rh-sub"><span class="vh">（</span>API<span class="vh">）</span></span></td>
+<td class="num">1.24K</td>
+<td class="num">6.96M</td>
+<td class="num">860K</td>
+<td class="num">15.6M</td>
+<td class="num">0.52×</td>
+<td class="num">261</td>
+<td>價格見<a class="xref" href="05-proprietary-models.html">第 5 章</a></td>
+</tr>
+</tbody>
+</table></div></figure>
+<figure class="tbl" data-cols="7" data-rows="4"><div aria-label="資料表" class="tbl-scroll" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th scope="col">模型池</th>
+<th scope="col">尖峰輸出 tokens/s</th>
+<th scope="col">GPU 數（decode 受限）</th>
+<th scope="col">hot KV tokens</th>
+<th scope="col">hot KV</th>
+<th scope="col">warm KV tokens</th>
+<th scope="col">warm KV</th>
+</tr>
+</thead>
+<tbody>
+<tr id="b287">
+<td class="rowhead">DeepSeek V4.1-Flash</td>
+<td class="num">8.14K</td>
+<td class="num">3.33</td>
+<td class="num">926K</td>
+<td class="num">0.82 GB</td>
+<td class="num">14.2M</td>
+<td class="num">12.6 GB</td>
+</tr>
+<tr id="b288">
+<td class="rowhead">GLM-5.3</td>
+<td class="num">982</td>
+<td class="num">8.24</td>
+<td class="num">85.8K</td>
+<td class="num">3.85 GB</td>
+<td class="num">860K</td>
+<td class="num">38.6 GB</td>
+</tr>
+<tr id="b289">
+<td class="rowhead">Kimi K3</td>
+<td class="num">9.85K</td>
+<td class="num">90.5</td>
+<td class="num">30.1M</td>
+<td class="num">557 GB</td>
+<td class="num">487M</td>
+<td class="num">8.63 TB</td>
+</tr>
+<tr id="b290">
+<td class="rowhead">DeepSeek V4-Pro</td>
+<td class="num">19K</td>
+<td class="num">32.1</td>
+<td class="num">26.8M</td>
+<td class="num">134 GB</td>
+<td class="num">454M</td>
+<td class="num">2.27 TB</td>
+</tr>
+</tbody>
+</table></div></figure>
+<p id="b291"><strong>MX3 只用 open-weight</strong></p>
+<figure class="tbl" data-cols="8" data-rows="4"><div aria-label="資料表" class="tbl-scroll" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th scope="col">模型池</th>
+<th scope="col">尖峰 RPM</th>
+<th scope="col">未快取輸入 TPM</th>
+<th scope="col">輸出 TPM</th>
+<th scope="col">Bedrock 計量 TPM</th>
+<th scope="col">÷ 預設配額</th>
+<th scope="col">同時在途（99.9%）</th>
+<th scope="col">月成本（list price）</th>
+</tr>
+</thead>
+<tbody>
+<tr id="b292">
+<td class="rowhead">DeepSeek V4.1-Flash</td>
+<td class="num">620</td>
+<td class="num">1.28M</td>
+<td class="num">263K</td>
+<td class="num">1.54M</td>
+<td class="num">0.02×</td>
+<td class="num">107</td>
+<td class="num">$6.38K</td>
+</tr>
+<tr id="b293">
+<td class="rowhead">GLM-5.3</td>
+<td class="num">1.16K</td>
+<td class="num">8.91M</td>
+<td class="num">739K</td>
+<td class="num">9.65M</td>
+<td class="num">0.10×</td>
+<td class="num">192</td>
+<td class="num">$371K</td>
+</tr>
+<tr id="b294">
+<td class="rowhead">Kimi K3</td>
+<td class="num">1.16K</td>
+<td class="num">8.91M</td>
+<td class="num">739K</td>
+<td class="num">9.65M</td>
+<td class="num">0.96×</td>
+<td class="num">402</td>
+<td class="num">$592K</td>
+</tr>
+<tr id="b295">
+<td class="rowhead">DeepSeek V4-Pro</td>
+<td class="num">1.82K</td>
+<td class="num">5.37M</td>
+<td class="num">1.39M</td>
+<td class="num">6.76M</td>
+<td class="num">0.07×</td>
+<td class="num">747</td>
+<td class="num">$112K</td>
+</tr>
+</tbody>
+</table></div></figure>
+<figure class="tbl" data-cols="7" data-rows="4"><div aria-label="資料表" class="tbl-scroll" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th scope="col">模型池</th>
+<th scope="col">尖峰輸出 tokens/s</th>
+<th scope="col">GPU 數（decode 受限）</th>
+<th scope="col">hot KV tokens</th>
+<th scope="col">hot KV</th>
+<th scope="col">warm KV tokens</th>
+<th scope="col">warm KV</th>
+</tr>
+</thead>
+<tbody>
+<tr id="b296">
+<td class="rowhead">DeepSeek V4.1-Flash</td>
+<td class="num">4.38K</td>
+<td class="num">1.79</td>
+<td class="num">416K</td>
+<td class="num">0.37 GB</td>
+<td class="num">5.93M</td>
+<td class="num">5.28 GB</td>
+</tr>
+<tr id="b297">
+<td class="rowhead">GLM-5.3</td>
+<td class="num">12.3K</td>
+<td class="num">103</td>
+<td class="num">17.7M</td>
+<td class="num">794 GB</td>
+<td class="num">272M</td>
+<td class="num">12.2 TB</td>
+</tr>
+<tr id="b298">
+<td class="rowhead">Kimi K3</td>
+<td class="num">12.3K</td>
+<td class="num">113</td>
+<td class="num">37M</td>
+<td class="num">685 GB</td>
+<td class="num">609M</td>
+<td class="num">10.8 TB</td>
+</tr>
+<tr id="b299">
+<td class="rowhead">DeepSeek V4-Pro</td>
+<td class="num">23.2K</td>
+<td class="num">39.2</td>
+<td class="num">4.64M</td>
+<td class="num">23.2 GB</td>
+<td class="num">79.6M</td>
+<td class="num">398 GB</td>
+</tr>
+</tbody>
+</table></div></figure>
+<p id="b300"><strong>MX4 單一 open flagship（Kimi K3）</strong></p>
+<figure class="tbl" data-cols="8" data-rows="1"><div aria-label="資料表" class="tbl-scroll" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th scope="col">模型池</th>
+<th scope="col">尖峰 RPM</th>
+<th scope="col">未快取輸入 TPM</th>
+<th scope="col">輸出 TPM</th>
+<th scope="col">Bedrock 計量 TPM</th>
+<th scope="col">÷ 預設配額</th>
+<th scope="col">同時在途（99.9%）</th>
+<th scope="col">月成本（list price）</th>
+</tr>
+</thead>
+<tbody>
+<tr id="b301">
+<td class="rowhead">Kimi K3</td>
+<td class="num">4.76K</td>
+<td class="num">24.5M</td>
+<td class="num">3.13M</td>
+<td class="num">27.6M</td>
+<td class="num">2.76×</td>
+<td class="num">1.58K</td>
+<td class="num">$1.6M</td>
+</tr>
+</tbody>
+</table></div></figure>
+<figure class="tbl" data-cols="7" data-rows="1"><div aria-label="資料表" class="tbl-scroll" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th scope="col">模型池</th>
+<th scope="col">尖峰輸出 tokens/s</th>
+<th scope="col">GPU 數（decode 受限）</th>
+<th scope="col">hot KV tokens</th>
+<th scope="col">hot KV</th>
+<th scope="col">warm KV tokens</th>
+<th scope="col">warm KV</th>
+</tr>
+</thead>
+<tbody>
+<tr id="b302">
+<td class="rowhead">Kimi K3</td>
+<td class="num">52.2K</td>
+<td class="num">480</td>
+<td class="num">75.4M</td>
+<td class="num">1.72 TB</td>
+<td class="num">1.34B</td>
+<td class="num">28.6 TB</td>
+</tr>
+</tbody>
+</table></div></figure>
+<p id="b303">有每 GPU KV 容量數據的只有兩個模型：Kimi K3 取 8 顆 B300 在 TP8 下扣掉權重後可放 3.25M tokens（每顆 406K）<span class="g g-a" title="等級 A：獨立第三方量測">A</span> <a href="https://inferencex.semianalysis.com/blog/kimi-k3-the-manos-the-mythos-the" rel="noopener" target="_blank">InferenceX blog, 3 Aug 2026</a>，DeepSeek V4-Pro 取 8 顆 B300 在 c384 量到的 HBM KV working set 43M tokens（每顆 5.4M）<span class="g g-a" title="等級 A：獨立第三方量測">A</span> <a href="https://inferencex.semianalysis.com/blog/deepseek-v4-pro-agentx-b200-vs-b300-kv-working-set" rel="noopener" target="_blank">InferenceX blog, 25 Aug 2026</a>。以 hot KV tokens 除以每顆容量，得到 HBM KV 受限的 GPU 數：</p>
+<figure class="tbl" data-cols="6" data-rows="10"><div aria-label="資料表" class="tbl-scroll" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th scope="col">員工數</th>
+<th scope="col">情境</th>
+<th scope="col">模型池</th>
+<th scope="col">GPU 數（decode 受限）</th>
+<th scope="col">GPU 數（HBM KV 受限）</th>
+<th scope="col">KV ÷ decode</th>
+</tr>
+</thead>
+<tbody>
+<tr id="b304">
+<td class="num rowhead">10,000 人</td>
+<td>MX2</td>
+<td>Kimi K3</td>
+<td class="num">10.5</td>
+<td class="num">11.2</td>
+<td class="num">1.07</td>
+</tr>
+<tr id="b305">
+<td class="num rowhead">10,000 人</td>
+<td>MX2</td>
+<td>DeepSeek V4-Pro</td>
+<td class="num">3.50</td>
+<td class="num">0.67</td>
+<td class="num">0.19</td>
+</tr>
+<tr id="b306">
+<td class="num rowhead">10,000 人</td>
+<td>MX3</td>
+<td>Kimi K3</td>
+<td class="num">12.8</td>
+<td class="num">13.2</td>
+<td class="num">1.03</td>
+</tr>
+<tr id="b307">
+<td class="num rowhead">10,000 人</td>
+<td>MX3</td>
+<td>DeepSeek V4-Pro</td>
+<td class="num">4.22</td>
+<td class="num">0.11</td>
+<td class="num">0.03</td>
+</tr>
+<tr id="b308">
+<td class="num rowhead">10,000 人</td>
+<td>MX4</td>
+<td>Kimi K3</td>
+<td class="num">48.0</td>
+<td class="num">21.6</td>
+<td class="num">0.45</td>
+</tr>
+<tr id="b309">
+<td class="num rowhead">100,000 人</td>
+<td>MX2</td>
+<td>Kimi K3</td>
+<td class="num">90.5</td>
+<td class="num">74.1</td>
+<td class="num">0.82</td>
+</tr>
+<tr id="b310">
+<td class="num rowhead">100,000 人</td>
+<td>MX2</td>
+<td>DeepSeek V4-Pro</td>
+<td class="num">32.1</td>
+<td class="num">4.99</td>
+<td class="num">0.16</td>
+</tr>
+<tr id="b311">
+<td class="num rowhead">100,000 人</td>
+<td>MX3</td>
+<td>Kimi K3</td>
+<td class="num">113</td>
+<td class="num">91.1</td>
+<td class="num">0.81</td>
+</tr>
+<tr id="b312">
+<td class="num rowhead">100,000 人</td>
+<td>MX3</td>
+<td>DeepSeek V4-Pro</td>
+<td class="num">39.2</td>
+<td class="num">0.86</td>
+<td class="num">0.02</td>
+</tr>
+<tr id="b313">
+<td class="num rowhead">100,000 人</td>
+<td>MX4</td>
+<td>Kimi K3</td>
+<td class="num">480</td>
+<td class="num">186</td>
+<td class="num">0.39</td>
+</tr>
+</tbody>
+</table></div></figure>
+</div></div><div class="subpanel" role="tabpanel" id="s4-5" aria-labelledby="tab-s4-5"><div class="prose"><h3>另外兩個案例</h3><p id="b314">100,000 人、組合 B、high（各池明細在 <code>calc/out/model_mix.md</code>）：</p>
+<figure class="tbl" data-cols="8" data-rows="4"><div aria-label="資料表" class="tbl-scroll" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th scope="col">情境</th>
+<th scope="col">自建 GPU（線性需求）</th>
+<th scope="col">取整到操作點單位</th>
+<th scope="col">hot KV 合計</th>
+<th scope="col">warm KV 合計</th>
+<th class="w1" scope="col">API 池：Bedrock 計量 TPM ÷ 預設配額</th>
+<th class="w1" scope="col">open-weight 月成本（list price）</th>
+<th scope="col">各池 RPM 合計 ÷ 單一池</th>
+</tr>
+</thead>
+<tbody>
+<tr id="b315">
+<td class="rowhead">MX1</td>
+<td class="num">0</td>
+<td class="num">0</td>
+<td class="num">0</td>
+<td class="num">0</td>
+<td>Opus 5.5 5.13×；Sonnet 5.5 19.86×</td>
+<td>價格見<a class="xref" href="05-proprietary-models.html">第 5 章</a></td>
+<td class="num">1.000</td>
+</tr>
+<tr id="b316">
+<td class="rowhead">MX2</td>
+<td class="num">682</td>
+<td class="num">690</td>
+<td class="num">3.79 TB</td>
+<td class="num">65.3 TB</td>
+<td>Opus 5.5 2.89×</td>
+<td>$3.52M + Opus（價格見<a class="xref" href="05-proprietary-models.html">第 5 章</a>）</td>
+<td class="num">1.000</td>
+</tr>
+<tr id="b317">
+<td class="rowhead">MX3</td>
+<td class="num">1,252</td>
+<td class="num">1,264</td>
+<td class="num">8.34 TB</td>
+<td class="num">144 TB</td>
+<td>無 API 池</td>
+<td class="num">$5.96M</td>
+<td class="num">1.000</td>
+</tr>
+<tr id="b318">
+<td class="rowhead">MX4</td>
+<td class="num">2,722</td>
+<td class="num">2,728</td>
+<td class="num">9.99 TB</td>
+<td class="num">174 TB</td>
+<td>無 API 池</td>
+<td class="num">$9.36M</td>
+<td class="num">1.000</td>
+</tr>
+</tbody>
+</table></div></figure>
+<p id="b319">100,000 人、組合 D（軟體 / 網路公司）、base：</p>
+<figure class="tbl" data-cols="8" data-rows="4"><div aria-label="資料表" class="tbl-scroll" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th scope="col">情境</th>
+<th scope="col">自建 GPU（線性需求）</th>
+<th scope="col">取整到操作點單位</th>
+<th scope="col">hot KV 合計</th>
+<th scope="col">warm KV 合計</th>
+<th class="w1" scope="col">API 池：Bedrock 計量 TPM ÷ 預設配額</th>
+<th class="w1" scope="col">open-weight 月成本（list price）</th>
+<th scope="col">各池 RPM 合計 ÷ 單一池</th>
+</tr>
+</thead>
+<tbody>
+<tr id="b320">
+<td class="rowhead">MX1</td>
+<td class="num">0</td>
+<td class="num">0</td>
+<td class="num">0</td>
+<td class="num">0</td>
+<td>Opus 5.5 2.63×；Sonnet 5.5 8.84×</td>
+<td>價格見<a class="xref" href="05-proprietary-models.html">第 5 章</a></td>
+<td class="num">1.000</td>
+</tr>
+<tr id="b321">
+<td class="rowhead">MX2</td>
+<td class="num">447</td>
+<td class="num">482</td>
+<td class="num">2.6 TB</td>
+<td class="num">44.1 TB</td>
+<td>Opus 5.5 1.46×</td>
+<td>$2.42M + Opus（價格見<a class="xref" href="05-proprietary-models.html">第 5 章</a>）</td>
+<td class="num">1.001</td>
+</tr>
+<tr id="b322">
+<td class="rowhead">MX3</td>
+<td class="num">925</td>
+<td class="num">946</td>
+<td class="num">5.63 TB</td>
+<td class="num">96 TB</td>
+<td>無 API 池</td>
+<td class="num">$4.08M</td>
+<td class="num">1.001</td>
+</tr>
+<tr id="b323">
+<td class="rowhead">MX4</td>
+<td class="num">1,084</td>
+<td class="num">1,088</td>
+<td class="num">5.41 TB</td>
+<td class="num">94.1 TB</td>
+<td>無 API 池</td>
+<td class="num">$5.17M</td>
+<td class="num">1.000</td>
+</tr>
+</tbody>
+</table></div></figure>
+</div></div><div class="subpanel" role="tabpanel" id="s4-6" aria-labelledby="tab-s4-6"><div class="prose"><h3>讀出的重點</h3><ol>
+<li id="b324"><strong>R&amp;D 與 OA 放在哪個模型，比 coding 的分流更影響 GPU 數。</strong> 100,000 人由 MX4 改成 MX3 少 222 顆：R&amp;D 的 23.2K 輸出 tokens/s 由 Kimi K3 移到 V4-Pro 省 174 顆（213 → 39.2），OA 移到 V4.1-Flash 省 38.5 顆，coding 的一半移到 GLM-5.3 只省 9.9 顆 <span class="g g-d" title="等級 D：本文推算，附算式">D</span>。原因是 output tokens/s per GPU 相差 5.4–22 倍（136 對 739 與 3,059）。</li>
+<li id="b325"><strong>Kimi K3 的 coding 池同時被 decode 與 HBM KV 卡住。</strong> 在 MX2 與 MX3，K3 池 HBM KV 受限的 GPU 數是 decode 受限的 0.81–1.07 倍；到 high 用量時 KV 反超（429 對 414、532 對 518）。TP 下 MLA KV 在每個 rank 各存一份，decode context parallelism（DCP8）可把同一節點的 KV 容量由 1.93M 提高到 19.75M tokens（vLLM，B300，2026-09-13）<span class="g g-b" title="等級 B：廠商或夥伴公布，且揭露方法">B</span> <a href="https://github.com/vllm-project/vllm-project.github.io/blob/main/_posts/2026-09-13-kimi-k3-performance-optimization.md" rel="noopener" target="_blank">vLLM blog, 13 Sep 2026</a>。</li>
+<li id="b326"><strong>warm KV 需要 DRAM 層，量級是每 8 顆 GPU 0.5–1 TB。</strong> 100,000 人、base：K3 池的 warm KV 為 8.63–28.6 TB、GLM 池 12.2 TB，折合每 8 顆 GPU 0.48–0.95 TB <span class="g g-d" title="等級 D：本文推算，附算式">D</span>；InferenceX 的規則是每台伺服器最多 3 TB DRAM 做 KV offload，並量到 DRAM 為 HBM KV 容量 1.5–3 倍時最有效 <span class="g g-a" title="等級 A：獨立第三方量測">A</span> <a href="https://inferencex.semianalysis.com/blog/deepseek-v4-pro-agentx-b200-vs-b300-kv-working-set" rel="noopener" target="_blank">InferenceX blog, 25 Aug 2026</a>。沒有這一層的後果有量測：Kimi K3 在 B300 上只用 GPU 常駐 KV、併發 16 / 24 時 cache 命中率掉到 2.7%、TTFT 中位 86 s / 191 s，加 DRAM offload 後為 0.85 s / 6.2 s <span class="g g-a" title="等級 A：獨立第三方量測">A</span> <a href="https://github.com/SemiAnalysisAI/InferenceX/blob/main/inferencex-e2e/perf-changelog.yaml" rel="noopener" target="_blank">InferenceX perf-changelog</a>。Kimi K3 的 warm KV 是下限：引擎為了 prefix caching 每 32K tokens 另存一份 recurrent state，每個 session 的份數查無公開資料。</li>
+<li id="b327"><strong>API 配額。</strong> MX1 在 100,000 人時 Opus 5.5 池是預設的 0.92 倍（已過 80% 告警線）、Sonnet 5.5 池 3.35 倍；若 Sonnet 5.5 的 burndown 實為 10×，會是 4.69 倍 <span class="g g-d" title="等級 D：本文推算，附算式">D</span>。MX4 把全部流量放到 Bedrock 上的 Kimi K3 是預設 10M TPM 的 2.76 倍；借用 100M 類別的三個模型在 TPM 上都不到 1 倍，但該類別的 RPM 上限 10,000 不可調，組合 B、high 的 V4-Pro 池（13.5K RPM）會先碰到。</li>
+<li id="b328"><strong>list price 的成本。</strong> 100,000 人、base：MX3 每月 $1.08M、MX4 $1.60M（Kimi K3 在這個 token 組成下的有效單價為 $0.74/M），矩陣用的混合實付均價 $0.72/M 給 $1.55M <span class="g g-d" title="等級 D：本文推算，附算式">D</span>。V4-Pro 池的有效單價只有 $0.23/M（MX2），因為 cached 輸入的牌價是 $0.044/M。</li>
+<li id="b329"><strong>小規模由最小部署單位決定。</strong> 10,000 人時 MX2 的線性需求是 15.6 顆，但四個模型各一個操作點大小的部署（2、32、16、8 顆）合計 58 顆；MX4 只有一個模型，48 顆即可 <span class="g g-d" title="等級 D：本文推算，附算式">D</span>。模型數越多，要到越大的人數才划算。</li>
+</ol>
+</div></div><div class="subpanel" role="tabpanel" id="s4-7" aria-labelledby="tab-s4-7"><div class="prose"><h3>不能換算到 Trainium、TPU 與 Cerebras 的部分</h3><p id="b330">GPU 數依賴「該模型在該硬體、指定併發下每顆晶片的 output tokens/s」。本章所用的筆記中，這四個模型只有 NVIDIA 與 AMD GPU 的 AgentX 量測；它們在 Trainium、TPU 或 Cerebras 上的每晶片批次吞吐量查無公開資料（筆記只記到 TPU 有 Qwen3.5-397B 的結果、Trainium 有社群移植的 GLM-5.2，細節在第 1 與<a class="xref" href="04-open-models.html">第 4 章</a>）。因此「GPU 數」「HBM KV 受限的 GPU 數」兩欄無法換成晶片數或系統數。</p>
+<p id="b331">可以直接帶過去的是需求側的四個量，它們與硬體無關：尖峰輸出 tokens/s、同時在途請求數（99.9%）、hot KV tokens、warm KV tokens。Cerebras 的 API 配額可用第一節的兩個 bucket 換算；一旦廠商或第三方公布每晶片（或每系統）在某併發下的 output tokens/s 與可常駐的 KV tokens，代入同一組公式即可。</p>
+</div></div></div>
+<details class="srcs"><summary>本節來源（19）</summary><ul><li><a href="https://www.anthropic.com/research/economic-index-june-2026-report" target="_blank" rel="noopener">Anthropic Economic Index: Cadences</a></li><li><a href="https://inferencex.semianalysis.com/api/v1/benchmarks?model=Kimi-K3" target="_blank" rel="noopener">InferenceX API, model=Kimi-K3, pulled 4 Oct 2026</a></li><li><a href="https://inferencex.semianalysis.com/api/v1/benchmarks?model=GLM-5.2" target="_blank" rel="noopener">InferenceX API, model=GLM-5.2, pulled 4 Oct 2026</a></li><li><a href="https://inferencex.semianalysis.com/api/v1/benchmarks?model=DeepSeek-V4-Pro" target="_blank" rel="noopener">InferenceX API, model=DeepSeek-V4-Pro, pulled 4 Oct 2026</a></li><li><a href="https://inferencex.semianalysis.com/api/v1/benchmarks?model=DeepSeek-V4.1-Flash" target="_blank" rel="noopener">InferenceX API, model=DeepSeek-V4.1-Flash, pulled 4 Oct 2026</a></li><li><a href="https://github.com/SemiAnalysisAI/InferenceX/blob/main/inferencex-e2e/perf-changelog.yaml" target="_blank" rel="noopener">InferenceX perf-changelog</a></li><li><a href="https://www.lmsys.org/blog/2026-07-27-kimi-k3-day0-support/" target="_blank" rel="noopener">LMSYS blog, 27 Jul 2026</a></li><li><a href="https://llm-d.ai/blog/serving-glm-5-2-agentic-workloads-on-llm-d" target="_blank" rel="noopener">llm-d blog, 22 Jul 2026</a></li><li><a href="https://github.com/vllm-project/vllm-project.github.io/blob/main/_posts/2026-04-24-deepseek-v4.md" target="_blank" rel="noopener">vLLM blog, 24 Apr 2026</a></li><li><a href="https://huggingface.co/deepseek-ai/DeepSeek-V4.1-Flash" target="_blank" rel="noopener">V4.1-Flash card</a></li><li><a href="https://docs.aws.amazon.com/general/latest/gr/bedrock.html" target="_blank" rel="noopener">Amazon Bedrock endpoints and quotas</a></li><li><a href="https://platform.kimi.ai/docs/pricing/chat" target="_blank" rel="noopener">Kimi pricing</a></li><li><a href="https://docs.z.ai/guides/overview/pricing" target="_blank" rel="noopener">Z.ai pricing</a></li><li><a href="https://api-docs.deepseek.com/quick_start/pricing" target="_blank" rel="noopener">DeepSeek pricing</a></li><li><a href="https://inferencex.semianalysis.com/blog/kimi-k3-the-manos-the-mythos-the" target="_blank" rel="noopener">InferenceX blog, 3 Aug 2026</a></li><li><a href="https://inferencex.semianalysis.com/blog/deepseek-v4-pro-agentx-mi355x-vs-b200-august" target="_blank" rel="noopener">InferenceX blog, 25 Aug 2026</a></li><li><a href="https://github.com/SemiAnalysisAI/InferenceX/blob/main/inferencex-e2e/docs/MODELS.md" target="_blank" rel="noopener">InferenceX MODELS.md</a></li><li><a href="https://inferencex.semianalysis.com/blog/deepseek-v4-pro-agentx-b200-vs-b300-kv-working-set" target="_blank" rel="noopener">InferenceX blog, 25 Aug 2026</a></li><li><a href="https://github.com/vllm-project/vllm-project.github.io/blob/main/_posts/2026-09-13-kimi-k3-performance-optimization.md" target="_blank" rel="noopener">vLLM blog, 13 Sep 2026</a></li></ul></details></section>
+<section class="panel" role="tabpanel" id="s5" aria-labelledby="tab-s5"><div class="panel-head"><h2>敏感度分析</h2><div class="sec-lead prose"><p id="b332">以 100,000 人、組合 B、base 為基準，影響最大的單一假設是 prefix caching 是否可用：失去快取時未快取輸入 TPM 變成 10.84 倍（24.5M → 265M），RPM 不變 <span class="g g-d" title="等級 D：本文推算，附算式">D</span>。其次是 coding 與 R&amp;D 的用量級（RPM 0.55–3.46 倍）與員工的時區分布（0.59 倍）。</p>
+</div></div>
+<div class="prose"><p id="b333">相對基準的倍數，依「RPM、未快取輸入 TPM、輸出 TPM、同時在途」四項中變動最大者排序：</p>
+<figure class="tbl" data-cols="7" data-rows="13"><div aria-label="資料表" class="tbl-scroll" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th scope="col">排名</th>
+<th class="w2" scope="col">變動</th>
+<th scope="col">尖峰 RPM</th>
+<th scope="col">未快取輸入 TPM</th>
+<th scope="col">cache read TPM</th>
+<th scope="col">輸出 TPM</th>
+<th scope="col">同時在途（99.9%）</th>
+</tr>
+</thead>
+<tbody>
+<tr id="b334">
+<td class="num rowhead">1</td>
+<td>沒有 prefix / prompt caching（輸入全部未快取）</td>
+<td class="num">1.00×</td>
+<td class="num">10.84×</td>
+<td class="num">0.00×</td>
+<td class="num">1.00×</td>
+<td class="num">1.00×</td>
+</tr>
+<tr id="b335">
+<td class="num rowhead">2</td>
+<td>coding 升到 high，其餘 base</td>
+<td class="num">2.42×</td>
+<td class="num">4.01×</td>
+<td class="num">5.39×</td>
+<td class="num">2.69×</td>
+<td class="num">2.52×</td>
+</tr>
+<tr id="b336">
+<td class="num rowhead">3</td>
+<td>R&amp;D 升到 high，其餘 base</td>
+<td class="num">3.46×</td>
+<td class="num">2.50×</td>
+<td class="num">1.42×</td>
+<td class="num">3.35×</td>
+<td class="num">3.32×</td>
+</tr>
+<tr id="b337">
+<td class="num rowhead">4</td>
+<td>wafer-scale 等級的串流（每使用者 1,000 tokens/s）</td>
+<td class="num">1.00×</td>
+<td class="num">1.00×</td>
+<td class="num">1.00×</td>
+<td class="num">1.00×</td>
+<td class="num">0.30×</td>
+</tr>
+<tr id="b338">
+<td class="num rowhead">5</td>
+<td>coding 降到 low，其餘 base</td>
+<td class="num">0.55×</td>
+<td class="num">0.32×</td>
+<td class="num">0.09×</td>
+<td class="num">0.54×</td>
+<td class="num">0.57×</td>
+</tr>
+<tr id="b339">
+<td class="num rowhead">6</td>
+<td>串流較快（每使用者 300 tokens/s）</td>
+<td class="num">1.00×</td>
+<td class="num">1.00×</td>
+<td class="num">1.00×</td>
+<td class="num">1.00×</td>
+<td class="num">0.44×</td>
+</tr>
+<tr id="b340">
+<td class="num rowhead">7</td>
+<td>輸出 tokens × 2（reasoning 加重）</td>
+<td class="num">1.00×</td>
+<td class="num">1.00×</td>
+<td class="num">1.00×</td>
+<td class="num">2.00×</td>
+<td class="num">1.74×</td>
+</tr>
+<tr id="b341">
+<td class="num rowhead">8</td>
+<td>串流較慢（每使用者 40 tokens/s）</td>
+<td class="num">1.00×</td>
+<td class="num">1.00×</td>
+<td class="num">1.00×</td>
+<td class="num">1.00×</td>
+<td class="num">1.74×</td>
+</tr>
+<tr id="b342">
+<td class="num rowhead">9</td>
+<td>員工分散全球（s = 6.5%，基準為 11%）</td>
+<td class="num">0.59×</td>
+<td class="num">0.59×</td>
+<td class="num">0.59×</td>
+<td class="num">0.59×</td>
+<td class="num">0.61×</td>
+</tr>
+<tr id="b343">
+<td class="num rowhead">10</td>
+<td>OA 升到 high（office agent），其餘 base</td>
+<td class="num">1.43×</td>
+<td class="num">1.33×</td>
+<td class="num">1.11×</td>
+<td class="num">1.64×</td>
+<td class="num">1.52×</td>
+</tr>
+<tr id="b344">
+<td class="num rowhead">11</td>
+<td>月底 / release 尖峰（d = 1.5）</td>
+<td class="num">1.25×</td>
+<td class="num">1.25×</td>
+<td class="num">1.25×</td>
+<td class="num">1.25×</td>
+<td class="num">1.24×</td>
+</tr>
+<tr id="b345">
+<td class="num rowhead">12</td>
+<td>以平均平日估（d = 1.0）</td>
+<td class="num">0.83×</td>
+<td class="num">0.83×</td>
+<td class="num">0.83×</td>
+<td class="num">0.83×</td>
+<td class="num">0.84×</td>
+</tr>
+<tr id="b346">
+<td class="num rowhead">13</td>
+<td>一日更集中（s = 12.5%）</td>
+<td class="num">1.14×</td>
+<td class="num">1.14×</td>
+<td class="num">1.14×</td>
+<td class="num">1.14×</td>
+<td class="num">1.13×</td>
+</tr>
+</tbody>
+</table></div></figure>
+<p id="b347">絕對值：</p>
+<figure class="tbl" data-cols="7" data-rows="14"><div aria-label="資料表" class="tbl-scroll" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th class="w2" scope="col">變動</th>
+<th scope="col">尖峰 RPM</th>
+<th scope="col">未快取輸入 TPM</th>
+<th scope="col">cache read TPM</th>
+<th scope="col">輸出 TPM</th>
+<th scope="col">全部 token TPM</th>
+<th scope="col">同時在途（99.9%）</th>
+</tr>
+</thead>
+<tbody>
+<tr id="b348">
+<td><span class="rh">基準</span><span class="rh-sub"><span class="vh">（</span>100,000 人、組合 B、base、單一時區<span class="vh">）</span></span></td>
+<td class="num">4.76K</td>
+<td class="num">24.5M</td>
+<td class="num">212M</td>
+<td class="num">3.13M</td>
+<td class="num">240M</td>
+<td class="num">865</td>
+</tr>
+<tr id="b349">
+<td><span class="rh">沒有 prefix / prompt caching</span><span class="rh-sub"><span class="vh">（</span>輸入全部未快取<span class="vh">）</span></span></td>
+<td class="num">4.76K</td>
+<td class="num">265M</td>
+<td class="num">0</td>
+<td class="num">3.13M</td>
+<td class="num">268M</td>
+<td class="num">865</td>
+</tr>
+<tr id="b350">
+<td class="rowhead">coding 升到 high，其餘 base</td>
+<td class="num">11.5K</td>
+<td class="num">98M</td>
+<td class="num">1.14B</td>
+<td class="num">8.41M</td>
+<td class="num">1.25B</td>
+<td class="num">2.18K</td>
+</tr>
+<tr id="b351">
+<td class="rowhead">R&amp;D 升到 high，其餘 base</td>
+<td class="num">16.5K</td>
+<td class="num">61.2M</td>
+<td class="num">302M</td>
+<td class="num">10.5M</td>
+<td class="num">374M</td>
+<td class="num">2.88K</td>
+</tr>
+<tr id="b352">
+<td><span class="rh">wafer-scale 等級的串流</span><span class="rh-sub"><span class="vh">（</span>每使用者 1,000 tokens/s<span class="vh">）</span></span></td>
+<td class="num">4.76K</td>
+<td class="num">24.5M</td>
+<td class="num">212M</td>
+<td class="num">3.13M</td>
+<td class="num">240M</td>
+<td class="num">258</td>
+</tr>
+<tr id="b353">
+<td class="rowhead">coding 降到 low，其餘 base</td>
+<td class="num">2.62K</td>
+<td class="num">7.73M</td>
+<td class="num">18.7M</td>
+<td class="num">1.7M</td>
+<td class="num">28.2M</td>
+<td class="num">491</td>
+</tr>
+<tr id="b354">
+<td><span class="rh">串流較快</span><span class="rh-sub"><span class="vh">（</span>每使用者 300 tokens/s<span class="vh">）</span></span></td>
+<td class="num">4.76K</td>
+<td class="num">24.5M</td>
+<td class="num">212M</td>
+<td class="num">3.13M</td>
+<td class="num">240M</td>
+<td class="num">384</td>
+</tr>
+<tr id="b355">
+<td><span class="rh">輸出 tokens × 2</span><span class="rh-sub"><span class="vh">（</span>reasoning 加重<span class="vh">）</span></span></td>
+<td class="num">4.76K</td>
+<td class="num">24.5M</td>
+<td class="num">212M</td>
+<td class="num">6.26M</td>
+<td class="num">243M</td>
+<td class="num">1.51K</td>
+</tr>
+<tr id="b356">
+<td><span class="rh">串流較慢</span><span class="rh-sub"><span class="vh">（</span>每使用者 40 tokens/s<span class="vh">）</span></span></td>
+<td class="num">4.76K</td>
+<td class="num">24.5M</td>
+<td class="num">212M</td>
+<td class="num">3.13M</td>
+<td class="num">240M</td>
+<td class="num">1.51K</td>
+</tr>
+<tr id="b357">
+<td><span class="rh">員工分散全球</span><span class="rh-sub"><span class="vh">（</span>s = 6.5%，基準為 11%<span class="vh">）</span></span></td>
+<td class="num">2.82K</td>
+<td class="num">14.5M</td>
+<td class="num">125M</td>
+<td class="num">1.85M</td>
+<td class="num">142M</td>
+<td class="num">527</td>
+</tr>
+<tr id="b358">
+<td class="rowhead">OA 升到 high（office agent），其餘 base</td>
+<td class="num">6.8K</td>
+<td class="num">32.6M</td>
+<td class="num">236M</td>
+<td class="num">5.12M</td>
+<td class="num">274M</td>
+<td class="num">1.31K</td>
+</tr>
+<tr id="b359">
+<td><span class="rh">月底 / release 尖峰</span><span class="rh-sub"><span class="vh">（</span>d = 1.5<span class="vh">）</span></span></td>
+<td class="num">5.95K</td>
+<td class="num">30.6M</td>
+<td class="num">265M</td>
+<td class="num">3.91M</td>
+<td class="num">300M</td>
+<td class="num">1.07K</td>
+</tr>
+<tr id="b360">
+<td><span class="rh">以平均平日估</span><span class="rh-sub"><span class="vh">（</span>d = 1.0<span class="vh">）</span></span></td>
+<td class="num">3.97K</td>
+<td class="num">20.4M</td>
+<td class="num">177M</td>
+<td class="num">2.61M</td>
+<td class="num">200M</td>
+<td class="num">728</td>
+</tr>
+<tr id="b361">
+<td><span class="rh">一日更集中</span><span class="rh-sub"><span class="vh">（</span>s = 12.5%<span class="vh">）</span></span></td>
+<td class="num">5.41K</td>
+<td class="num">27.8M</td>
+<td class="num">241M</td>
+<td class="num">3.56M</td>
+<td class="num">272M</td>
+<td class="num">977</td>
+</tr>
+</tbody>
+</table></div></figure>
+<ul>
+<li id="b362">prefix caching 是否可用、coding 的用量級、時區分布這三項決定 RPM 與 TPM 的量級：分別是未快取輸入 10.84 倍、0.32–4.01 倍、0.59 倍。R&amp;D 升到 high 是 RPM 的最大推力（3.46 倍，每活躍日 540 次呼叫），而 R&amp;D 的參數全部是判斷值，這一列的不確定性最大。</li>
+<li id="b363">每條串流的速度對 RPM 與 TPM 沒有影響（1.00×），對併發影響很大：99.9% 在途數由 40 tokens/s 的 1,510 降到 1,000 tokens/s 的 258，相差 5.9 倍。快的硬體省的是併發槽與 hot KV，不是配額。</li>
+<li id="b364">d 與 s 的合理範圍只帶來 0.83–1.25 倍的變動，遠小於用量級的不確定性；先把 coding 與 R&amp;D 的實際用量量出來，比調整尖峰係數有用。</li>
+</ul>
+</div></section>
+<section class="panel" role="tabpanel" id="s6" aria-labelledby="tab-s6"><div class="panel-head"><h2>與公開基準的交叉檢查</h2><div class="sec-lead prose"><p id="b365">模型的 coding base（每活躍開發者日 15.7M tokens、每授權席次每月 168M）落在四個公開基準的範圍內或其下緣：Anthropic 的成本換算 13–23M / 活躍日、AWS 的 225M / 使用者 / 月上限（模型為 0.75 倍）、用量筆記的示範混合（模型低 13%）、Meta 的每員工每日 23.6M（模型的軟體公司 high 為 0.66 倍）<span class="g g-d" title="等級 D：本文推算，附算式">D</span>。</p>
+</div></div>
+<div class="prose"><figure class="tbl" data-cols="5" data-rows="5"><div aria-label="資料表" class="tbl-scroll" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th class="w3" scope="col">基準</th>
+<th class="w2" scope="col">公開數值</th>
+<th class="w2" scope="col">模型對應值</th>
+<th class="w2" scope="col">模型的位置</th>
+<th class="w3" scope="col">原因</th>
+</tr>
+</thead>
+<tbody>
+<tr id="b366">
+<td>Anthropic Claude Code 建議表，500 人以上列的 RPM（2026-10-04 取得）<span class="g g-c" title="等級 C：廠商宣稱或規格，未揭露方法">C</span> <a href="https://code.claude.com/docs/en/costs" rel="noopener" target="_blank">Claude Code docs: Manage costs effectively</a></td>
+<td>每使用者 0.25–0.35 RPM</td>
+<td>純 coding、10,000 人、base：每授權開發者 0.194 RPM；a 改為 0.70 時 0.301</td>
+<td>a = 0.45 時低於（0.55–0.78 倍）；a = 0.70 時在範圍內</td>
+<td>表的單位是「使用者」；模型的 base 只有 45% 席次每日活躍，折合每席次每月 10.8 個活躍日，低於 Anthropic 成本數字隱含的 11.5–19 日</td>
+</tr>
+<tr id="b367">
+<td class="rowhead">同一張表的 TPM</td>
+<td>每使用者 10–15K TPM</td>
+<td>全部 token 18.7K TPM；未快取輸入 + 輸出 1.61K TPM（a = 0.70：29.1K 與 2.50K）</td>
+<td>以全部 token 計高於（1.25–1.87 倍）；不計 cache read 則遠低於（0.11–0.16 倍）</td>
+<td>表沒有定義 TPM 是否含 cache read；表內 TPM ÷ RPM 約 40–43K tokens/請求，介於模型每次呼叫的兩種計法之間（8.3K 與 96.7K，含尖峰修正）</td>
+</tr>
+<tr id="b368">
+<td>AWS「Guidance for Claude Code with Amazon Bedrock」的 per-user 預設（repo commit 2026-08-20）<span class="g g-c" title="等級 C：廠商宣稱或規格，未揭露方法">C</span> <a href="https://github.com/aws-solutions-library-samples/guidance-for-claude-code-with-amazon-bedrock/blob/main/assets/docs/QUOTA_MONITORING.md" rel="noopener" target="_blank">QUOTA_MONITORING.md</a></td>
+<td>每使用者每月 225M tokens；每日約 8.25M</td>
+<td>coding base：每席次每月 168M；每月活躍 19 日的開發者 297M；每活躍日 15.7M</td>
+<td>席次平均低於（0.75 倍）；活躍 19 日者高於（1.32 倍）；每活躍日為每日預設的 1.9 倍</td>
+<td>AWS 的數字是上限的預設值，未附依據，也未說明是否計入 cache read；照模型的 base 強度，每月活躍超過 14.4 日的開發者就會碰到 225M</td>
+</tr>
+<tr id="b369">
+<td>用量筆記的示範混合：10,000 人、70 / 20 / 10、各取中位值 <span class="g g-d" title="等級 D：本文推算，附算式">D</span></td>
+<td>每工作日約 16.5B tokens，98% 來自工程師</td>
+<td>每平日 14.4B tokens，98% 來自 coding</td>
+<td>低 13%</td>
+<td>筆記以每開發者日 18M（13–23M 的中段）計，模型的 coding base 是 15.7M；OA 與 R&amp;D 兩項相同（0.10B 與 0.25B）</td>
+</tr>
+<tr id="b370">
+<td>Meta：85,000 名以上員工 30 天用了 60.2T tokens（2026-04，轉述 The Information）<span class="g g-c" title="等級 C：廠商宣稱或規格，未揭露方法">C</span> <a href="https://blog.pragmaticengineer.com/the-pulse-tokenmaxxing-as-a-weird-new-trend/" rel="noopener" target="_blank">The Pragmatic Engineer</a></td>
+<td>每員工每日曆日 23.6M tokens</td>
+<td>85,000 人、組合 D、high：15.5M；純 coding、high：30.5M</td>
+<td>組合 D 的 high 低於（0.66 倍）；純 coding 的 high 高於（1.29 倍）</td>
+<td>Meta 的平均涵蓋全體員工，且當時有排行榜鼓勵用量（最高的個人 30 天約 280B）；模型的 high 只到 P90 的每活躍日 $30，不含無人值守的 agent（Pegatron 單一開發者每活躍日 697M）</td>
+</tr>
+</tbody>
+</table></div></figure>
+<p id="b371">另外兩項本章補算的檢查 <span class="g g-d" title="等級 D：本文推算，附算式">D</span>：</p>
+<ul>
+<li id="b372"><strong>每員工每月支出。</strong> 10,000 人、base、$0.72/M 下，組合 A–E 為每員工每月 $8.85–$61.2，與 Ramp 的中位數 $46（2026-04）同一量級 <span class="g g-b" title="等級 B：廠商或夥伴公布，且揭露方法">B</span> <a href="https://ramp.com/blog/ai-token-cost-for-businesses" rel="noopener" target="_blank">Ramp: AI token cost for businesses</a>；coding 席次每月 $121，低於 Anthropic 所說每位開發者每月 $150–250，原因同上表第一列（活躍日數較少）。</li>
+<li id="b373"><strong>尖峰形狀。</strong> 模型的「尖峰分鐘 ÷ 當日平均分鐘」是 24 × s × k = 3.04（請求數），乘上 f 後各類 token 為 3.16–3.58。筆記由 Copilot 的多工曲線推得單一時區大型組織約 2.7–3.4（全球混合的 1.8–1.9 再乘 1.5–1.8）；請求數與輸出、cache read 在範圍內，未快取輸入略高於上緣，另外模型還乘了 d = 1.2 把基準移到 P95 平日。</li>
+</ul>
+</div>
+<details class="srcs"><summary>本節來源（4）</summary><ul><li><a href="https://code.claude.com/docs/en/costs" target="_blank" rel="noopener">Claude Code docs: Manage costs effectively</a></li><li><a href="https://github.com/aws-solutions-library-samples/guidance-for-claude-code-with-amazon-bedrock/blob/main/assets/docs/QUOTA_MONITORING.md" target="_blank" rel="noopener">QUOTA_MONITORING.md</a></li><li><a href="https://blog.pragmaticengineer.com/the-pulse-tokenmaxxing-as-a-weird-new-trend/" target="_blank" rel="noopener">The Pragmatic Engineer</a></li><li><a href="https://ramp.com/blog/ai-token-cost-for-businesses" target="_blank" rel="noopener">Ramp: AI token cost for businesses</a></li></ul></details></section></div>
+<nav class="pager" aria-label="上一張與下一張"><a href="09-deployment.html"><span>← 09</span>部署模式</a><a class="nx" href="11-evidence.html"><span>11 →</span>估算依據</a></nav>
+<footer class="foot"><span>資料截至 2026-10-04；逐項查核於 2026-10-05 完成。模型與價格每週在變，引用前請對照來源。</span><span class="code">IA-10 · REV 2026-10-05</span></footer>
+</main>
+</div>
+<script src="assets/site.js" defer></script>
+<script src="assets/planner-model.js" defer></script>
+<script src="assets/planner.js" defer></script>
+</body>
+</html>

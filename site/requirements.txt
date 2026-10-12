@@ -1,0 +1,4 @@
+markdown-it-py>=3.0
+beautifulsoup4>=4.12
+# tests/interact.py and tests/shots.py only:
+# playwright>=1.40
